@@ -34,8 +34,12 @@ var Circle = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
-    Circle.prototype.colliding = function (point) {
-        return point.Sub(this.center).length <= this.radius;
+    Circle.prototype.colliding = function (other) {
+        if (other instanceof Vector2)
+            return other.Sub(this.center).length <= this.radius;
+        else {
+            return other.center.Sub(this.center).length < this.radius + other.radius;
+        }
     };
     return Circle;
 }(Hitbox));
@@ -60,4 +64,3 @@ var Rectangle = /** @class */ (function (_super) {
     };
     return Rectangle;
 }(Hitbox));
-var hitboxGetters = [];

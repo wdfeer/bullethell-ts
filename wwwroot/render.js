@@ -13,8 +13,8 @@ function render() {
         obj.draw(ctx);
     });
 }
-function drawCircle(ctx, radius, position) {
+function drawCircle(ctx, radius, center) {
     ctx.beginPath();
-    ctx.arc(position.x, position.y, radius, 0, 2 * Math.PI);
+    ctx.arc(center.x, center.y, radius, 0, 2 * Math.PI);
     ctx.stroke();
 }

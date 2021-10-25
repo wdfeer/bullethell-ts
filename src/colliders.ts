@@ -15,8 +15,12 @@ class Circle extends Hitbox {
         super(position);
         this.radius = radius;
     }
-    colliding(point: Vector2) {
-        return point.Sub(this.center).length <= this.radius;
+    colliding(other: Vector2 | Circle) {
+        if (other instanceof Vector2)
+            return other.Sub(this.center).length <= this.radius;
+        else {
+            return other.center.Sub(this.center).length < this.radius + other.radius;
+        }
     }
 }
 class Rectangle extends Hitbox {
@@ -35,6 +39,3 @@ class Rectangle extends Hitbox {
         return relativePos.x <= this.width && relativePos.x >= 0 && relativePos.y <= this.height && relativePos.y >= 0;
     }
 }
-
-let hitboxGetters: (() => Hitbox)[] = [];
-

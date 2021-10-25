@@ -16,8 +16,8 @@ function render(): void {
     });
 }
 
-function drawCircle(ctx: CanvasRenderingContext2D, radius: number, position: Vector2): void {
+function drawCircle(ctx: CanvasRenderingContext2D, radius: number, center: Vector2): void {
     ctx.beginPath();
-    ctx.arc(position.x, position.y, radius, 0, 2 * Math.PI);
+    ctx.arc(center.x, center.y, radius, 0, 2 * Math.PI);
     ctx.stroke();
 }

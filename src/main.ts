@@ -16,6 +16,21 @@ class SecTimer extends Timer {
     }
 }
 
+class coin {
+    static radius = 25;
+    drawing: drawing;
+    drawingId: number;
+    collider: Circle;
+    onPlayerCollide: () => void;
+    constructor(public pos: Vector2) {
+        this.drawing = new drawing(ctx => { drawCircle(ctx, coin.radius, pos) });
+        this.drawingId = drawings.length;
+        drawings.push(this.drawing);
+        this.collider = new Circle(pos, coin.radius);
+        this.onPlayerCollide = () => { drawings.splice(this.drawingId); score++; };
+    }
+}
+
 const fps = 60;
 
 const canv = document.querySelector("canvas")!;
@@ -35,27 +50,57 @@ function velocityMultOnHit(): number {
     return 1 - Number(vLossOnHit.value) / 100;
 }
 
-let score = 0;
-let plPos = new Vector2(canv.width / 2, canv.height / 2);
-let plVelocity = Vector2.Zero;
-let plSpeed = 4;
-let plRadius = 13;
-drawings.push(new drawing((ctx) => {drawCircle(ctx, plRadius, plPos)}));
-new Timer(1000 / fps, 99999999, update);
+let score: number;
+let plPos: Vector2;
+let plVelocity: Vector2;
+let plSpeed: number;
+let plRadius: number;
+let plCollider: Circle;
 function reset(): void {
+    score = 0;
     plPos = new Vector2(canvWidth / 2, canvHeight / 2);
     plVelocity = Vector2.Zero;
+    plSpeed = 4;
+    plRadius = 13;
+    plCollider = new Circle(plPos.Sub(new Vector2(plRadius, plRadius)), plRadius);
 
     timescale.ondblclick!(new MouseEvent(""));
     vLossOnHit.ondblclick!(new MouseEvent(""));
+
+    drawings = [new drawing((ctx) => { drawCircle(ctx, plRadius, plPos) })];
 }
+reset();
+
+drawings.push(new drawing((ctx) => { drawCircle(ctx, plRadius, plPos) }));
+
+new Timer(1000 / fps, 99999999, update);
+let coins: coin[] = [];
+let coinTimer = 0;
 function update(): void {
+    coinTimer += Number(timescale.value);
+    if (coinTimer >= 180 && coins.length < 3) {
+        let pos = new Vector2(Math.random() * canvWidth, Math.random() * canvHeight);
+        coins.push(new coin(pos));
+
+        coinTimer = 0;
+    }
+    let newCoins: coin[] = [];
+    coins.forEach(c => {
+        if (c.collider.colliding(plCollider)) {
+            c.onPlayerCollide();
+        } else {
+            newCoins.push(c);
+        }
+    });
+    coins = newCoins;
+
     if ((plPos.x + plRadius > canvWidth && plVelocity.x > 0) || (plPos.x - plRadius < 0 && plVelocity.x < 0))
         plVelocity.x = -plVelocity.x * velocityMultOnHit();
     if ((plPos.y + plRadius > canvHeight && plVelocity.y > 0) || (plPos.y - plRadius < 0 && plVelocity.y < 0))
         plVelocity.y = -plVelocity.y * velocityMultOnHit();
     plPos.add(plVelocity.Mult(Number(timescale.value)));
     render();
+    document.querySelector("#score")!.innerHTML = String(score);
 }
 
 function onClick(event: MouseEvent): void {
