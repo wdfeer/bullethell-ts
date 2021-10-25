@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset='utf-8'>
+    <title>Page Title</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <script src='Vector2.js'></script>
+</head>
+
+<body>
+    <canvas width="1200" height="800" style="border: 2px solid black;" onclick="onClick(event)"></canvas>
+    <div>
+        <input type="button" value="Reset" onclick="reset()">
+        | Velocity loss on hit: <input type="range" step="5" max="100" min="0.00" value="10" style="width: 120px;"
+            onchange="document.querySelector('#vLossOnHitLabel').innerHTML = document.querySelector('#vLossOnHit').value + '%'"
+            id="vLossOnHit"><span id="vLossOnHitLabel">10% </span>
+        | Timescale: <input type="range" step="0.05" max="5.00" min="0.00" value="1" style="width: 200px;"
+            onchange="document.querySelector('#timescaleLabel').innerHTML = document.querySelector('#timescale').value"
+            id="timescale"><span id="timescaleLabel">1.00 </span>
+    </div>
+    <script src='main.js'></script>
+</body>
+
+</html>
