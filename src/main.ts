@@ -34,29 +34,32 @@ vLossOnHit.ondblclick = (event) => {
 function velocityMultOnHit(): number {
     return 1 - Number(vLossOnHit.value) / 100;
 }
-let playerPos = new Vector2(canv.width / 2, canv.height / 2);
-let playerVelocity = Vector2.Zero;
-let playerRadius = 10;
-drawings.push(new drawing((ctx) => {drawCircle(ctx, playerRadius, playerPos)}));
+
+let score = 0;
+let plPos = new Vector2(canv.width / 2, canv.height / 2);
+let plVelocity = Vector2.Zero;
+let plSpeed = 4;
+let plRadius = 13;
+drawings.push(new drawing((ctx) => {drawCircle(ctx, plRadius, plPos)}));
 new Timer(1000 / fps, 99999999, update);
 function reset(): void {
-    playerPos = new Vector2(canvWidth / 2, canvHeight / 2);
-    playerVelocity = Vector2.Zero;
+    plPos = new Vector2(canvWidth / 2, canvHeight / 2);
+    plVelocity = Vector2.Zero;
 
     timescale.ondblclick!(new MouseEvent(""));
     vLossOnHit.ondblclick!(new MouseEvent(""));
 }
 function update(): void {
-    if ((playerPos.x + playerRadius > canvWidth && playerVelocity.x > 0) || (playerPos.x - playerRadius < 0 && playerVelocity.x < 0))
-        playerVelocity.x = -playerVelocity.x * velocityMultOnHit();
-    if ((playerPos.y + playerRadius > canvHeight && playerVelocity.y > 0) || (playerPos.y - playerRadius < 0 && playerVelocity.y < 0))
-        playerVelocity.y = -playerVelocity.y * velocityMultOnHit();
-    playerPos.add(playerVelocity.Mult(Number(timescale.value)));
+    if ((plPos.x + plRadius > canvWidth && plVelocity.x > 0) || (plPos.x - plRadius < 0 && plVelocity.x < 0))
+        plVelocity.x = -plVelocity.x * velocityMultOnHit();
+    if ((plPos.y + plRadius > canvHeight && plVelocity.y > 0) || (plPos.y - plRadius < 0 && plVelocity.y < 0))
+        plVelocity.y = -plVelocity.y * velocityMultOnHit();
+    plPos.add(plVelocity.Mult(Number(timescale.value)));
     render();
 }
 
 function onClick(event: MouseEvent): void {
-    playerVelocity = CursorPos(event).Sub(playerPos).normalized.Mult(4);
+    plVelocity = CursorPos(event).Sub(plPos).normalized.Mult(plSpeed);
 }
 
 function CursorPos(event: MouseEvent): Vector2 {

@@ -15,6 +15,7 @@ function render(): void {
         obj.draw(ctx);
     });
 }
+
 function drawCircle(ctx: CanvasRenderingContext2D, radius: number, position: Vector2): void {
     ctx.beginPath();
     ctx.arc(position.x, position.y, radius, 0, 2 * Math.PI);
