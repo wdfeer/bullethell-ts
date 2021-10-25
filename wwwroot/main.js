@@ -44,12 +44,6 @@ var SecTimer = /** @class */ (function (_super) {
     }
     return SecTimer;
 }(Timer));
-var renderObject = /** @class */ (function () {
-    function renderObject(render) {
-        this.render = render;
-    }
-    return renderObject;
-}());
 var fps = 60;
 var canv = document.querySelector("canvas");
 var canvWidth = canv.width;
@@ -70,6 +64,7 @@ function velocityMultOnHit() {
 var playerPos = new Vector2(canv.width / 2, canv.height / 2);
 var playerVelocity = Vector2.Zero;
 var playerRadius = 10;
+drawings.push(new drawing(function (ctx) { drawCircle(ctx, playerRadius, playerPos); }));
 new Timer(1000 / fps, 99999999, update);
 function reset() {
     playerPos = new Vector2(canvWidth / 2, canvHeight / 2);
@@ -83,20 +78,8 @@ function update() {
     if ((playerPos.y + playerRadius > canvHeight && playerVelocity.y > 0) || (playerPos.y - playerRadius < 0 && playerVelocity.y < 0))
         playerVelocity.y = -playerVelocity.y * velocityMultOnHit();
     playerPos.add(playerVelocity.Mult(Number(timescale.value)));
-    gameRender();
+    render();
 }
-//#region Rendering
-function gameRender() {
-    var ctx = canv.getContext("2d");
-    ctx.clearRect(0, 0, canv.width, canv.height);
-    drawCircle(ctx, playerRadius, playerPos);
-}
-function drawCircle(ctx, radius, position) {
-    ctx.beginPath();
-    ctx.arc(position.x, position.y, radius, 0, 2 * Math.PI);
-    ctx.stroke();
-}
-//#endregion
 function onClick(event) {
     playerVelocity = CursorPos(event).Sub(playerPos).normalized.Mult(4);
 }

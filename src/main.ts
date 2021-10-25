@@ -16,13 +16,6 @@ class SecTimer extends Timer {
     }
 }
 
-class renderObject {
-    render: (ctx: CanvasRenderingContext2D) => void;
-    constructor(render: (ctx: CanvasRenderingContext2D) => void) {
-        this.render = render;
-    }
-}
-
 const fps = 60;
 
 const canv = document.querySelector("canvas")!;
@@ -44,6 +37,7 @@ function velocityMultOnHit(): number {
 let playerPos = new Vector2(canv.width / 2, canv.height / 2);
 let playerVelocity = Vector2.Zero;
 let playerRadius = 10;
+drawings.push(new drawing((ctx) => {drawCircle(ctx, playerRadius, playerPos)}));
 new Timer(1000 / fps, 99999999, update);
 function reset(): void {
     playerPos = new Vector2(canvWidth / 2, canvHeight / 2);
@@ -58,22 +52,8 @@ function update(): void {
     if ((playerPos.y + playerRadius > canvHeight && playerVelocity.y > 0) || (playerPos.y - playerRadius < 0 && playerVelocity.y < 0))
         playerVelocity.y = -playerVelocity.y * velocityMultOnHit();
     playerPos.add(playerVelocity.Mult(Number(timescale.value)));
-    gameRender();
+    render();
 }
-
-//#region Rendering
-function gameRender(): void {
-    let ctx = canv.getContext("2d")!;
-    ctx.clearRect(0, 0, canv.width, canv.height);
-
-    drawCircle(ctx, playerRadius, playerPos);
-}
-function drawCircle(ctx: CanvasRenderingContext2D, radius: number, position: Vector2): void {
-    ctx.beginPath();
-    ctx.arc(position.x, position.y, radius, 0, 2 * Math.PI);
-    ctx.stroke();
-}
-//#endregion
 
 function onClick(event: MouseEvent): void {
     playerVelocity = CursorPos(event).Sub(playerPos).normalized.Mult(4);
