@@ -48,7 +48,7 @@ var coin = /** @class */ (function () {
     function coin(pos) {
         var _this = this;
         this.pos = pos;
-        this.drawing = new drawing(function (ctx) { drawCircle(ctx, coin.radius, pos); });
+        this.drawing = new drawing(function (ctx) { drawCircle(ctx, coin.radius, pos, 'brown'); });
         this.drawingId = drawings.length;
         drawings.push(this.drawing);
         this.collider = new Circle(pos, coin.radius);

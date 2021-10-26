@@ -13,8 +13,10 @@ function render() {
         obj.draw(ctx);
     });
 }
-function drawCircle(ctx, radius, center) {
+function drawCircle(ctx, radius, center, color) {
+    if (color === void 0) { color = 'black'; }
     ctx.beginPath();
     ctx.arc(center.x, center.y, radius, 0, 2 * Math.PI);
+    ctx.strokeStyle = color;
     ctx.stroke();
 }

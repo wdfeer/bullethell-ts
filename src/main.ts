@@ -23,7 +23,7 @@ class coin {
     collider: Circle;
     onPlayerCollide: () => void;
     constructor(public pos: Vector2) {
-        this.drawing = new drawing(ctx => { drawCircle(ctx, coin.radius, pos) });
+        this.drawing = new drawing(ctx => { drawCircle(ctx, coin.radius, pos, 'brown') });
         this.drawingId = drawings.length;
         drawings.push(this.drawing);
         this.collider = new Circle(pos, coin.radius);
