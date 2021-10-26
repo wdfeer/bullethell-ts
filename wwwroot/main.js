@@ -77,16 +77,20 @@ function velocityMultOnHit() {
 var score;
 var plCenter;
 var plVelocity;
-var plSpeed;
+function plSpeed() {
+    return 4 + score / 2;
+}
 var plRadius;
 function plCollider() {
     return new Circle(plCenter.Add(new Vector2(plRadius, plRadius)), plRadius);
+}
+function coinSpawnCooldown() {
+    return fps * 3 / Math.sqrt(1 + score / 3);
 }
 function reset() {
     score = 0;
     plCenter = new Vector2(canvWidth / 2, canvHeight / 2);
     plVelocity = Vector2.Zero;
-    plSpeed = 4;
     plRadius = 13;
     timescale.ondblclick(new MouseEvent(""));
     vLossOnHit.ondblclick(new MouseEvent(""));
@@ -97,9 +101,12 @@ drawings.push(new drawing(function (ctx) { drawCircle(ctx, plRadius, plCenter); 
 new Timer(1000 / fps, 99999999, update);
 var coins = [];
 var coinTimer = 0;
+var clickCooldown = fps * 0.4;
+var clickTimer = 0;
 function update() {
+    clickTimer += Number(timescale.value);
     coinTimer += Number(timescale.value);
-    if (coinTimer >= 180 && coins.length < 3) {
+    if (coinTimer >= coinSpawnCooldown() && coins.length < 3) {
         var coinPos = new Vector2(Math.random() * canvWidth, Math.random() * canvHeight);
         coins.push(new coin(coinPos));
         coinTimer = 0;
@@ -123,7 +130,10 @@ function update() {
     document.querySelector("#score").innerHTML = String(score);
 }
 function onClick(event) {
-    plVelocity = CursorPos(event).Sub(plCenter).normalized.Mult(plSpeed);
+    if (clickTimer < clickCooldown)
+        return;
+    plVelocity = CursorPos(event).Sub(plCenter).normalized.Mult(plSpeed());
+    clickTimer = 0;
 }
 function CursorPos(event) {
     return new Vector2(event.clientX, event.clientY);

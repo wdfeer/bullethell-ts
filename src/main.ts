@@ -52,16 +52,20 @@ function velocityMultOnHit(): number {
 let score: number;
 let plCenter: Vector2;
 let plVelocity: Vector2;
-let plSpeed: number;
+function plSpeed() {
+    return 4 + score / 2;
+}
 let plRadius: number;
 function plCollider() {
     return new Circle(plCenter.Add(new Vector2(plRadius, plRadius)), plRadius)
+}
+function coinSpawnCooldown() {
+    return fps * 3 / Math.sqrt(1 + score / 3);
 }
 function reset(): void {
     score = 0;
     plCenter = new Vector2(canvWidth / 2, canvHeight / 2);
     plVelocity = Vector2.Zero;
-    plSpeed = 4;
     plRadius = 13;
 
     timescale.ondblclick!(new MouseEvent(""));
@@ -76,9 +80,12 @@ drawings.push(new drawing((ctx) => { drawCircle(ctx, plRadius, plCenter) }));
 new Timer(1000 / fps, 99999999, update);
 let coins: coin[] = [];
 let coinTimer = 0;
+const clickCooldown = fps * 0.4;
+let clickTimer = 0;
 function update(): void {
+    clickTimer += Number(timescale.value);
     coinTimer += Number(timescale.value);
-    if (coinTimer >= 180 && coins.length < 3) {
+    if (coinTimer >= coinSpawnCooldown() && coins.length < 3) {
         let coinPos = new Vector2(Math.random() * canvWidth, Math.random() * canvHeight);
         coins.push(new coin(coinPos));
 
@@ -104,7 +111,9 @@ function update(): void {
 }
 
 function onClick(event: MouseEvent): void {
-    plVelocity = CursorPos(event).Sub(plCenter).normalized.Mult(plSpeed);
+    if (clickTimer < clickCooldown) return;
+    plVelocity = CursorPos(event).Sub(plCenter).normalized.Mult(plSpeed());
+    clickTimer = 0;
 }
 
 function CursorPos(event: MouseEvent): Vector2 {
