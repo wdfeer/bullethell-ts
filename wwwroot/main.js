@@ -48,11 +48,11 @@ var coin = /** @class */ (function () {
     function coin(pos) {
         var _this = this;
         this.pos = pos;
+        this.onPlayerCollide = function () { delete drawings[_this.drawingId]; score++; };
         this.drawing = new drawing(function (ctx) { drawCircle(ctx, coin.radius, pos, 'brown'); });
         this.drawingId = drawings.length;
         drawings.push(this.drawing);
         this.collider = new Circle(pos, coin.radius);
-        this.onPlayerCollide = function () { drawings.splice(_this.drawingId); score++; };
     }
     coin.radius = 25;
     return coin;
@@ -75,37 +75,38 @@ function velocityMultOnHit() {
     return 1 - Number(vLossOnHit.value) / 100;
 }
 var score;
-var plPos;
+var plCenter;
 var plVelocity;
 var plSpeed;
 var plRadius;
-var plCollider;
+function plCollider() {
+    return new Circle(plCenter.Add(new Vector2(plRadius, plRadius)), plRadius);
+}
 function reset() {
     score = 0;
-    plPos = new Vector2(canvWidth / 2, canvHeight / 2);
+    plCenter = new Vector2(canvWidth / 2, canvHeight / 2);
     plVelocity = Vector2.Zero;
     plSpeed = 4;
     plRadius = 13;
-    plCollider = new Circle(plPos.Sub(new Vector2(plRadius, plRadius)), plRadius);
     timescale.ondblclick(new MouseEvent(""));
     vLossOnHit.ondblclick(new MouseEvent(""));
-    drawings = [new drawing(function (ctx) { drawCircle(ctx, plRadius, plPos); })];
+    drawings = [new drawing(function (ctx) { drawCircle(ctx, plRadius, plCenter); })];
 }
 reset();
-drawings.push(new drawing(function (ctx) { drawCircle(ctx, plRadius, plPos); }));
+drawings.push(new drawing(function (ctx) { drawCircle(ctx, plRadius, plCenter); }));
 new Timer(1000 / fps, 99999999, update);
 var coins = [];
 var coinTimer = 0;
 function update() {
     coinTimer += Number(timescale.value);
     if (coinTimer >= 180 && coins.length < 3) {
-        var pos = new Vector2(Math.random() * canvWidth, Math.random() * canvHeight);
-        coins.push(new coin(pos));
+        var coinPos = new Vector2(Math.random() * canvWidth, Math.random() * canvHeight);
+        coins.push(new coin(coinPos));
         coinTimer = 0;
     }
     var newCoins = [];
     coins.forEach(function (c) {
-        if (c.collider.colliding(plCollider)) {
+        if (c.collider.colliding(plCollider())) {
             c.onPlayerCollide();
         }
         else {
@@ -113,16 +114,16 @@ function update() {
         }
     });
     coins = newCoins;
-    if ((plPos.x + plRadius > canvWidth && plVelocity.x > 0) || (plPos.x - plRadius < 0 && plVelocity.x < 0))
+    if ((plCenter.x + plRadius > canvWidth && plVelocity.x > 0) || (plCenter.x - plRadius < 0 && plVelocity.x < 0))
         plVelocity.x = -plVelocity.x * velocityMultOnHit();
-    if ((plPos.y + plRadius > canvHeight && plVelocity.y > 0) || (plPos.y - plRadius < 0 && plVelocity.y < 0))
+    if ((plCenter.y + plRadius > canvHeight && plVelocity.y > 0) || (plCenter.y - plRadius < 0 && plVelocity.y < 0))
         plVelocity.y = -plVelocity.y * velocityMultOnHit();
-    plPos.add(plVelocity.Mult(Number(timescale.value)));
+    plCenter.add(plVelocity.Mult(Number(timescale.value)));
     render();
     document.querySelector("#score").innerHTML = String(score);
 }
 function onClick(event) {
-    plVelocity = CursorPos(event).Sub(plPos).normalized.Mult(plSpeed);
+    plVelocity = CursorPos(event).Sub(plCenter).normalized.Mult(plSpeed);
 }
 function CursorPos(event) {
     return new Vector2(event.clientX, event.clientY);
