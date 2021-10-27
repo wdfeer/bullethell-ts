@@ -24,6 +24,7 @@ class coin {
     drawingId: number;
     collider: Circle;
     onPlayerCollide: () => void = () => {
+        delete drawings[this.drawingId];
         pl.score++;
         drawings[this.drawingId] = new drawing((ctx) => {
             drawCenteredText(ctx, String(pl.score));
@@ -71,9 +72,7 @@ new Timer(1000 / fps, 99999999, update);
 let coins: coin[] = [];
 let coinTimer = 0;
 const clickCooldown = fps * 0.4;
-let clickTimer = 0;
 function update(): void {
-    clickTimer += 1;
     coinTimer += 1;
     if (coinTimer >= pl.coinSpawnCooldown && coins.length < 3) {
         let coinPos = new Vector2(Math.random() * canv.width, Math.random() * canv.height);
@@ -100,9 +99,7 @@ function update(): void {
 }
 
 function onClick(event: MouseEvent): void {
-    if (clickTimer < clickCooldown) return;
     pl.velocity = CursorPos(event).Sub(pl.center).normalized.Mult(pl.speed);
-    clickTimer = 0;
 }
 
 function CursorPos(event: MouseEvent): Vector2 {
