@@ -1,49 +1,4 @@
 "use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        if (typeof b !== "function" && b !== null)
-            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var Timer = /** @class */ (function () {
-    function Timer(tickInterval, counter, preTick) {
-        var _this = this;
-        this.tickInterval = tickInterval;
-        this.counter = counter;
-        var intervalId = setInterval(function () {
-            preTick(_this.counter);
-            _this.counter = _this.counter - 1;
-            if (_this.counter <= 0)
-                clearInterval(intervalId);
-        }, tickInterval);
-    }
-    Object.defineProperty(Timer.prototype, "hasEnded", {
-        get: function () {
-            return this.counter <= 0;
-        },
-        enumerable: false,
-        configurable: true
-    });
-    return Timer;
-}());
-var SecTimer = /** @class */ (function (_super) {
-    __extends(SecTimer, _super);
-    function SecTimer(counter, preTick) {
-        var _this = _super.call(this, 1000, counter, preTick) || this;
-        _this.counter = counter;
-        return _this;
-    }
-    return SecTimer;
-}(Timer));
 var player = /** @class */ (function () {
     function player(center, radius) {
         this.score = 0;
@@ -81,16 +36,33 @@ var coin = /** @class */ (function () {
     function coin(pos) {
         var _this = this;
         this.pos = pos;
-        this.onPlayerCollide = function () { delete drawings[_this.drawingId]; pl.score++; };
-        this.drawing = new drawing(function (ctx) { drawCircle(ctx, coin.radius, pos, 'brown'); });
+        this.onPlayerCollide = function () {
+            delete drawings[_this.drawingId];
+            pl.score++;
+            var alpha = 1;
+            var timeLeft = fps * 2;
+            new Timer(frameInterval, timeLeft, function (counter) {
+                if (counter < timeLeft / 3) {
+                    alpha = counter / (timeLeft / 3);
+                }
+            });
+            scoreDraw = function (ctx) {
+                drawCenteredText(ctx, String(pl.score), undefined, alpha);
+            };
+        };
+        this.draw = function (ctx) {
+            drawCircle(ctx, coin.radius, pos, 'brown');
+            fillCircle(ctx, coin.radius, pos, '#ffffde');
+        };
         this.drawingId = drawings.length;
-        drawings.push(this.drawing);
+        drawings.push(this.draw);
         this.collider = new Circle(pos, coin.radius);
     }
     coin.radius = 25;
     return coin;
 }());
 var fps = 60;
+var frameInterval = 1000 / fps;
 var canv = document.querySelector("canvas");
 window.onresize = function () {
     canv.width = window.innerWidth;
@@ -102,20 +74,20 @@ var pl;
 function restart() {
     pl = new player(new Vector2(canv.width / 2, canv.height / 2), 13);
     coins = [];
-    drawings = [new drawing(function (ctx) { drawCircle(ctx, pl.radius, pl.center); })];
+    drawings = [function (ctx) {
+            drawCircle(ctx, pl.radius, pl.center);
+            fillCircle(ctx, pl.radius, pl.center, '#eeeeee');
+        }];
 }
 window.onkeydown = function (event) {
     if (event.key == 'r')
         restart();
 };
 restart();
-new Timer(1000 / fps, 99999999, update);
 var coins = [];
 var coinTimer = 0;
-var clickCooldown = fps * 0.4;
-var clickTimer = 0;
+new Timer(1000 / fps, 99999999, update);
 function update() {
-    clickTimer += 1;
     coinTimer += 1;
     if (coinTimer >= pl.coinSpawnCooldown && coins.length < 3) {
         var coinPos = new Vector2(Math.random() * canv.width, Math.random() * canv.height);
@@ -140,10 +112,7 @@ function update() {
     render();
 }
 function onClick(event) {
-    if (clickTimer < clickCooldown)
-        return;
     pl.velocity = CursorPos(event).Sub(pl.center).normalized.Mult(pl.speed);
-    clickTimer = 0;
 }
 function CursorPos(event) {
     return new Vector2(event.clientX, event.clientY);
