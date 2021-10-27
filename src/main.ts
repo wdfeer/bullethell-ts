@@ -50,6 +50,10 @@ class coin {
 const fps = 60;
 
 const canv = document.querySelector("canvas")!;
+window.onresize = () => {
+    canv.width = window.innerWidth;
+    canv.height = window.innerHeight;
+}
 canv.width = window.innerWidth;
 canv.height = window.innerHeight;
 const canvWidth = canv.width;
