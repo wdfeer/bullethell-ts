@@ -133,7 +133,7 @@ var boss1 = /** @class */ (function (_super) {
         configurable: true
     });
     boss1.prototype.rangedAttack = function () {
-        var bullets = shootEvenlyInACircle(3 + Math.floor(Math.sqrt(pl.score)), 19, this.center, 5 + 10 * Math.random());
+        var bullets = shootEvenlyInACircle(3 + Math.floor(Math.sqrt(pl.score)), 15 * sizeMult(), this.center, 5 + 10 * Math.random());
         bullets.forEach(function (b) {
             bodies.push(b);
             drawings.push(function (ctx) {
@@ -195,9 +195,15 @@ var coin = /** @class */ (function () {
         drawings.push(this.draw);
         this.collider = new CircleCollider(pos, coin.radius);
     }
+    Object.defineProperty(coin, "radius", {
+        get: function () {
+            return 22 * sizeMult();
+        },
+        enumerable: false,
+        configurable: true
+    });
     coin.prototype.deleteDrawing = function () {
         delete drawings[this.drawingId];
     };
-    coin.radius = 25;
     return coin;
 }());

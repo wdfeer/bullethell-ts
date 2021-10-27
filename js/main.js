@@ -8,6 +8,9 @@ window.onresize = function () {
 };
 canv.width = window.innerWidth;
 canv.height = window.innerHeight;
+function sizeMult() {
+    return (canv.width + canv.height) / 2600;
+}
 function randomPoint() {
     return new Vector2(Math.random() * canv.width, Math.random() * canv.height);
 }
@@ -16,7 +19,7 @@ var pl;
 var boss;
 var bossTimer;
 function restart() {
-    pl = new player(new Vector2(canv.width / 2, canv.height / 2), 9);
+    pl = new player(new Vector2(canv.width / 2, canv.height / 2), 8.5 * sizeMult());
     if (boss)
         boss.active = false;
     if (bossTimer)
@@ -28,7 +31,7 @@ function restart() {
                 while (pos.Sub(pl.center).length < (canv.width + canv.height) / 3) {
                     pos = randomPoint();
                 }
-                boss = new boss1(pos, 60);
+                boss = new boss1(pos, 55 * sizeMult());
                 bodies.push(boss);
             }
             else
