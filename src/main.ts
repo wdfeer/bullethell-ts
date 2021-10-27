@@ -20,28 +20,37 @@ class player {
 }
 class coin {
     static radius = 25;
-    drawing: drawing;
+    draw: draw;
     drawingId: number;
     collider: Circle;
     onPlayerCollide: () => void = () => {
         delete drawings[this.drawingId];
         pl.score++;
-        drawings[this.drawingId] = new drawing((ctx) => {
-            drawCenteredText(ctx, String(pl.score));
+
+        let alpha = 1;
+        let timeLeft = fps * 2;
+        new Timer(frameInterval, timeLeft, (counter) => {
+            if (counter < timeLeft / 3){
+                alpha = counter / (timeLeft / 3);
+            }
         });
+        scoreDraw = (ctx) => {
+            drawCenteredText(ctx, String(pl.score), undefined, alpha);
+        };
     };
     constructor(public pos: Vector2) {
-        this.drawing = new drawing(ctx => {
+        this.draw = ctx => {
             drawCircle(ctx, coin.radius, pos, 'brown');
             fillCircle(ctx, coin.radius, pos, '#ffffde');
-        });
+        };
         this.drawingId = drawings.length;
-        drawings.push(this.drawing);
+        drawings.push(this.draw);
         this.collider = new Circle(pos, coin.radius);
     }
 }
 
 const fps = 60;
+const frameInterval = 1000 / fps;
 
 const canv = document.querySelector("canvas")!;
 window.onresize = () => {
@@ -50,17 +59,16 @@ window.onresize = () => {
 }
 canv.width = window.innerWidth;
 canv.height = window.innerHeight;
-
 var pl: player;
 function restart(): void {
     pl = new player(new Vector2(canv.width / 2, canv.height / 2), 13);
 
     coins = [];
 
-    drawings = [new drawing((ctx) => {
+    drawings = [(ctx) => {
         drawCircle(ctx, pl.radius, pl.center);
         fillCircle(ctx, pl.radius, pl.center, '#eeeeee');
-    })];
+    }];
 }
 window.onkeydown = (event) => {
     if (event.key == 'r')
@@ -68,10 +76,10 @@ window.onkeydown = (event) => {
 }
 restart();
 
+var coins: coin[] = [];
+var coinTimer = 0;
+
 new Timer(1000 / fps, 99999999, update);
-let coins: coin[] = [];
-let coinTimer = 0;
-const clickCooldown = fps * 0.4;
 function update(): void {
     coinTimer += 1;
     if (coinTimer >= pl.coinSpawnCooldown && coins.length < 3) {
@@ -95,6 +103,7 @@ function update(): void {
     if ((pl.center.y + pl.radius > canv.height && pl.velocity.y > 0) || (pl.center.y - pl.radius < 0 && pl.velocity.y < 0))
         pl.velocity.y = -pl.velocity.y * 0.9;
     pl.center.add(pl.velocity);
+
     render();
 }
 
