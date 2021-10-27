@@ -20,47 +20,40 @@ var Hitbox = /** @class */ (function () {
     }
     return Hitbox;
 }());
-var Circle = /** @class */ (function (_super) {
-    __extends(Circle, _super);
-    function Circle(position, radius) {
-        var _this = _super.call(this, position) || this;
+var CircleCollider = /** @class */ (function (_super) {
+    __extends(CircleCollider, _super);
+    function CircleCollider(center, radius) {
+        var _this = _super.call(this, center) || this;
         _this.radius = radius;
         return _this;
     }
-    Object.defineProperty(Circle.prototype, "center", {
-        get: function () {
-            return new Vector2(this.position.x + this.radius, this.position.y + this.radius);
-        },
-        enumerable: false,
-        configurable: true
-    });
-    Circle.prototype.colliding = function (other) {
+    CircleCollider.prototype.colliding = function (other) {
         if (other instanceof Vector2)
-            return other.Sub(this.center).length <= this.radius;
+            return other.Sub(this.position).length <= this.radius;
         else {
-            return other.center.Sub(this.center).length < this.radius + other.radius;
+            return other.position.Sub(this.position).length < this.radius + other.radius;
         }
     };
-    return Circle;
+    return CircleCollider;
 }(Hitbox));
-var Rectangle = /** @class */ (function (_super) {
-    __extends(Rectangle, _super);
-    function Rectangle(position, width, height) {
+var RectCollider = /** @class */ (function (_super) {
+    __extends(RectCollider, _super);
+    function RectCollider(position, width, height) {
         var _this = _super.call(this, position) || this;
         _this.width = width;
         _this.height = height;
         return _this;
     }
-    Object.defineProperty(Rectangle.prototype, "center", {
+    Object.defineProperty(RectCollider.prototype, "center", {
         get: function () {
             return new Vector2(this.position.x + this.width, this.position.y + this.height);
         },
         enumerable: false,
         configurable: true
     });
-    Rectangle.prototype.colliding = function (point) {
+    RectCollider.prototype.colliding = function (point) {
         var relativePos = point.Sub(this.position);
         return relativePos.x <= this.width && relativePos.x >= 0 && relativePos.y <= this.height && relativePos.y >= 0;
     };
-    return Rectangle;
+    return RectCollider;
 }(Hitbox));

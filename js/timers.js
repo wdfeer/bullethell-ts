@@ -20,7 +20,7 @@ var Timer = /** @class */ (function () {
         this.tickInterval = tickInterval;
         this.counter = counter;
         var intervalId = setInterval(function () {
-            preTick(_this.counter);
+            preTick(_this.counter, _this);
             _this.counter = _this.counter - 1;
             if (_this.counter <= 0)
                 clearInterval(intervalId);
