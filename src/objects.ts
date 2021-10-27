@@ -72,7 +72,7 @@ class boss1 extends enemy {
         pl.hp -= 100;
     }
     get attackCooldown(): number {
-        return 40 + 80 / Math.sqrt(pl.score + 1);
+        return 40 + 80 / (pl.score > 9 ? Math.sqrt(pl.score - 8) : 1);
     }
     attackTimer = 0;
     ai = () => {
@@ -87,8 +87,9 @@ class boss1 extends enemy {
         }
     }
     rangedAttack() {
-        let bullets = shootEvenlyInACircle(6 + Math.random() > 0.5 ? 6 : 0, 12 * sizeMult(), this.center, 1 + 3 * Math.random());
+        let bullets = shootEvenlyInACircle(Math.random() < 0.6 ? 6 : 12, 12 * sizeMult(), this.center, 1 + 3 * Math.random());
         bullets.forEach(b => {
+            b.velocity.add(this.velocity);
             bodies.push(b);
             let drawingsLen = drawings.length;
             drawings.push((ctx) => {
