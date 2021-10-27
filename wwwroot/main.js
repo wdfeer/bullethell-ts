@@ -91,14 +91,12 @@ window.onresize = function () {
 };
 canv.width = window.innerWidth;
 canv.height = window.innerHeight;
-var canvWidth = canv.width;
-var canvHeight = canv.height;
 var pl;
 function coinSpawnCooldown() {
     return fps * 3 / Math.sqrt(1 + pl.score / 3);
 }
 function reset() {
-    pl = new player(new Vector2(canvWidth / 2, canvHeight / 2), 13);
+    pl = new player(new Vector2(canv.width / 2, canv.height / 2), 13);
     drawings = [new drawing(function (ctx) { drawCircle(ctx, pl.radius, pl.center); })];
 }
 reset();
@@ -111,7 +109,7 @@ function update() {
     clickTimer += 1;
     coinTimer += 1;
     if (coinTimer >= coinSpawnCooldown() && coins.length < 3) {
-        var coinPos = new Vector2(Math.random() * canvWidth, Math.random() * canvHeight);
+        var coinPos = new Vector2(Math.random() * canv.width, Math.random() * canv.height);
         coins.push(new coin(coinPos));
         coinTimer = 0;
     }
@@ -125,9 +123,9 @@ function update() {
         }
     });
     coins = newCoins;
-    if ((pl.center.x + pl.radius > canvWidth && pl.velocity.x > 0) || (pl.center.x - pl.radius < 0 && pl.velocity.x < 0))
+    if ((pl.center.x + pl.radius > canv.width && pl.velocity.x > 0) || (pl.center.x - pl.radius < 0 && pl.velocity.x < 0))
         pl.velocity.x = -pl.velocity.x * 0.9;
-    if ((pl.center.y + pl.radius > canvHeight && pl.velocity.y > 0) || (pl.center.y - pl.radius < 0 && pl.velocity.y < 0))
+    if ((pl.center.y + pl.radius > canv.height && pl.velocity.y > 0) || (pl.center.y - pl.radius < 0 && pl.velocity.y < 0))
         pl.velocity.y = -pl.velocity.y * 0.9;
     pl.center.add(pl.velocity);
     render();
