@@ -68,6 +68,13 @@ var player = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
+    Object.defineProperty(player.prototype, "coinSpawnCooldown", {
+        get: function () {
+            return fps * 3 / Math.sqrt(1 + pl.score / 3);
+        },
+        enumerable: false,
+        configurable: true
+    });
     return player;
 }());
 var coin = /** @class */ (function () {
@@ -92,14 +99,16 @@ window.onresize = function () {
 canv.width = window.innerWidth;
 canv.height = window.innerHeight;
 var pl;
-function coinSpawnCooldown() {
-    return fps * 3 / Math.sqrt(1 + pl.score / 3);
-}
-function reset() {
+function restart() {
     pl = new player(new Vector2(canv.width / 2, canv.height / 2), 13);
+    coins = [];
     drawings = [new drawing(function (ctx) { drawCircle(ctx, pl.radius, pl.center); })];
 }
-reset();
+window.onkeydown = function (event) {
+    if (event.key == 'r')
+        restart();
+};
+restart();
 new Timer(1000 / fps, 99999999, update);
 var coins = [];
 var coinTimer = 0;
@@ -108,7 +117,7 @@ var clickTimer = 0;
 function update() {
     clickTimer += 1;
     coinTimer += 1;
-    if (coinTimer >= coinSpawnCooldown() && coins.length < 3) {
+    if (coinTimer >= pl.coinSpawnCooldown && coins.length < 3) {
         var coinPos = new Vector2(Math.random() * canv.width, Math.random() * canv.height);
         coins.push(new coin(coinPos));
         coinTimer = 0;
@@ -129,7 +138,6 @@ function update() {
         pl.velocity.y = -pl.velocity.y * 0.9;
     pl.center.add(pl.velocity);
     render();
-    document.querySelector("#score").innerHTML = String(pl.score);
 }
 function onClick(event) {
     if (clickTimer < clickCooldown)
