@@ -3,7 +3,7 @@ class body {
     velocity: Vector2 = Vector2.Zero;
     radius: number = 0;
     get collider() {
-        return new CircleCollider(this.center.Add(new Vector2(this.radius, this.radius)), this.radius)
+        return new CircleCollider(this.center, this.radius)
     }
     constructor(center: Vector2, radius: number) {
         this.center = center;

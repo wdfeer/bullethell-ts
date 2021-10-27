@@ -1,6 +1,5 @@
 abstract class Hitbox {
     position: Vector2;
-    public abstract get center(): Vector2;
     constructor(position: Vector2) {
         this.position = position;
     }
@@ -8,18 +7,15 @@ abstract class Hitbox {
 }
 class CircleCollider extends Hitbox {
     radius: number;
-    public get center(): Vector2 {
-        return new Vector2(this.position.x + this.radius, this.position.y + this.radius);
-    }
-    constructor(position: Vector2, radius: number) {
-        super(position);
+    constructor(center: Vector2, radius: number) {
+        super(center);
         this.radius = radius;
     }
     colliding(other: Vector2 | CircleCollider) {
         if (other instanceof Vector2)
-            return other.Sub(this.center).length <= this.radius;
+            return other.Sub(this.position).length <= this.radius;
         else {
-            return other.center.Sub(this.center).length < this.radius + other.radius;
+            return other.position.Sub(this.position).length < this.radius + other.radius;
         }
     }
 }
