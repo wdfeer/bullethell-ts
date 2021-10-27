@@ -41,9 +41,9 @@ jobs:
         run:
           git add wwwroot/js -f
         
-      - name: Commit wwwroot to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@3.7.1
+      - name: Deploy to Github Pages
+        uses: peaceiris/actions-gh-pages@v3.7.3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: gh-pages
-          folder: wwwroot
+          publish_dir: wwwroot
+
