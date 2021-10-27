@@ -1,12 +1,16 @@
 class Timer {
+    private intervalId;
     get hasEnded(): boolean {
         return this.counter <= 0;
     }
+    end(){
+        clearInterval(this.intervalId);
+    }
     constructor(public tickInterval: number, public counter: number, preTick: (counter: number, timer: Timer) => void) {
-        let intervalId = setInterval(() => {
+        this.intervalId = setInterval(() => {
             preTick(this.counter, this);
             this.counter = this.counter - 1;
-            if (this.counter <= 0) clearInterval(intervalId)
+            if (this.counter <= 0) this.end();
         }, tickInterval)
     }
 }
