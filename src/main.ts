@@ -27,6 +27,9 @@ class player {
     get collider() {
         return new Circle(this.center.Add(new Vector2(this.radius, this.radius)), this.radius)
     }
+    get coinSpawnCooldown() {
+        return fps * 3 / Math.sqrt(1 + pl.score / 3);
+    }
     constructor(center: Vector2, radius?: number) {
         this.center = center;
         if (radius)
@@ -56,16 +59,20 @@ window.onresize = () => {
 }
 canv.width = window.innerWidth;
 canv.height = window.innerHeight;
+
 var pl: player;
-function coinSpawnCooldown() {
-    return fps * 3 / Math.sqrt(1 + pl.score / 3);
-}
-function reset(): void {
+function restart(): void {
     pl = new player(new Vector2(canv.width / 2, canv.height / 2), 13);
+
+    coins = [];
 
     drawings = [new drawing((ctx) => { drawCircle(ctx, pl.radius, pl.center) })];
 }
-reset();
+window.onkeydown = (event) => {
+    if (event.key == 'r')
+        restart();
+}
+restart();
 
 new Timer(1000 / fps, 99999999, update);
 let coins: coin[] = [];
@@ -75,7 +82,7 @@ let clickTimer = 0;
 function update(): void {
     clickTimer += 1;
     coinTimer += 1;
-    if (coinTimer >= coinSpawnCooldown() && coins.length < 3) {
+    if (coinTimer >= pl.coinSpawnCooldown && coins.length < 3) {
         let coinPos = new Vector2(Math.random() * canv.width, Math.random() * canv.height);
         coins.push(new coin(coinPos));
 
@@ -97,7 +104,6 @@ function update(): void {
         pl.velocity.y = -pl.velocity.y * 0.9;
     pl.center.add(pl.velocity);
     render();
-    document.querySelector("#score")!.innerHTML = String(pl.score);
 }
 
 function onClick(event: MouseEvent): void {
