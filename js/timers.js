@@ -19,11 +19,11 @@ var Timer = /** @class */ (function () {
         var _this = this;
         this.tickInterval = tickInterval;
         this.counter = counter;
-        var intervalId = setInterval(function () {
+        this.intervalId = setInterval(function () {
             preTick(_this.counter, _this);
             _this.counter = _this.counter - 1;
             if (_this.counter <= 0)
-                clearInterval(intervalId);
+                _this.end();
         }, tickInterval);
     }
     Object.defineProperty(Timer.prototype, "hasEnded", {
@@ -33,6 +33,9 @@ var Timer = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
+    Timer.prototype.end = function () {
+        clearInterval(this.intervalId);
+    };
     return Timer;
 }());
 var SecTimer = /** @class */ (function (_super) {

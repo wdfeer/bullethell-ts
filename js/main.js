@@ -19,6 +19,7 @@ function restart() {
     pl = new player(new Vector2(canv.width / 2, canv.height / 2), 9);
     if (boss)
         boss.active = false;
+    bossTimer.end();
     bossTimer = new SecTimer(9, function (count, timer) {
         if (count == 1) {
             if (pl.score > 0) {
