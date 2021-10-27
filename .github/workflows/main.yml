@@ -32,8 +32,10 @@ jobs:
           npm install typescript
           
       - name: Compile typescript
-        run:
+        run: |
           tsc
+          echo The compiled JS files:
+          ls wwwroot/js
         
       - name: Track the compiled JS with git
         run:
