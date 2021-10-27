@@ -6,7 +6,7 @@ abstract class Hitbox {
     }
     abstract colliding(point: Vector2): boolean;
 }
-class Circle extends Hitbox {
+class CircleCollider extends Hitbox {
     radius: number;
     public get center(): Vector2 {
         return new Vector2(this.position.x + this.radius, this.position.y + this.radius);
@@ -15,7 +15,7 @@ class Circle extends Hitbox {
         super(position);
         this.radius = radius;
     }
-    colliding(other: Vector2 | Circle) {
+    colliding(other: Vector2 | CircleCollider) {
         if (other instanceof Vector2)
             return other.Sub(this.center).length <= this.radius;
         else {
@@ -23,7 +23,7 @@ class Circle extends Hitbox {
         }
     }
 }
-class Rectangle extends Hitbox {
+class RectCollider extends Hitbox {
     width: number;
     height: number;
     public get center(): Vector2 {
