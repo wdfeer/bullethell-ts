@@ -32,7 +32,8 @@ jobs:
           npm install typescript
           
       - name: Compile typescript
-        uses: iCrawl/action-tsc@v1
+        run:
+          tsc
         
       - name: Track the compiled JS with git
         run:
