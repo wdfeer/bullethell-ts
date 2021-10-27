@@ -15,14 +15,19 @@ function randomPoint(): Vector2 {
 var bodies: body[];
 var pl: player;
 var boss: enemy;
+let bossTimer: SecTimer;
 function restart(): void {
     pl = new player(new Vector2(canv.width / 2, canv.height / 2), 9);
     if (boss)
         boss.active = false;
-    new SecTimer(9, (count, timer) => {
+    bossTimer = new SecTimer(9, (count, timer) => {
         if (count == 1) {
             if (pl.score > 0) {
-                boss = new boss1(randomPoint(), 60);
+                let pos = randomPoint();
+                while (pos.Sub(pl.center).length < (canv.width + canv.height) / 3) {
+                    pos = randomPoint();
+                }
+                boss = new boss1(pos, 60);
                 bodies.push(boss);
             }
             else timer.counter += 4;
