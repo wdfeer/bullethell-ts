@@ -21,18 +21,23 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-        
-      - uses: actions/checkout@v1
+
       - name: install node v12
         uses: actions/setup-node@v1
         with:
           node-version: 12
+          
       - name: install typescript
         run:
           npm install typescript
+          
       - name: Compile typescript
         uses: iCrawl/action-tsc@v1
-          
+        
+      - name: Track the compiled JS with git
+        run:
+          git add wwwroot/js
+        
       - name: Commit wwwroot to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
