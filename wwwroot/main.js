@@ -44,11 +44,37 @@ var SecTimer = /** @class */ (function (_super) {
     }
     return SecTimer;
 }(Timer));
+var player = /** @class */ (function () {
+    function player(center, radius) {
+        this.score = 0;
+        this.center = Vector2.Zero;
+        this.velocity = Vector2.Zero;
+        this.radius = 0;
+        this.center = center;
+        if (radius)
+            this.radius = radius;
+    }
+    Object.defineProperty(player.prototype, "speed", {
+        get: function () {
+            return 4 + this.score / 2;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Object.defineProperty(player.prototype, "collider", {
+        get: function () {
+            return new Circle(this.center.Add(new Vector2(this.radius, this.radius)), this.radius);
+        },
+        enumerable: false,
+        configurable: true
+    });
+    return player;
+}());
 var coin = /** @class */ (function () {
     function coin(pos) {
         var _this = this;
         this.pos = pos;
-        this.onPlayerCollide = function () { delete drawings[_this.drawingId]; score++; };
+        this.onPlayerCollide = function () { delete drawings[_this.drawingId]; pl.score++; };
         this.drawing = new drawing(function (ctx) { drawCircle(ctx, coin.radius, pos, 'brown'); });
         this.drawingId = drawings.length;
         drawings.push(this.drawing);
@@ -59,53 +85,27 @@ var coin = /** @class */ (function () {
 }());
 var fps = 60;
 var canv = document.querySelector("canvas");
+canv.width = window.innerWidth;
+canv.height = window.innerHeight;
 var canvWidth = canv.width;
 var canvHeight = canv.height;
-var timescale = document.querySelector("#timescale");
-timescale.ondblclick = function (event) {
-    timescale.value = "1.00";
-    timescale.onchange(new Event("click"));
-};
-var vLossOnHit = document.querySelector("#vLossOnHit");
-vLossOnHit.ondblclick = function (event) {
-    vLossOnHit.value = "10";
-    vLossOnHit.onchange(new Event("click"));
-};
-function velocityMultOnHit() {
-    return 1 - Number(vLossOnHit.value) / 100;
-}
-var score;
-var plCenter;
-var plVelocity;
-function plSpeed() {
-    return 4 + score / 2;
-}
-var plRadius;
-function plCollider() {
-    return new Circle(plCenter.Add(new Vector2(plRadius, plRadius)), plRadius);
-}
+var pl;
 function coinSpawnCooldown() {
-    return fps * 3 / Math.sqrt(1 + score / 3);
+    return fps * 3 / Math.sqrt(1 + pl.score / 3);
 }
 function reset() {
-    score = 0;
-    plCenter = new Vector2(canvWidth / 2, canvHeight / 2);
-    plVelocity = Vector2.Zero;
-    plRadius = 13;
-    timescale.ondblclick(new MouseEvent(""));
-    vLossOnHit.ondblclick(new MouseEvent(""));
-    drawings = [new drawing(function (ctx) { drawCircle(ctx, plRadius, plCenter); })];
+    pl = new player(new Vector2(canvWidth / 2, canvHeight / 2), 13);
+    drawings = [new drawing(function (ctx) { drawCircle(ctx, pl.radius, pl.center); })];
 }
 reset();
-drawings.push(new drawing(function (ctx) { drawCircle(ctx, plRadius, plCenter); }));
 new Timer(1000 / fps, 99999999, update);
 var coins = [];
 var coinTimer = 0;
 var clickCooldown = fps * 0.4;
 var clickTimer = 0;
 function update() {
-    clickTimer += Number(timescale.value);
-    coinTimer += Number(timescale.value);
+    clickTimer += 1;
+    coinTimer += 1;
     if (coinTimer >= coinSpawnCooldown() && coins.length < 3) {
         var coinPos = new Vector2(Math.random() * canvWidth, Math.random() * canvHeight);
         coins.push(new coin(coinPos));
@@ -113,7 +113,7 @@ function update() {
     }
     var newCoins = [];
     coins.forEach(function (c) {
-        if (c.collider.colliding(plCollider())) {
+        if (c.collider.colliding(pl.collider)) {
             c.onPlayerCollide();
         }
         else {
@@ -121,18 +121,18 @@ function update() {
         }
     });
     coins = newCoins;
-    if ((plCenter.x + plRadius > canvWidth && plVelocity.x > 0) || (plCenter.x - plRadius < 0 && plVelocity.x < 0))
-        plVelocity.x = -plVelocity.x * velocityMultOnHit();
-    if ((plCenter.y + plRadius > canvHeight && plVelocity.y > 0) || (plCenter.y - plRadius < 0 && plVelocity.y < 0))
-        plVelocity.y = -plVelocity.y * velocityMultOnHit();
-    plCenter.add(plVelocity.Mult(Number(timescale.value)));
+    if ((pl.center.x + pl.radius > canvWidth && pl.velocity.x > 0) || (pl.center.x - pl.radius < 0 && pl.velocity.x < 0))
+        pl.velocity.x = -pl.velocity.x * 0.9;
+    if ((pl.center.y + pl.radius > canvHeight && pl.velocity.y > 0) || (pl.center.y - pl.radius < 0 && pl.velocity.y < 0))
+        pl.velocity.y = -pl.velocity.y * 0.9;
+    pl.center.add(pl.velocity);
     render();
-    document.querySelector("#score").innerHTML = String(score);
+    document.querySelector("#score").innerHTML = String(pl.score);
 }
 function onClick(event) {
     if (clickTimer < clickCooldown)
         return;
-    plVelocity = CursorPos(event).Sub(plCenter).normalized.Mult(plSpeed());
+    pl.velocity = CursorPos(event).Sub(pl.center).normalized.Mult(pl.speed);
     clickTimer = 0;
 }
 function CursorPos(event) {

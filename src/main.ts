@@ -16,12 +16,29 @@ class SecTimer extends Timer {
     }
 }
 
+class player {
+    score: number = 0;
+    center: Vector2 = Vector2.Zero;
+    velocity: Vector2 = Vector2.Zero;
+    radius: number = 0;
+    get speed() {
+        return 4 + this.score / 2;
+    }
+    get collider() {
+        return new Circle(this.center.Add(new Vector2(this.radius, this.radius)), this.radius)
+    }
+    constructor(center: Vector2, radius?: number) {
+        this.center = center;
+        if (radius)
+            this.radius = radius;
+    }
+}
 class coin {
     static radius = 25;
     drawing: drawing;
     drawingId: number;
     collider: Circle;
-    onPlayerCollide: () => void = () => { delete drawings[this.drawingId]; score++; };
+    onPlayerCollide: () => void = () => { delete drawings[this.drawingId]; pl.score++; };
     constructor(public pos: Vector2) {
         this.drawing = new drawing(ctx => { drawCircle(ctx, coin.radius, pos, 'brown') });
         this.drawingId = drawings.length;
@@ -33,49 +50,20 @@ class coin {
 const fps = 60;
 
 const canv = document.querySelector("canvas")!;
+canv.width = window.innerWidth;
+canv.height = window.innerHeight;
 const canvWidth = canv.width;
 const canvHeight = canv.height;
-const timescale = document.querySelector("#timescale") as HTMLInputElement;
-timescale.ondblclick = (event) => {
-    timescale.value = "1.00";
-    timescale.onchange!(new Event("click"));
-}
-const vLossOnHit = document.querySelector("#vLossOnHit") as HTMLInputElement;
-vLossOnHit.ondblclick = (event) => {
-    vLossOnHit.value = "10";
-    vLossOnHit.onchange!(new Event("click"));
-}
-function velocityMultOnHit(): number {
-    return 1 - Number(vLossOnHit.value) / 100;
-}
-
-let score: number;
-let plCenter: Vector2;
-let plVelocity: Vector2;
-function plSpeed() {
-    return 4 + score / 2;
-}
-let plRadius: number;
-function plCollider() {
-    return new Circle(plCenter.Add(new Vector2(plRadius, plRadius)), plRadius)
-}
+var pl: player;
 function coinSpawnCooldown() {
-    return fps * 3 / Math.sqrt(1 + score / 3);
+    return fps * 3 / Math.sqrt(1 + pl.score / 3);
 }
 function reset(): void {
-    score = 0;
-    plCenter = new Vector2(canvWidth / 2, canvHeight / 2);
-    plVelocity = Vector2.Zero;
-    plRadius = 13;
+    pl = new player(new Vector2(canvWidth / 2, canvHeight / 2), 13);
 
-    timescale.ondblclick!(new MouseEvent(""));
-    vLossOnHit.ondblclick!(new MouseEvent(""));
-
-    drawings = [new drawing((ctx) => { drawCircle(ctx, plRadius, plCenter) })];
+    drawings = [new drawing((ctx) => { drawCircle(ctx, pl.radius, pl.center) })];
 }
 reset();
-
-drawings.push(new drawing((ctx) => { drawCircle(ctx, plRadius, plCenter) }));
 
 new Timer(1000 / fps, 99999999, update);
 let coins: coin[] = [];
@@ -83,8 +71,8 @@ let coinTimer = 0;
 const clickCooldown = fps * 0.4;
 let clickTimer = 0;
 function update(): void {
-    clickTimer += Number(timescale.value);
-    coinTimer += Number(timescale.value);
+    clickTimer += 1;
+    coinTimer += 1;
     if (coinTimer >= coinSpawnCooldown() && coins.length < 3) {
         let coinPos = new Vector2(Math.random() * canvWidth, Math.random() * canvHeight);
         coins.push(new coin(coinPos));
@@ -93,7 +81,7 @@ function update(): void {
     }
     let newCoins: coin[] = [];
     coins.forEach(c => {
-        if (c.collider.colliding(plCollider())) {
+        if (c.collider.colliding(pl.collider)) {
             c.onPlayerCollide();
         } else {
             newCoins.push(c);
@@ -101,18 +89,18 @@ function update(): void {
     });
     coins = newCoins;
 
-    if ((plCenter.x + plRadius > canvWidth && plVelocity.x > 0) || (plCenter.x - plRadius < 0 && plVelocity.x < 0))
-        plVelocity.x = -plVelocity.x * velocityMultOnHit();
-    if ((plCenter.y + plRadius > canvHeight && plVelocity.y > 0) || (plCenter.y - plRadius < 0 && plVelocity.y < 0))
-        plVelocity.y = -plVelocity.y * velocityMultOnHit();
-    plCenter.add(plVelocity.Mult(Number(timescale.value)));
+    if ((pl.center.x + pl.radius > canvWidth && pl.velocity.x > 0) || (pl.center.x - pl.radius < 0 && pl.velocity.x < 0))
+        pl.velocity.x = -pl.velocity.x * 0.9;
+    if ((pl.center.y + pl.radius > canvHeight && pl.velocity.y > 0) || (pl.center.y - pl.radius < 0 && pl.velocity.y < 0))
+        pl.velocity.y = -pl.velocity.y * 0.9;
+    pl.center.add(pl.velocity);
     render();
-    document.querySelector("#score")!.innerHTML = String(score);
+    document.querySelector("#score")!.innerHTML = String(pl.score);
 }
 
 function onClick(event: MouseEvent): void {
     if (clickTimer < clickCooldown) return;
-    plVelocity = CursorPos(event).Sub(plCenter).normalized.Mult(plSpeed());
+    pl.velocity = CursorPos(event).Sub(pl.center).normalized.Mult(pl.speed);
     clickTimer = 0;
 }
 
