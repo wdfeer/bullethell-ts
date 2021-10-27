@@ -85,6 +85,10 @@ var coin = /** @class */ (function () {
 }());
 var fps = 60;
 var canv = document.querySelector("canvas");
+window.onresize = function () {
+    canv.width = window.innerWidth;
+    canv.height = window.innerHeight;
+};
 canv.width = window.innerWidth;
 canv.height = window.innerHeight;
 var canvWidth = canv.width;
