@@ -57,7 +57,7 @@ var player = /** @class */ (function (_super) {
     });
     Object.defineProperty(player.prototype, "speed", {
         get: function () {
-            return 4 + this.score / 2;
+            return (3 + this.score / 2) * sizeMult();
         },
         enumerable: false,
         configurable: true
@@ -111,7 +111,7 @@ var boss1 = /** @class */ (function (_super) {
     __extends(boss1, _super);
     function boss1(center, radius) {
         var _this = _super.call(this, center, radius) || this;
-        _this.speed = 2.5;
+        _this.speed = 2.5 * sizeMult();
         _this.onPlayerHit = function () {
             pl.hp -= 100;
         };
@@ -123,7 +123,7 @@ var boss1 = /** @class */ (function (_super) {
                 _this.velocity = pl.center.Sub(_this.center).normalized.Mult(_this.speed);
             _this.attackTimer++;
             if (_this.attackTimer >= _this.attackCooldown) {
-                _this.rangedAttack();
+                _this.rangedAttack(pl.score > 5 && Math.random() < 0.2);
                 _this.attackTimer = 0;
             }
         };
@@ -140,16 +140,17 @@ var boss1 = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
-    boss1.prototype.rangedAttack = function () {
+    boss1.prototype.rangedAttack = function (homing) {
         var _this = this;
-        var bullets = shootEvenlyInACircle(Math.random() < 0.6 ? 6 : 12, 12 * sizeMult(), this.center, 1 + 3 * Math.random());
+        if (homing === void 0) { homing = false; }
+        var bullets = shootEvenlyInACircle(Math.random() < 0.6 ? 6 : 12, (homing ? 10 : 12) * sizeMult(), this.center, (1 + 3 * Math.random()) * sizeMult());
         bullets.forEach(function (b) {
             b.velocity.add(_this.velocity);
             bodies.push(b);
             var drawingsLen = drawings.length;
             drawings.push(function (ctx) {
                 drawCircle(ctx, b.radius, b.center, 'black', b.alpha);
-                fillCircle(ctx, b.radius, b.center, '#ef4099', b.alpha);
+                fillCircle(ctx, b.radius, b.center, homing ? '#9940ef' : '#ef4099', b.alpha);
             });
             b.timerPreTick = function (timeLeft) {
                 if (timeLeft <= 60) {
@@ -160,6 +161,13 @@ var boss1 = /** @class */ (function (_super) {
             b.onTimeout = function () {
                 delete drawings[drawingsLen];
             };
+            if (homing) {
+                b.ai = function () {
+                    var direction = pl.center.Sub(b.center).normalized;
+                    var dist = pl.center.Sub(b.center).length;
+                    b.velocity.add(direction.Div(dist > 1 ? dist * dist : 1).Mult(480 * sizeMult()));
+                };
+            }
         });
     };
     return boss1;
