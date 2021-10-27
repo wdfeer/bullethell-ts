@@ -135,15 +135,16 @@ var boss1 = /** @class */ (function (_super) {
     }
     Object.defineProperty(boss1.prototype, "attackCooldown", {
         get: function () {
-            return 40 + 80 / Math.sqrt(pl.score + 1);
+            return 40 + 80 / (pl.score > 9 ? Math.sqrt(pl.score - 8) : 1);
         },
         enumerable: false,
         configurable: true
     });
     boss1.prototype.rangedAttack = function () {
         var _this = this;
-        var bullets = shootEvenlyInACircle(6 + Math.random() > 0.5 ? 6 : 0, 12 * sizeMult(), this.center, 1 + 3 * Math.random());
+        var bullets = shootEvenlyInACircle(Math.random() < 0.6 ? 6 : 12, 12 * sizeMult(), this.center, 1 + 3 * Math.random());
         bullets.forEach(function (b) {
+            b.velocity.add(_this.velocity);
             bodies.push(b);
             var drawingsLen = drawings.length;
             drawings.push(function (ctx) {
