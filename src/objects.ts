@@ -78,7 +78,7 @@ class boss1 extends enemy {
         }
     }
     rangedAttack() {
-        let bullets = shootEvenlyInACircle(3 + Math.floor(Math.sqrt(pl.score)), 19, this.center, 5 + 10 * Math.random());
+        let bullets = shootEvenlyInACircle(3 + Math.floor(Math.sqrt(pl.score)), 15 * sizeMult(), this.center, 5 + 10 * Math.random());
         bullets.forEach(b => {
             bodies.push(b);
             drawings.push((ctx) => {
@@ -117,7 +117,9 @@ function shootEvenlyInACircle(count: number, bulletRadius: number, pos: Vector2,
     return bullets;
 }
 class coin {
-    static radius = 25;
+    static get radius() {
+        return 22 * sizeMult();
+    }
     draw: draw;
     drawingId: number;
     collider: CircleCollider;
