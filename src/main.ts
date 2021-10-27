@@ -8,16 +8,27 @@ window.onresize = () => {
 }
 canv.width = window.innerWidth;
 canv.height = window.innerHeight;
+function randomPoint(): Vector2 {
+    return new Vector2(Math.random() * canv.width, Math.random() * canv.height)
+}
 
+var bodies: body[];
 var pl: player;
+var boss: enemy;
 function restart(): void {
-    pl = new player(new Vector2(canv.width / 2, canv.height / 2), 13);
+    pl = new player(new Vector2(canv.width / 2, canv.height / 2), 9);
+    new SecTimer(8, (count) => {
+        if (count == 1)
+            boss = new boss1(randomPoint(), 60);
+        bodies.push(boss);
+    })
+    bodies = [pl];
 
     coins = [];
 
     drawings = [(ctx) => {
         drawCircle(ctx, pl.radius, pl.center);
-        fillCircle(ctx, pl.radius, pl.center, '#eeeeee');
+        fillCircle(ctx, pl.radius, pl.center, 'crimson');
     }];
 }
 window.onkeydown = (event) => {
@@ -29,11 +40,11 @@ restart();
 var coins: coin[] = [];
 var coinTimer = 0;
 
-new Timer(1000 / fps, 99999999, update);
-function update(): void {
+new Timer(1000 / fps, 99999999, gameUpdate);
+function gameUpdate(): void {
     coinTimer += 1;
     if (coinTimer >= pl.coinSpawnCooldown && coins.length < 3) {
-        let coinPos = new Vector2(Math.random() * canv.width, Math.random() * canv.height);
+        let coinPos = randomPoint();
         coins.push(new coin(coinPos));
 
         coinTimer = 0;
@@ -48,11 +59,12 @@ function update(): void {
     });
     coins = newCoins;
 
-    if ((pl.center.x + pl.radius > canv.width && pl.velocity.x > 0) || (pl.center.x - pl.radius < 0 && pl.velocity.x < 0))
-        pl.velocity.x = -pl.velocity.x * 0.9;
-    if ((pl.center.y + pl.radius > canv.height && pl.velocity.y > 0) || (pl.center.y - pl.radius < 0 && pl.velocity.y < 0))
-        pl.velocity.y = -pl.velocity.y * 0.9;
-    pl.center.add(pl.velocity);
+    bodies.forEach(b => {
+        if (!b) return;
+        b.update();
+        if (b instanceof enemy)
+            b.AI();
+    });
 
     render();
 }

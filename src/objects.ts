@@ -24,13 +24,43 @@ class player extends body {
     constructor(center: Vector2, radius: number) {
         super(center, radius);
     }
+    update() {
+        this.center.add(this.velocity);
+        if ((this.center.x + this.radius > canv.width && this.velocity.x > 0) || (this.center.x - this.radius < 0 && this.velocity.x < 0))
+            this.velocity.x = -this.velocity.x * 0.9;
+        if ((this.center.y + this.radius > canv.height && this.velocity.y > 0) || (this.center.y - this.radius < 0 && this.velocity.y < 0))
+            this.velocity.y = -this.velocity.y * 0.9;
+    }
 }
-class enemy extends body {
+abstract class enemy extends body {
+    active: boolean = true;
     constructor(center: Vector2, radius: number) {
         super(center, radius);
     }
+    protected ai = () => { };
+    public get AI(): () => void {
+        if (!this.active)
+            return () => { };
+        return this.ai;
+    }
 }
-class bullet extends body {
+class boss1 extends enemy {
+    speed = 6;
+    constructor(center: Vector2, radius: number) {
+        super(center, radius);
+        drawings.push((ctx) => {
+            fillCircle(ctx, this.radius, this.center, 'red');
+            fillCircle(ctx, this.radius * 0.9, this.center, 'black');
+        });
+    }
+    ai = () => {
+        let diff: Vector2 = pl.center.Sub(this.center);
+        let dist: number = diff.length;
+        if (dist > 200 + 1000 * Math.random())
+            this.velocity = pl.center.Sub(this.center).normalized.Mult(this.speed);
+    }
+}
+class bullet extends enemy {
     constructor(center: Vector2, velocity: Vector2, radius: number) {
         super(center, radius);
         this.velocity = velocity;
