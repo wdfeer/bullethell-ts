@@ -41,9 +41,17 @@ class coin {
     drawing: drawing;
     drawingId: number;
     collider: Circle;
-    onPlayerCollide: () => void = () => { delete drawings[this.drawingId]; pl.score++; };
+    onPlayerCollide: () => void = () => {
+        pl.score++;
+        drawings[this.drawingId] = new drawing((ctx) => {
+            drawCenteredText(ctx, String(pl.score));
+        });
+    };
     constructor(public pos: Vector2) {
-        this.drawing = new drawing(ctx => { drawCircle(ctx, coin.radius, pos, 'brown') });
+        this.drawing = new drawing(ctx => {
+            drawCircle(ctx, coin.radius, pos, 'brown');
+            fillCircle(ctx, coin.radius, pos, '#ffffde');
+        });
         this.drawingId = drawings.length;
         drawings.push(this.drawing);
         this.collider = new Circle(pos, coin.radius);
@@ -66,7 +74,10 @@ function restart(): void {
 
     coins = [];
 
-    drawings = [new drawing((ctx) => { drawCircle(ctx, pl.radius, pl.center) })];
+    drawings = [new drawing((ctx) => {
+        drawCircle(ctx, pl.radius, pl.center);
+        fillCircle(ctx, pl.radius, pl.center, '#eeeeee');
+    })];
 }
 window.onkeydown = (event) => {
     if (event.key == 'r')
