@@ -15,6 +15,16 @@ class body {
 }
 class player extends body {
     score: number = 0;
+    private _hp: number = 100;
+    public get hp(): number {
+        return this._hp;
+    }
+    public set hp(value: number) {
+        if (value <= 0)
+            restart();
+        this._hp = value;
+    }
+
     get speed() {
         return 4 + this.score / 2;
     }
@@ -37,10 +47,13 @@ abstract class enemy extends body {
     constructor(center: Vector2, radius: number) {
         super(center, radius);
     }
+    onPlayerHit = () => { };
     protected ai = () => { };
     public get AI(): () => void {
         if (!this.active)
             return () => { };
+        if (this.collider.colliding(pl.collider))
+            this.onPlayerHit();
         return this.ai;
     }
 }
@@ -52,6 +65,9 @@ class boss1 extends enemy {
             fillCircle(ctx, this.radius, this.center, 'red');
             fillCircle(ctx, this.radius * 0.9, this.center, 'black');
         });
+    }
+    onPlayerHit = () => {
+        pl.hp -= 100;
     }
     ai = () => {
         let diff: Vector2 = pl.center.Sub(this.center);
@@ -71,8 +87,11 @@ class coin {
     draw: draw;
     drawingId: number;
     collider: CircleCollider;
-    onPlayerCollide: () => void = () => {
+    deleteDrawing(){
         delete drawings[this.drawingId];
+    }
+    onPlayerCollide: () => void = () => {
+        this.deleteDrawing();
         pl.score++;
 
         let alpha = 1;

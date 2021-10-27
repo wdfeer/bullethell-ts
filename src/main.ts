@@ -17,10 +17,16 @@ var pl: player;
 var boss: enemy;
 function restart(): void {
     pl = new player(new Vector2(canv.width / 2, canv.height / 2), 9);
-    new SecTimer(8, (count) => {
-        if (count == 1)
-            boss = new boss1(randomPoint(), 60);
-        bodies.push(boss);
+    if (boss)
+        boss.active = false;
+    new SecTimer(9, (count, timer) => {
+        if (count == 1) {
+            if (pl.score > 0) {
+                boss = new boss1(randomPoint(), 60);
+                bodies.push(boss);
+            }
+            else timer.counter += 4;
+        }
     })
     bodies = [pl];
 
@@ -51,11 +57,14 @@ function gameUpdate(): void {
     }
     let newCoins: coin[] = [];
     coins.forEach(c => {
-        if (c.collider.colliding(pl.collider)) {
+        let plColliding = c.collider.colliding(pl.collider);
+        if (plColliding)
             c.onPlayerCollide();
-        } else {
-            newCoins.push(c);
+        if (plColliding || (boss && c.collider.colliding(boss.collider))) {
+            c.deleteDrawing();
         }
+        else
+            newCoins.push(c);
     });
     coins = newCoins;
 
