@@ -37,7 +37,7 @@ jobs:
         
       - name: Track the compiled JS with git
         run:
-          git add wwwroot/js
+          git add wwwroot/js -f
         
       - name: Commit wwwroot to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@3.7.1
