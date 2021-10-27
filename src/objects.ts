@@ -28,7 +28,7 @@ class player extends body {
     }
 
     get speed() {
-        return 4 + this.score / 2;
+        return (3 + this.score / 2) * sizeMult();
     }
     get coinSpawnCooldown() {
         return fps * 3 / Math.sqrt(1 + this.score / 3);
@@ -50,7 +50,7 @@ abstract class enemy extends body {
         super(center, radius);
     }
     onPlayerHit = () => { };
-    protected ai = () => { };
+    ai = () => { };
     public get AI(): () => void {
         if (!this.active)
             return () => { };
@@ -67,7 +67,7 @@ abstract class enemy extends body {
     }
 }
 class boss1 extends enemy {
-    speed = 2.5;
+    speed = 2.5 * sizeMult();
     onPlayerHit = () => {
         pl.hp -= 100;
     }
@@ -82,19 +82,19 @@ class boss1 extends enemy {
             this.velocity = pl.center.Sub(this.center).normalized.Mult(this.speed);
         this.attackTimer++;
         if (this.attackTimer >= this.attackCooldown) {
-            this.rangedAttack();
+            this.rangedAttack(pl.score > 5 && Math.random() < 0.2);
             this.attackTimer = 0;
         }
     }
-    rangedAttack() {
-        let bullets = shootEvenlyInACircle(Math.random() < 0.6 ? 6 : 12, 12 * sizeMult(), this.center, 1 + 3 * Math.random());
+    rangedAttack(homing: boolean = false) {
+        let bullets = shootEvenlyInACircle(Math.random() < 0.6 ? 6 : 12, (homing ? 10 : 12) * sizeMult(), this.center, (1 + 3 * Math.random()) * sizeMult());
         bullets.forEach(b => {
             b.velocity.add(this.velocity);
             bodies.push(b);
             let drawingsLen = drawings.length;
             drawings.push((ctx) => {
                 drawCircle(ctx, b.radius, b.center, 'black', b.alpha);
-                fillCircle(ctx, b.radius, b.center, '#ef4099', b.alpha);
+                fillCircle(ctx, b.radius, b.center, homing ? '#9940ef' : '#ef4099', b.alpha);
             });
             b.timerPreTick = (timeLeft) => {
                 if (timeLeft <= 60){
@@ -104,6 +104,13 @@ class boss1 extends enemy {
             }
             b.onTimeout = () => {
                 delete drawings[drawingsLen];
+            }
+            if (homing){
+                b.ai = () => {
+                    let direction = pl.center.Sub(b.center).normalized;
+                    let dist = pl.center.Sub(b.center).length;
+                    b.velocity.add(direction.Div(dist > 1 ? dist*dist : 1).Mult(480 * sizeMult()));
+                }
             }
         });
     }
