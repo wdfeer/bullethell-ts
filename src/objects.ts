@@ -13,6 +13,10 @@ class body {
     }
     update() {
         this.center.add(this.velocity);
+        if ((this.center.x + this.radius > canv.width && this.velocity.x > 0) || (this.center.x - this.radius < 0 && this.velocity.x < 0))
+            this.velocity.x = -this.velocity.x * 0.5;
+        if ((this.center.y + this.radius > canv.height && this.velocity.y > 0) || (this.center.y - this.radius < 0 && this.velocity.y < 0))
+            this.velocity.y = -this.velocity.y * 0.5;
     }
 }
 class player extends body {
@@ -26,7 +30,6 @@ class player extends body {
             restart();
         this._hp = value;
     }
-
     get speed() {
         return (3 + this.score / 2) * sizeMult();
     }
@@ -35,13 +38,6 @@ class player extends body {
     }
     constructor(center: Vector2, radius: number) {
         super(center, radius);
-    }
-    update() {
-        this.center.add(this.velocity);
-        if ((this.center.x + this.radius > canv.width && this.velocity.x > 0) || (this.center.x - this.radius < 0 && this.velocity.x < 0))
-            this.velocity.x = -this.velocity.x * 0.9;
-        if ((this.center.y + this.radius > canv.height && this.velocity.y > 0) || (this.center.y - this.radius < 0 && this.velocity.y < 0))
-            this.velocity.y = -this.velocity.y * 0.9;
     }
 }
 abstract class enemy extends body {
@@ -57,13 +53,6 @@ abstract class enemy extends body {
         if (this.collider.colliding(pl.collider))
             this.onPlayerHit();
         return this.ai;
-    }
-    update() {
-        this.center.add(this.velocity);
-        if ((this.center.x + this.radius > canv.width && this.velocity.x > 0) || (this.center.x - this.radius < 0 && this.velocity.x < 0))
-            this.velocity.x = -this.velocity.x * 0.5;
-        if ((this.center.y + this.radius > canv.height && this.velocity.y > 0) || (this.center.y - this.radius < 0 && this.velocity.y < 0))
-            this.velocity.y = -this.velocity.y * 0.5;
     }
 }
 class boss1 extends enemy {
@@ -92,24 +81,26 @@ class boss1 extends enemy {
             b.velocity.add(this.velocity);
             bodies.push(b);
             let drawingsLen = drawings.length;
-            drawings.push((ctx) => {
-                drawCircle(ctx, b.radius, b.center, 'black', b.alpha);
-                fillCircle(ctx, b.radius, b.center, homing ? '#9940ef' : '#ef4099', b.alpha);
+            drawings.push({
+                draw: (ctx) => {
+                    drawCircle(ctx, b.radius, b.center, 'black', b.alpha);
+                    fillCircle(ctx, b.radius, b.center, homing ? '#9940ef' : '#ef4099', b.alpha)
+                }, zIndex: bullet.zIndex
             });
             b.timerPreTick = (timeLeft) => {
-                if (timeLeft <= 60){
+                if (timeLeft <= 60) {
                     this.alpha = timeLeft / 60;
                     delete bodies[bodies.indexOf(b)];
-                }  
+                }
             }
             b.onTimeout = () => {
                 delete drawings[drawingsLen];
             }
-            if (homing){
+            if (homing) {
                 b.ai = () => {
                     let direction = pl.center.Sub(b.center).normalized;
                     let dist = pl.center.Sub(b.center).length;
-                    b.velocity.add(direction.Div(dist > 1 ? dist*dist : 1).Mult(480 * sizeMult()));
+                    b.velocity.add(direction.Div(dist > 1 ? dist * dist : 1).Mult(480 * sizeMult()));
                 }
             }
         });
@@ -123,6 +114,7 @@ class boss1 extends enemy {
     }
 }
 class bullet extends enemy {
+    static zIndex = -1;
     onPlayerHit = () => {
         pl.hp -= 100;
     }
@@ -154,7 +146,7 @@ class coin {
     static get radius() {
         return 22 * sizeMult();
     }
-    draw: draw;
+    drawing: drawing;
     drawingId: number;
     collider: CircleCollider;
     deleteDrawing() {
@@ -176,12 +168,14 @@ class coin {
         };
     };
     constructor(public pos: Vector2) {
-        this.draw = ctx => {
-            drawCircle(ctx, coin.radius, pos, 'green');
-            fillCircle(ctx, coin.radius, pos, '#ffffde');
+        this.drawing = {
+            draw: ctx => {
+                drawCircle(ctx, coin.radius, pos, 'green');
+                fillCircle(ctx, coin.radius, pos, '#ffffde');
+            }, zIndex: -2
         };
         this.drawingId = drawings.length;
-        drawings.push(this.draw);
+        drawings.push(this.drawing);
         this.collider = new CircleCollider(pos, coin.radius);
     }
 }

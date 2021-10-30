@@ -1,15 +1,31 @@
 type draw = (ctx: CanvasRenderingContext2D) => void;
+type drawing = {
+    draw: draw,
+    zIndex: number
+}
 
-var scoreDraw: draw = (ctx) => {};
-var drawings: draw[] = [];
+var scoreDraw: draw = (ctx) => { };
+var drawings: (drawing | draw)[] = [];
 
 function render(): void {
     let ctx = canv.getContext("2d")!;
     ctx.clearRect(0, 0, canv.width, canv.height);
 
-    drawings.forEach(draw => {
-        draw(ctx);
-    });
+    let getZ = (d: drawing | draw) => {
+        if (typeof d == 'function')
+            return 0;
+        else return d.zIndex;
+    };
+    console.log(drawings.min(getZ), drawings.max(getZ));
+    for (let i = drawings.min(getZ); i <= drawings.max(getZ); i++) {
+        drawings.forEach(d => {
+            if (getZ(d) == i) {
+                if (typeof d == 'function')
+                    d(ctx);
+                else d.draw(ctx);
+            }
+        });
+    }
     scoreDraw(ctx);
 }
 
