@@ -1,32 +1,53 @@
 type draw = (ctx: CanvasRenderingContext2D) => void;
-type drawing = {
-    draw: draw,
-    zIndex: number
+class drawable {
+    isDrawn: boolean = true;
+    draw: draw;
+    Draw(ctx: CanvasRenderingContext2D) {
+        if (this.isDrawn)
+            this.draw(ctx);
+    }
+    zIndex: number;
+    id: string;
+    delete() {
+        delete drawables[drawables.indexOf(this)];
+    }
+    constructor(draw: draw = () => { }, zIndex: number = 0, id: string = '') {
+        this.draw = draw;
+        this.zIndex = zIndex;
+        this.id = id;
+        drawables.push(this);
+    }
 }
-
-var scoreDraw: draw = (ctx) => { };
-var drawings: (drawing | draw)[] = [];
+function setDrawableWithIdOrPush(drawable: drawable, id: string): void {
+    if (!setDrawableWithId(drawable, id))
+        drawables.push(drawable);
+}
+function setDrawableWithId(drawable: drawable, id: string): boolean {
+    for (let i = 0; i < drawables.length; i++) {
+        if (drawables[i].id != id) continue;
+        drawables[i] = drawable;
+        return true;
+    }
+    return false;
+}
+var drawables: drawable[] = [];
 
 function render(): void {
     let ctx = canv.getContext("2d")!;
     ctx.clearRect(0, 0, canv.width, canv.height);
 
-    let getZ = (d: drawing | draw) => {
-        if (typeof d == 'function')
-            return 0;
-        else return d.zIndex;
+    let getZ = (d: drawable) => {
+        if (d)
+            return d.zIndex;
+        return 0;
     };
-    console.log(drawings.min(getZ), drawings.max(getZ));
-    for (let i = drawings.min(getZ); i <= drawings.max(getZ); i++) {
-        drawings.forEach(d => {
-            if (getZ(d) == i) {
-                if (typeof d == 'function')
-                    d(ctx);
-                else d.draw(ctx);
+    for (let i = drawables.min(getZ); i <= drawables.max(getZ); i++) {
+        drawables.forEach(d => {
+            if (d.zIndex == i) {
+                d.Draw(ctx);
             }
         });
     }
-    scoreDraw(ctx);
 }
 
 function drawCircle(ctx: CanvasRenderingContext2D, radius: number, center: Vector2, color: string = 'black', alpha: number = 1): void {

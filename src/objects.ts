@@ -1,4 +1,4 @@
-class body {
+class body extends drawable {
     alpha: number = 1;
 
     center: Vector2 = Vector2.Zero;
@@ -8,6 +8,7 @@ class body {
         return new CircleCollider(this.center, this.radius)
     }
     constructor(center: Vector2, radius: number) {
+        super();
         this.center = center;
         this.radius = radius;
     }
@@ -20,6 +21,11 @@ class body {
     }
 }
 class player extends body {
+    draw = (ctx: CanvasRenderingContext2D) => {
+        drawCircle(ctx, getPlayer().radius, getPlayer().center);
+        fillCircle(ctx, getPlayer().radius, getPlayer().center, 'crimson');
+    };
+    id = 'player';
     score: number = 0;
     private _hp: number = 100;
     public get hp(): number {
@@ -41,37 +47,37 @@ class player extends body {
     }
 }
 abstract class enemy extends body {
-    active: boolean = true;
     constructor(center: Vector2, radius: number) {
         super(center, radius);
     }
     onPlayerHit = () => { };
     ai = () => { };
     public get AI(): () => void {
-        if (!this.active)
+        if (!this.isDrawn)
             return () => { };
-        if (this.collider.colliding(pl.collider))
+        if (this.collider.colliding(getPlayer().collider))
             this.onPlayerHit();
         return this.ai;
     }
 }
 class boss1 extends enemy {
+    id = 'boss1';
     speed = 2.5 * sizeMult();
     onPlayerHit = () => {
-        pl.hp -= 100;
+        getPlayer().hp -= 100;
     }
     get attackCooldown(): number {
-        return 40 + 80 / (pl.score > 9 ? Math.sqrt(pl.score - 8) : 1);
+        return 40 + 80 / (getPlayer().score > 9 ? Math.sqrt(getPlayer().score - 8) : 1);
     }
     attackTimer = 0;
     ai = () => {
-        let diff: Vector2 = pl.center.Sub(this.center);
+        let diff: Vector2 = getPlayer().center.Sub(this.center);
         let dist: number = diff.length;
         if (dist > this.radius * 4 + this.radius * 20 * Math.random())
-            this.velocity = pl.center.Sub(this.center).normalized.Mult(this.speed);
+            this.velocity = getPlayer().center.Sub(this.center).normalized.Mult(this.speed);
         this.attackTimer++;
         if (this.attackTimer >= this.attackCooldown) {
-            this.rangedAttack(pl.score > 5 && Math.random() < 0.2);
+            this.rangedAttack(getPlayer().score > 5 && Math.random() < 0.2);
             this.attackTimer = 0;
         }
     }
@@ -79,27 +85,23 @@ class boss1 extends enemy {
         let bullets = shootEvenlyInACircle(Math.random() < 0.6 ? 6 : 12, (homing ? 10 : 12) * sizeMult(), this.center, (1 + 3 * Math.random()) * sizeMult());
         bullets.forEach(b => {
             b.velocity.add(this.velocity);
-            bodies.push(b);
-            let drawingsLen = drawings.length;
-            drawings.push({
-                draw: (ctx) => {
-                    drawCircle(ctx, b.radius, b.center, 'black', b.alpha);
-                    fillCircle(ctx, b.radius, b.center, homing ? '#9940ef' : '#ef4099', b.alpha)
-                }, zIndex: bullet.zIndex
-            });
-            b.timerPreTick = (timeLeft) => {
+            b.draw = (ctx) => {
+                drawCircle(ctx, b.radius, b.center, 'black', b.alpha);
+                fillCircle(ctx, b.radius, b.center, homing ? '#9940ef' : '#ef4099', b.alpha)
+            };
+            b.preUpdate = (timeLeft) => {
                 if (timeLeft <= 60) {
                     this.alpha = timeLeft / 60;
-                    delete bodies[bodies.indexOf(b)];
+                    this.onPlayerHit = () => { };
                 }
             }
             b.onTimeout = () => {
-                delete drawings[drawingsLen];
+                b.delete();
             }
             if (homing) {
                 b.ai = () => {
-                    let direction = pl.center.Sub(b.center).normalized;
-                    let dist = pl.center.Sub(b.center).length;
+                    let direction = getPlayer().center.Sub(b.center).normalized;
+                    let dist = getPlayer().center.Sub(b.center).length;
                     b.velocity.add(direction.Div(dist > 1 ? dist * dist : 1).Mult(480 * sizeMult()));
                 }
             }
@@ -107,27 +109,35 @@ class boss1 extends enemy {
     }
     constructor(center: Vector2, radius: number) {
         super(center, radius);
-        drawings.push((ctx) => {
+        this.draw = (ctx) => {
             fillCircle(ctx, this.radius, this.center, '#ff10a0');
             fillCircle(ctx, this.radius * 0.9, this.center, 'black');
-        });
+        };
     }
 }
 class bullet extends enemy {
-    static zIndex = -1;
+    zIndex = -1;
     onPlayerHit = () => {
-        pl.hp -= 100;
+        getPlayer().hp -= 100;
     }
-    timerPreTick = (timeLeft: number) => { };
+    timer: Timer;
+    preUpdate = (timeLeft: number) => { };
     onTimeout = () => { };
     constructor(center: Vector2, velocity: Vector2, radius: number, lifetime: number = 9) {
         super(center, radius);
         this.velocity = velocity;
-        new Timer(frameInterval, lifetime * fps, (c) => {
-            this.timerPreTick(c);
+        this.timer = new Timer(frameInterval, lifetime * fps, (c) => {
+            this.preUpdate(c);
             if (c <= 1)
                 this.onTimeout();
         });
+    }
+    delete() {
+        this.timer.end();
+        super.delete();
+    }
+    update() {
+        super.update();
     }
 }
 function shootEvenlyInACircle(count: number, bulletRadius: number, pos: Vector2, velocity: number, spawnRadius: number = 0): bullet[] {
@@ -142,19 +152,14 @@ function shootEvenlyInACircle(count: number, bulletRadius: number, pos: Vector2,
     }
     return bullets;
 }
-class coin {
+class coin extends drawable {
+    zIndex = -2;
     static get radius() {
         return 22 * sizeMult();
     }
-    drawing: drawing;
-    drawingId: number;
     collider: CircleCollider;
-    deleteDrawing() {
-        delete drawings[this.drawingId];
-    }
     onPlayerCollide: () => void = () => {
-        this.deleteDrawing();
-        pl.score++;
+        getPlayer().score++;
 
         let alpha = 1;
         let timeLeft = fps * 2;
@@ -163,19 +168,20 @@ class coin {
                 alpha = counter / (timeLeft / 3);
             }
         });
-        scoreDraw = (ctx) => {
-            drawCenteredText(ctx, String(pl.score), undefined, alpha);
-        };
+        new drawable((ctx) => {
+            drawCenteredText(ctx, String(getPlayer().score), undefined, alpha);
+        }, undefined, 'score');
+
+        this.delete();
     };
     constructor(public pos: Vector2) {
-        this.drawing = {
-            draw: ctx => {
-                drawCircle(ctx, coin.radius, pos, 'green');
-                fillCircle(ctx, coin.radius, pos, '#ffffde');
-            }, zIndex: -2
-        };
-        this.drawingId = drawings.length;
-        drawings.push(this.drawing);
+        super(ctx => {
+            drawCircle(ctx, coin.radius, pos, 'green');
+            fillCircle(ctx, coin.radius, pos, '#faffde');
+        });
         this.collider = new CircleCollider(pos, coin.radius);
+    }
+    update() {
+
     }
 }

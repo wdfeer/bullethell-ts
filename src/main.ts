@@ -15,37 +15,31 @@ function randomPoint(): Vector2 {
     return new Vector2(Math.random() * canv.width, Math.random() * canv.height)
 }
 
-var bodies: body[];
-var pl: player;
+function getBodies(): body[] {
+    return drawables.filter(x => x instanceof body) as body[];
+}
+function getPlayer() {
+    return drawables.filter(x => x instanceof player)[0] as player;
+}
 var boss: enemy;
 let bossTimer: SecTimer;
 function restart(): void {
-    pl = new player(new Vector2(canv.width / 2, canv.height / 2), 8.5 * sizeMult());
-    if (boss)
-        boss.active = false;
+    drawables = [new drawable()];
+    new player(new Vector2(canv.width / 2, canv.height / 2), 8.5 * sizeMult());
     if (bossTimer)
         bossTimer.end();
     bossTimer = new SecTimer(9, (count, timer) => {
         if (count == 1) {
-            if (pl.score > 0) {
+            if (getPlayer().score > 0) {
                 let pos = randomPoint();
-                while (pos.Sub(pl.center).length < (canv.width + canv.height) / 3) {
+                while (pos.Sub(getPlayer().center).length < (canv.width + canv.height) / 3) {
                     pos = randomPoint();
                 }
                 boss = new boss1(pos, 55 * sizeMult());
-                bodies.push(boss);
             }
             else timer.counter += 4;
         }
     })
-    bodies = [pl];
-
-    coins = [];
-
-    drawings = [(ctx) => {
-        drawCircle(ctx, pl.radius, pl.center);
-        fillCircle(ctx, pl.radius, pl.center, 'crimson');
-    }];
 }
 window.onkeydown = (event) => {
     if (event.key == 'r')
@@ -53,32 +47,32 @@ window.onkeydown = (event) => {
 }
 restart();
 
-var coins: coin[] = [];
+function getCoins(): coin[] {
+    return drawables.filter(x => x instanceof coin) as coin[];
+}
 var coinTimer = 0;
 
 new Timer(1000 / fps, 99999999, gameUpdate);
 function gameUpdate(): void {
+
     coinTimer += 1;
-    if (coinTimer >= pl.coinSpawnCooldown && coins.length < 3) {
+    if (coinTimer >= getPlayer().coinSpawnCooldown && getCoins().length < 3) {
         let coinPos = randomPoint();
-        coins.push(new coin(coinPos));
+        new coin(coinPos);
 
         coinTimer = 0;
     }
-    let newCoins: coin[] = [];
-    coins.forEach(c => {
-        let plColliding = c.collider.colliding(pl.collider);
+
+    getCoins().forEach(c => {
+        let plColliding = c.collider.colliding(getPlayer().collider);
         if (plColliding)
             c.onPlayerCollide();
         if (plColliding || (boss && c.collider.colliding(boss.collider))) {
-            c.deleteDrawing();
+            c.delete();
         }
-        else
-            newCoins.push(c);
     });
-    coins = newCoins;
 
-    bodies.forEach(b => {
+    getBodies().forEach(b => {
         if (!b) return;
         b.update();
         if (b instanceof enemy)
@@ -89,7 +83,7 @@ function gameUpdate(): void {
 }
 
 function onClick(event: MouseEvent): void {
-    pl.velocity = CursorPos(event).Sub(pl.center).normalized.Mult(pl.speed);
+    getPlayer().velocity = CursorPos(event).Sub(getPlayer().center).normalized.Mult(getPlayer().speed);
 }
 
 function CursorPos(event: MouseEvent): Vector2 {
