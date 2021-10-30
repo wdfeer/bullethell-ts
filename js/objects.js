@@ -32,6 +32,10 @@ var body = /** @class */ (function () {
     });
     body.prototype.update = function () {
         this.center.add(this.velocity);
+        if ((this.center.x + this.radius > canv.width && this.velocity.x > 0) || (this.center.x - this.radius < 0 && this.velocity.x < 0))
+            this.velocity.x = -this.velocity.x * 0.5;
+        if ((this.center.y + this.radius > canv.height && this.velocity.y > 0) || (this.center.y - this.radius < 0 && this.velocity.y < 0))
+            this.velocity.y = -this.velocity.y * 0.5;
     };
     return body;
 }());
@@ -69,13 +73,6 @@ var player = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
-    player.prototype.update = function () {
-        this.center.add(this.velocity);
-        if ((this.center.x + this.radius > canv.width && this.velocity.x > 0) || (this.center.x - this.radius < 0 && this.velocity.x < 0))
-            this.velocity.x = -this.velocity.x * 0.9;
-        if ((this.center.y + this.radius > canv.height && this.velocity.y > 0) || (this.center.y - this.radius < 0 && this.velocity.y < 0))
-            this.velocity.y = -this.velocity.y * 0.9;
-    };
     return player;
 }(body));
 var enemy = /** @class */ (function (_super) {
@@ -98,13 +95,6 @@ var enemy = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
-    enemy.prototype.update = function () {
-        this.center.add(this.velocity);
-        if ((this.center.x + this.radius > canv.width && this.velocity.x > 0) || (this.center.x - this.radius < 0 && this.velocity.x < 0))
-            this.velocity.x = -this.velocity.x * 0.5;
-        if ((this.center.y + this.radius > canv.height && this.velocity.y > 0) || (this.center.y - this.radius < 0 && this.velocity.y < 0))
-            this.velocity.y = -this.velocity.y * 0.5;
-    };
     return enemy;
 }(body));
 var boss1 = /** @class */ (function (_super) {
@@ -148,9 +138,11 @@ var boss1 = /** @class */ (function (_super) {
             b.velocity.add(_this.velocity);
             bodies.push(b);
             var drawingsLen = drawings.length;
-            drawings.push(function (ctx) {
-                drawCircle(ctx, b.radius, b.center, 'black', b.alpha);
-                fillCircle(ctx, b.radius, b.center, homing ? '#9940ef' : '#ef4099', b.alpha);
+            drawings.push({
+                draw: function (ctx) {
+                    drawCircle(ctx, b.radius, b.center, 'black', b.alpha);
+                    fillCircle(ctx, b.radius, b.center, homing ? '#9940ef' : '#ef4099', b.alpha);
+                }, zIndex: bullet.zIndex
             });
             b.timerPreTick = function (timeLeft) {
                 if (timeLeft <= 60) {
@@ -190,6 +182,7 @@ var bullet = /** @class */ (function (_super) {
         });
         return _this;
     }
+    bullet.zIndex = -1;
     return bullet;
 }(enemy));
 function shootEvenlyInACircle(count, bulletRadius, pos, velocity, spawnRadius) {
@@ -223,12 +216,14 @@ var coin = /** @class */ (function () {
                 drawCenteredText(ctx, String(pl.score), undefined, alpha);
             };
         };
-        this.draw = function (ctx) {
-            drawCircle(ctx, coin.radius, pos, 'green');
-            fillCircle(ctx, coin.radius, pos, '#ffffde');
+        this.drawing = {
+            draw: function (ctx) {
+                drawCircle(ctx, coin.radius, pos, 'green');
+                fillCircle(ctx, coin.radius, pos, '#ffffde');
+            }, zIndex: -2
         };
         this.drawingId = drawings.length;
-        drawings.push(this.draw);
+        drawings.push(this.drawing);
         this.collider = new CircleCollider(pos, coin.radius);
     }
     Object.defineProperty(coin, "radius", {

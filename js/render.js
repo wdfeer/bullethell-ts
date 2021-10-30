@@ -4,9 +4,26 @@ var drawings = [];
 function render() {
     var ctx = canv.getContext("2d");
     ctx.clearRect(0, 0, canv.width, canv.height);
-    drawings.forEach(function (draw) {
-        draw(ctx);
-    });
+    var getZ = function (d) {
+        if (typeof d == 'function')
+            return 0;
+        else
+            return d.zIndex;
+    };
+    console.log(drawings.min(getZ), drawings.max(getZ));
+    var _loop_1 = function (i) {
+        drawings.forEach(function (d) {
+            if (getZ(d) == i) {
+                if (typeof d == 'function')
+                    d(ctx);
+                else
+                    d.draw(ctx);
+            }
+        });
+    };
+    for (var i = drawings.min(getZ); i <= drawings.max(getZ); i++) {
+        _loop_1(i);
+    }
     scoreDraw(ctx);
 }
 function drawCircle(ctx, radius, center, color, alpha) {
