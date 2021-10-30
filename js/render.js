@@ -1,30 +1,56 @@
 "use strict";
-var scoreDraw = function (ctx) { };
-var drawings = [];
+var drawable = /** @class */ (function () {
+    function drawable(draw, zIndex, id) {
+        if (draw === void 0) { draw = function () { }; }
+        if (zIndex === void 0) { zIndex = 0; }
+        if (id === void 0) { id = ''; }
+        this.isDrawn = true;
+        this.draw = draw;
+        this.zIndex = zIndex;
+        this.id = id;
+        drawables.push(this);
+    }
+    drawable.prototype.Draw = function (ctx) {
+        if (this.isDrawn)
+            this.draw(ctx);
+    };
+    drawable.prototype.delete = function () {
+        delete drawables[drawables.indexOf(this)];
+    };
+    return drawable;
+}());
+function setDrawableWithIdOrPush(drawable, id) {
+    if (!setDrawableWithId(drawable, id))
+        drawables.push(drawable);
+}
+function setDrawableWithId(drawable, id) {
+    for (var i = 0; i < drawables.length; i++) {
+        if (drawables[i].id != id)
+            continue;
+        drawables[i] = drawable;
+        return true;
+    }
+    return false;
+}
+var drawables = [];
 function render() {
     var ctx = canv.getContext("2d");
     ctx.clearRect(0, 0, canv.width, canv.height);
     var getZ = function (d) {
-        if (typeof d == 'function')
-            return 0;
-        else
+        if (d)
             return d.zIndex;
+        return 0;
     };
-    console.log(drawings.min(getZ), drawings.max(getZ));
     var _loop_1 = function (i) {
-        drawings.forEach(function (d) {
-            if (getZ(d) == i) {
-                if (typeof d == 'function')
-                    d(ctx);
-                else
-                    d.draw(ctx);
+        drawables.forEach(function (d) {
+            if (d.zIndex == i) {
+                d.Draw(ctx);
             }
         });
     };
-    for (var i = drawings.min(getZ); i <= drawings.max(getZ); i++) {
+    for (var i = drawables.min(getZ); i <= drawables.max(getZ); i++) {
         _loop_1(i);
     }
-    scoreDraw(ctx);
 }
 function drawCircle(ctx, radius, center, color, alpha) {
     if (color === void 0) { color = 'black'; }

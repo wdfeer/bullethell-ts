@@ -14,14 +14,17 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var body = /** @class */ (function () {
+var body = /** @class */ (function (_super) {
+    __extends(body, _super);
     function body(center, radius) {
-        this.alpha = 1;
-        this.center = Vector2.Zero;
-        this.velocity = Vector2.Zero;
-        this.radius = 0;
-        this.center = center;
-        this.radius = radius;
+        var _this = _super.call(this) || this;
+        _this.alpha = 1;
+        _this.center = Vector2.Zero;
+        _this.velocity = Vector2.Zero;
+        _this.radius = 0;
+        _this.center = center;
+        _this.radius = radius;
+        return _this;
     }
     Object.defineProperty(body.prototype, "collider", {
         get: function () {
@@ -38,11 +41,16 @@ var body = /** @class */ (function () {
             this.velocity.y = -this.velocity.y * 0.5;
     };
     return body;
-}());
+}(drawable));
 var player = /** @class */ (function (_super) {
     __extends(player, _super);
     function player(center, radius) {
         var _this = _super.call(this, center, radius) || this;
+        _this.draw = function (ctx) {
+            drawCircle(ctx, getPlayer().radius, getPlayer().center);
+            fillCircle(ctx, getPlayer().radius, getPlayer().center, 'crimson');
+        };
+        _this.id = 'player';
         _this.score = 0;
         _this._hp = 100;
         return _this;
@@ -79,16 +87,15 @@ var enemy = /** @class */ (function (_super) {
     __extends(enemy, _super);
     function enemy(center, radius) {
         var _this = _super.call(this, center, radius) || this;
-        _this.active = true;
         _this.onPlayerHit = function () { };
         _this.ai = function () { };
         return _this;
     }
     Object.defineProperty(enemy.prototype, "AI", {
         get: function () {
-            if (!this.active)
+            if (!this.isDrawn)
                 return function () { };
-            if (this.collider.colliding(pl.collider))
+            if (this.collider.colliding(getPlayer().collider))
                 this.onPlayerHit();
             return this.ai;
         },
@@ -101,31 +108,32 @@ var boss1 = /** @class */ (function (_super) {
     __extends(boss1, _super);
     function boss1(center, radius) {
         var _this = _super.call(this, center, radius) || this;
+        _this.id = 'boss1';
         _this.speed = 2.5 * sizeMult();
         _this.onPlayerHit = function () {
-            pl.hp -= 100;
+            getPlayer().hp -= 100;
         };
         _this.attackTimer = 0;
         _this.ai = function () {
-            var diff = pl.center.Sub(_this.center);
+            var diff = getPlayer().center.Sub(_this.center);
             var dist = diff.length;
             if (dist > _this.radius * 4 + _this.radius * 20 * Math.random())
-                _this.velocity = pl.center.Sub(_this.center).normalized.Mult(_this.speed);
+                _this.velocity = getPlayer().center.Sub(_this.center).normalized.Mult(_this.speed);
             _this.attackTimer++;
             if (_this.attackTimer >= _this.attackCooldown) {
-                _this.rangedAttack(pl.score > 5 && Math.random() < 0.2);
+                _this.rangedAttack(getPlayer().score > 5 && Math.random() < 0.2);
                 _this.attackTimer = 0;
             }
         };
-        drawings.push(function (ctx) {
+        _this.draw = function (ctx) {
             fillCircle(ctx, _this.radius, _this.center, '#ff10a0');
             fillCircle(ctx, _this.radius * 0.9, _this.center, 'black');
-        });
+        };
         return _this;
     }
     Object.defineProperty(boss1.prototype, "attackCooldown", {
         get: function () {
-            return 40 + 80 / (pl.score > 9 ? Math.sqrt(pl.score - 8) : 1);
+            return 40 + 80 / (getPlayer().score > 9 ? Math.sqrt(getPlayer().score - 8) : 1);
         },
         enumerable: false,
         configurable: true
@@ -136,27 +144,23 @@ var boss1 = /** @class */ (function (_super) {
         var bullets = shootEvenlyInACircle(Math.random() < 0.6 ? 6 : 12, (homing ? 10 : 12) * sizeMult(), this.center, (1 + 3 * Math.random()) * sizeMult());
         bullets.forEach(function (b) {
             b.velocity.add(_this.velocity);
-            bodies.push(b);
-            var drawingsLen = drawings.length;
-            drawings.push({
-                draw: function (ctx) {
-                    drawCircle(ctx, b.radius, b.center, 'black', b.alpha);
-                    fillCircle(ctx, b.radius, b.center, homing ? '#9940ef' : '#ef4099', b.alpha);
-                }, zIndex: bullet.zIndex
-            });
-            b.timerPreTick = function (timeLeft) {
+            b.draw = function (ctx) {
+                drawCircle(ctx, b.radius, b.center, 'black', b.alpha);
+                fillCircle(ctx, b.radius, b.center, homing ? '#9940ef' : '#ef4099', b.alpha);
+            };
+            b.preUpdate = function (timeLeft) {
                 if (timeLeft <= 60) {
                     _this.alpha = timeLeft / 60;
-                    delete bodies[bodies.indexOf(b)];
+                    _this.onPlayerHit = function () { };
                 }
             };
             b.onTimeout = function () {
-                delete drawings[drawingsLen];
+                b.delete();
             };
             if (homing) {
                 b.ai = function () {
-                    var direction = pl.center.Sub(b.center).normalized;
-                    var dist = pl.center.Sub(b.center).length;
+                    var direction = getPlayer().center.Sub(b.center).normalized;
+                    var dist = getPlayer().center.Sub(b.center).length;
                     b.velocity.add(direction.Div(dist > 1 ? dist * dist : 1).Mult(480 * sizeMult()));
                 };
             }
@@ -169,20 +173,27 @@ var bullet = /** @class */ (function (_super) {
     function bullet(center, velocity, radius, lifetime) {
         if (lifetime === void 0) { lifetime = 9; }
         var _this = _super.call(this, center, radius) || this;
+        _this.zIndex = -1;
         _this.onPlayerHit = function () {
-            pl.hp -= 100;
+            getPlayer().hp -= 100;
         };
-        _this.timerPreTick = function (timeLeft) { };
+        _this.preUpdate = function (timeLeft) { };
         _this.onTimeout = function () { };
         _this.velocity = velocity;
-        new Timer(frameInterval, lifetime * fps, function (c) {
-            _this.timerPreTick(c);
+        _this.timer = new Timer(frameInterval, lifetime * fps, function (c) {
+            _this.preUpdate(c);
             if (c <= 1)
                 _this.onTimeout();
         });
         return _this;
     }
-    bullet.zIndex = -1;
+    bullet.prototype.delete = function () {
+        this.timer.end();
+        _super.prototype.delete.call(this);
+    };
+    bullet.prototype.update = function () {
+        _super.prototype.update.call(this);
+    };
     return bullet;
 }(enemy));
 function shootEvenlyInACircle(count, bulletRadius, pos, velocity, spawnRadius) {
@@ -198,13 +209,17 @@ function shootEvenlyInACircle(count, bulletRadius, pos, velocity, spawnRadius) {
     }
     return bullets;
 }
-var coin = /** @class */ (function () {
+var coin = /** @class */ (function (_super) {
+    __extends(coin, _super);
     function coin(pos) {
-        var _this = this;
-        this.pos = pos;
-        this.onPlayerCollide = function () {
-            _this.deleteDrawing();
-            pl.score++;
+        var _this = _super.call(this, function (ctx) {
+            drawCircle(ctx, coin.radius, pos, 'green');
+            fillCircle(ctx, coin.radius, pos, '#faffde');
+        }) || this;
+        _this.pos = pos;
+        _this.zIndex = -2;
+        _this.onPlayerCollide = function () {
+            getPlayer().score++;
             var alpha = 1;
             var timeLeft = fps * 2;
             new Timer(frameInterval, timeLeft, function (counter) {
@@ -212,19 +227,13 @@ var coin = /** @class */ (function () {
                     alpha = counter / (timeLeft / 3);
                 }
             });
-            scoreDraw = function (ctx) {
-                drawCenteredText(ctx, String(pl.score), undefined, alpha);
-            };
+            new drawable(function (ctx) {
+                drawCenteredText(ctx, String(getPlayer().score), undefined, alpha);
+            }, undefined, 'score');
+            _this.delete();
         };
-        this.drawing = {
-            draw: function (ctx) {
-                drawCircle(ctx, coin.radius, pos, 'green');
-                fillCircle(ctx, coin.radius, pos, '#ffffde');
-            }, zIndex: -2
-        };
-        this.drawingId = drawings.length;
-        drawings.push(this.drawing);
-        this.collider = new CircleCollider(pos, coin.radius);
+        _this.collider = new CircleCollider(pos, coin.radius);
+        return _this;
     }
     Object.defineProperty(coin, "radius", {
         get: function () {
@@ -233,8 +242,7 @@ var coin = /** @class */ (function () {
         enumerable: false,
         configurable: true
     });
-    coin.prototype.deleteDrawing = function () {
-        delete drawings[this.drawingId];
+    coin.prototype.update = function () {
     };
     return coin;
-}());
+}(drawable));
