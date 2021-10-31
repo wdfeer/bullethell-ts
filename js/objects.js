@@ -91,17 +91,13 @@ var enemy = /** @class */ (function (_super) {
         _this.ai = function () { };
         return _this;
     }
-    Object.defineProperty(enemy.prototype, "AI", {
-        get: function () {
-            if (!this.isDrawn)
-                return function () { };
-            if (this.collider.colliding(getPlayer().collider))
-                this.onPlayerHit();
-            return this.ai;
-        },
-        enumerable: false,
-        configurable: true
-    });
+    enemy.prototype.AI = function () {
+        if (!this.isDrawn)
+            return;
+        if (this.collider.colliding(getPlayer().collider))
+            this.onPlayerHit();
+        this.ai();
+    };
     return enemy;
 }(body));
 var boss1 = /** @class */ (function (_super) {
@@ -149,8 +145,8 @@ var boss1 = /** @class */ (function (_super) {
                 fillCircle(ctx, b.radius, b.center, homing ? '#9940ef' : '#ef4099', b.alpha);
             };
             b.preUpdate = function (timeLeft) {
-                if (timeLeft <= 60) {
-                    _this.alpha = timeLeft / 60;
+                if (timeLeft <= 600) {
+                    _this.alpha = timeLeft / 600;
                     _this.onPlayerHit = function () { };
                 }
             };
@@ -168,34 +164,6 @@ var boss1 = /** @class */ (function (_super) {
     };
     return boss1;
 }(enemy));
-var bullet = /** @class */ (function (_super) {
-    __extends(bullet, _super);
-    function bullet(center, velocity, radius, lifetime) {
-        if (lifetime === void 0) { lifetime = 9; }
-        var _this = _super.call(this, center, radius) || this;
-        _this.zIndex = -1;
-        _this.onPlayerHit = function () {
-            getPlayer().hp -= 100;
-        };
-        _this.preUpdate = function (timeLeft) { };
-        _this.onTimeout = function () { };
-        _this.velocity = velocity;
-        _this.timer = new Timer(frameInterval, lifetime * fps, function (c) {
-            _this.preUpdate(c);
-            if (c <= 1)
-                _this.onTimeout();
-        });
-        return _this;
-    }
-    bullet.prototype.delete = function () {
-        this.timer.end();
-        _super.prototype.delete.call(this);
-    };
-    bullet.prototype.update = function () {
-        _super.prototype.update.call(this);
-    };
-    return bullet;
-}(enemy));
 function shootEvenlyInACircle(count, bulletRadius, pos, velocity, spawnRadius) {
     if (spawnRadius === void 0) { spawnRadius = 0; }
     var bullets = [];
@@ -209,6 +177,34 @@ function shootEvenlyInACircle(count, bulletRadius, pos, velocity, spawnRadius) {
     }
     return bullets;
 }
+var bullet = /** @class */ (function (_super) {
+    __extends(bullet, _super);
+    function bullet(center, velocity, radius, lifetime) {
+        if (lifetime === void 0) { lifetime = 9; }
+        var _this = _super.call(this, center, radius) || this;
+        _this.zIndex = -1;
+        _this.onPlayerHit = function () {
+            getPlayer().hp -= 100;
+        };
+        _this.preUpdate = function (timeLeft) { };
+        _this.onTimeout = function () { _this.delete(); };
+        _this.velocity = velocity;
+        _this.timer = new Timer(frameInterval, lifetime * fps, function (c) {
+            _this.preUpdate(c);
+            if (c == 1)
+                _this.onTimeout();
+        });
+        return _this;
+    }
+    bullet.prototype.delete = function () {
+        this.timer.end();
+        _super.prototype.delete.call(this);
+    };
+    bullet.prototype.update = function () {
+        _super.prototype.update.call(this);
+    };
+    return bullet;
+}(enemy));
 var coin = /** @class */ (function (_super) {
     __extends(coin, _super);
     function coin(pos) {
