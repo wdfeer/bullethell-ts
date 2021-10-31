@@ -52,12 +52,12 @@ abstract class enemy extends body {
     }
     onPlayerHit = () => { };
     ai = () => { };
-    public get AI(): () => void {
+    AI(): void {
         if (!this.isDrawn)
-            return () => { };
+            return;
         if (this.collider.colliding(getPlayer().collider))
             this.onPlayerHit();
-        return this.ai;
+        this.ai();
     }
 }
 class boss1 extends enemy {
@@ -90,8 +90,8 @@ class boss1 extends enemy {
                 fillCircle(ctx, b.radius, b.center, homing ? '#9940ef' : '#ef4099', b.alpha)
             };
             b.preUpdate = (timeLeft) => {
-                if (timeLeft <= 60) {
-                    this.alpha = timeLeft / 60;
+                if (timeLeft <= 600) {
+                    this.alpha = timeLeft / 600;
                     this.onPlayerHit = () => { };
                 }
             }
@@ -115,31 +115,6 @@ class boss1 extends enemy {
         };
     }
 }
-class bullet extends enemy {
-    zIndex = -1;
-    onPlayerHit = () => {
-        getPlayer().hp -= 100;
-    }
-    timer: Timer;
-    preUpdate = (timeLeft: number) => { };
-    onTimeout = () => { };
-    constructor(center: Vector2, velocity: Vector2, radius: number, lifetime: number = 9) {
-        super(center, radius);
-        this.velocity = velocity;
-        this.timer = new Timer(frameInterval, lifetime * fps, (c) => {
-            this.preUpdate(c);
-            if (c <= 1)
-                this.onTimeout();
-        });
-    }
-    delete() {
-        this.timer.end();
-        super.delete();
-    }
-    update() {
-        super.update();
-    }
-}
 function shootEvenlyInACircle(count: number, bulletRadius: number, pos: Vector2, velocity: number, spawnRadius: number = 0): bullet[] {
     let bullets: bullet[] = [];
     let angle = 0;
@@ -151,6 +126,31 @@ function shootEvenlyInACircle(count: number, bulletRadius: number, pos: Vector2,
         angle += 360 / count;
     }
     return bullets;
+}
+class bullet extends enemy {
+    zIndex = -1;
+    onPlayerHit = () => {
+        getPlayer().hp -= 100;
+    }
+    timer: Timer;
+    preUpdate = (timeLeft: number) => { };
+    onTimeout = () => { this.delete() };
+    constructor(center: Vector2, velocity: Vector2, radius: number, lifetime: number = 9) {
+        super(center, radius);
+        this.velocity = velocity;
+        this.timer = new Timer(frameInterval, lifetime * fps, (c) => {
+            this.preUpdate(c);
+            if (c == 1)
+                this.onTimeout();
+        });
+    }
+    delete() {
+        this.timer.end();
+        super.delete();
+    }
+    update() {
+        super.update();
+    }
 }
 class coin extends drawable {
     zIndex = -2;
