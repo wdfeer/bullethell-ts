@@ -3,7 +3,13 @@ class body extends drawable {
 
     center: Vector2 = Vector2.Zero;
     velocity: Vector2 = Vector2.Zero;
-    radius: number = 0;
+    protected _radius: number = 0;
+    public get radius(): number {
+        return this._radius;
+    }
+    public set radius(value: number) {
+        this._radius = value;
+    }
     get collider() {
         return new CircleCollider(this.center, this.radius)
     }
@@ -26,6 +32,12 @@ class player extends body {
         fillCircle(ctx, getPlayer().radius, getPlayer().center, 'crimson');
     };
     id = 'player';
+    get radius(){
+        return this._radius * sizeMult();
+    }
+    set radius(value: number){
+        this._radius = value / sizeMult();
+    }
     score: number = 0;
     private _hp: number = 100;
     public get hp(): number {
