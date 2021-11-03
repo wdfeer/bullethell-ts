@@ -21,11 +21,21 @@ var body = /** @class */ (function (_super) {
         _this.alpha = 1;
         _this.center = Vector2.Zero;
         _this.velocity = Vector2.Zero;
-        _this.radius = 0;
+        _this._radius = 0;
         _this.center = center;
         _this.radius = radius;
         return _this;
     }
+    Object.defineProperty(body.prototype, "radius", {
+        get: function () {
+            return this._radius;
+        },
+        set: function (value) {
+            this._radius = value;
+        },
+        enumerable: false,
+        configurable: true
+    });
     Object.defineProperty(body.prototype, "collider", {
         get: function () {
             return new CircleCollider(this.center, this.radius);
@@ -55,6 +65,16 @@ var player = /** @class */ (function (_super) {
         _this._hp = 100;
         return _this;
     }
+    Object.defineProperty(player.prototype, "radius", {
+        get: function () {
+            return this._radius * sizeMult();
+        },
+        set: function (value) {
+            this._radius = value / sizeMult();
+        },
+        enumerable: false,
+        configurable: true
+    });
     Object.defineProperty(player.prototype, "hp", {
         get: function () {
             return this._hp;
