@@ -7,8 +7,10 @@ window.onresize = function () {
     canv.height = window.innerHeight;
 };
 var audio = document.querySelector('audio');
-function playSound(src) {
+function playSound(src, volume) {
+    if (volume === void 0) { volume = 1; }
     audio.src = src;
+    audio.volume = volume;
     audio.play();
 }
 window.onkeydown = function (event) {

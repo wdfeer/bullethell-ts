@@ -73,7 +73,7 @@ var player = /** @class */ (function (_super) {
         },
         set: function (value) {
             if (value < this.hp)
-                playSound('./hit.mp3');
+                playSound('./sounds/hit.mp3');
             if (value <= 0) {
                 restart();
                 this._hp = 0;
@@ -96,6 +96,7 @@ var player = /** @class */ (function (_super) {
     player.prototype.onCoinCollect = function () {
         this.score++;
         this.hp += 5;
+        playSound('./sounds/score.mp3', 0.25);
     };
     Object.defineProperty(player.prototype, "coinSpawnCooldown", {
         get: function () {
