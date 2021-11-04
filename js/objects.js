@@ -120,7 +120,8 @@ var enemy = /** @class */ (function (_super) {
         _super.prototype.update.call(this);
         if (!this.isDrawn)
             return;
-        if (this.collider.colliding(getPlayer().collider))
+        var plColliding = this.collider.colliding(getPlayer().collider);
+        if (plColliding)
             this.onPlayerHit();
         this.ai();
     };
@@ -171,8 +172,8 @@ var boss1 = /** @class */ (function (_super) {
             };
             b.preUpdate = function (timeLeft) {
                 if (timeLeft <= 600) {
-                    _this.alpha = timeLeft / 600;
-                    _this.onPlayerHit = function () { };
+                    b.alpha = timeLeft / 600;
+                    b.onPlayerHit = function () { };
                 }
             };
             b.onTimeout = function () {
@@ -210,7 +211,7 @@ var bullet = /** @class */ (function (_super) {
         _this.zIndex = -1;
         _this.damage = 35;
         _this.onPlayerHit = function () {
-            _super.prototype.onPlayerHit.call(_this);
+            // super.onPlayerHit();
             _this.delete();
         };
         _this.preUpdate = function (timeLeft) { };
@@ -267,6 +268,13 @@ var coin = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
-    coin.prototype.update = function () { };
+    coin.prototype.update = function () {
+        var plColliding = this.collider.colliding(getPlayer().collider);
+        if (plColliding)
+            this.onPlayerCollide();
+        if (plColliding || (boss && this.collider.colliding(boss.collider))) {
+            this.delete();
+        }
+    };
     return coin;
 }(drawable));

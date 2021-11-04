@@ -28,10 +28,13 @@ var CircleCollider = /** @class */ (function (_super) {
         return _this;
     }
     CircleCollider.prototype.colliding = function (other) {
-        if (other instanceof Vector2)
-            return other.Sub(this.position).length <= this.radius;
+        if (other instanceof Vector2) {
+            var dist = other.Sub(this.position).length;
+            return dist <= this.radius;
+        }
         else {
-            return (other.position.Sub(this.position).length < this.radius + other.radius);
+            var dist = other.position.Sub(this.position).length;
+            return dist < this.radius + other.radius;
         }
     };
     return CircleCollider;

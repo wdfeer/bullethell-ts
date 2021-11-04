@@ -39,7 +39,7 @@ restart();
 function getCoins() {
     return drawables.filter(function (x) { return x instanceof coin; });
 }
-new Timer(1000 / fps, 99999999, gameUpdate);
+var updateTimer = new Timer(1000 / fps, 99999999, gameUpdate);
 function gameUpdate() {
     updateCoinSpawn();
     updateCoins(getCoins());
@@ -57,12 +57,7 @@ function updateCoinSpawn() {
 }
 function updateCoins(coins) {
     coins.forEach(function (c) {
-        var plColliding = c.collider.colliding(getPlayer().collider);
-        if (plColliding)
-            c.onPlayerCollide();
-        if (plColliding || (boss && c.collider.colliding(boss.collider))) {
-            c.delete();
-        }
+        c.update();
     });
 }
 function updateBodies(bodies) {

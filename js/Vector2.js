@@ -4,7 +4,9 @@ var Vector2 = /** @class */ (function () {
         this.x = x;
         this.y = y;
     }
-    //#region Basic Math Operations
+    Vector2.prototype.clone = function () {
+        return new Vector2(this.x, this.y);
+    };
     Vector2.prototype.add = function (other) {
         this.x += other.x;
         this.y += other.y;
@@ -34,7 +36,6 @@ var Vector2 = /** @class */ (function () {
         return new Vector2(this.x / by, this.y / by);
     };
     Object.defineProperty(Vector2.prototype, "length", {
-        //#endregion
         get: function () {
             return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
         },
