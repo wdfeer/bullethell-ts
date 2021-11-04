@@ -52,7 +52,7 @@ class player extends body {
 		return this._hp;
 	}
 	public set hp(value: number) {
-		if (value < this.hp) playSound('./hit.mp3');
+		if (value < this.hp) playSound('./sounds/hit.mp3');
 		if (value <= 0) {
 			restart();
 			this._hp = 0;
@@ -67,6 +67,8 @@ class player extends body {
 	onCoinCollect() {
 		this.score++;
 		this.hp += 5;
+
+		playSound('./sounds/score.mp3', 0.25);
 	}
 	get coinSpawnCooldown() {
 		return (fps * 3) / Math.sqrt(1 + this.score / 3);

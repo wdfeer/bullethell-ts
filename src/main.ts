@@ -7,8 +7,9 @@ window.onresize = () => {
 };
 
 const audio = document.querySelector('audio')!;
-function playSound(src: string) {
+function playSound(src: string, volume: number = 1) {
 	audio.src = src;
+	audio.volume = volume;
 	audio.play();
 }
 
