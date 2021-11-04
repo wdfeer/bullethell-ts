@@ -171,8 +171,8 @@ var boss1 = /** @class */ (function (_super) {
                 fillCircle(ctx, b.radius, b.center, homing ? '#9940ef' : '#ef4099', b.alpha);
             };
             b.preUpdate = function (timeLeft) {
-                if (timeLeft <= 600) {
-                    b.alpha = timeLeft / 600;
+                if (timeLeft <= 60) {
+                    b.alpha = timeLeft / 60;
                     b.onPlayerHit = function () { };
                 }
             };
