@@ -6,6 +6,12 @@ window.onresize = () => {
 	canv.height = window.innerHeight;
 };
 
+const audio = document.querySelector('audio')!;
+function playSound(src: string) {
+	audio.src = src;
+	audio.play();
+}
+
 window.onkeydown = (event: KeyboardEvent) => {
 	onKeyPress(event.key);
 };

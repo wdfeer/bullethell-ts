@@ -52,6 +52,7 @@ class player extends body {
 		return this._hp;
 	}
 	public set hp(value: number) {
+		if (value < this.hp) playSound('./hit.mp3');
 		if (value <= 0) {
 			restart();
 			this._hp = 0;
