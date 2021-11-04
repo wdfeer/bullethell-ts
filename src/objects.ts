@@ -135,8 +135,8 @@ class boss1 extends enemy {
 				);
 			};
 			b.preUpdate = (timeLeft) => {
-				if (timeLeft <= 600) {
-					b.alpha = timeLeft / 600;
+				if (timeLeft <= 60) {
+					b.alpha = timeLeft / 60;
 					b.onPlayerHit = () => {};
 				}
 			};
