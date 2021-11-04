@@ -31,7 +31,7 @@ var CircleCollider = /** @class */ (function (_super) {
         if (other instanceof Vector2)
             return other.Sub(this.position).length <= this.radius;
         else {
-            return other.position.Sub(this.position).length < this.radius + other.radius;
+            return (other.position.Sub(this.position).length < this.radius + other.radius);
         }
     };
     return CircleCollider;
@@ -53,7 +53,10 @@ var RectCollider = /** @class */ (function (_super) {
     });
     RectCollider.prototype.colliding = function (point) {
         var relativePos = point.Sub(this.position);
-        return relativePos.x <= this.width && relativePos.x >= 0 && relativePos.y <= this.height && relativePos.y >= 0;
+        return (relativePos.x <= this.width &&
+            relativePos.x >= 0 &&
+            relativePos.y <= this.height &&
+            relativePos.y >= 0);
     };
     return RectCollider;
 }(Hitbox));

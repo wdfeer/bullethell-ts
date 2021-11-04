@@ -1,5 +1,5 @@
 "use strict";
-var canv = document.querySelector("canvas");
+var canv = document.querySelector('canvas');
 canv.width = window.innerWidth;
 canv.height = window.innerHeight;
 window.onresize = function () {

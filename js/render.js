@@ -34,7 +34,7 @@ function setDrawableWithId(drawable, id) {
 }
 var drawables = [];
 function render() {
-    var ctx = canv.getContext("2d");
+    var ctx = canv.getContext('2d');
     ctx.clearRect(0, 0, canv.width, canv.height);
     var getZ = function (d) {
         if (d)

@@ -28,10 +28,10 @@ var body = /** @class */ (function (_super) {
     }
     Object.defineProperty(body.prototype, "radius", {
         get: function () {
-            return this._radius;
+            return this._radius * sizeMult();
         },
         set: function (value) {
-            this._radius = value;
+            this._radius = value / sizeMult();
         },
         enumerable: false,
         configurable: true
@@ -45,9 +45,11 @@ var body = /** @class */ (function (_super) {
     });
     body.prototype.update = function () {
         this.center.add(this.velocity);
-        if ((this.center.x + this.radius > canv.width && this.velocity.x > 0) || (this.center.x - this.radius < 0 && this.velocity.x < 0))
+        if ((this.center.x + this.radius > canv.width && this.velocity.x > 0) ||
+            (this.center.x - this.radius < 0 && this.velocity.x < 0))
             this.velocity.x = -this.velocity.x * 0.5;
-        if ((this.center.y + this.radius > canv.height && this.velocity.y > 0) || (this.center.y - this.radius < 0 && this.velocity.y < 0))
+        if ((this.center.y + this.radius > canv.height && this.velocity.y > 0) ||
+            (this.center.y - this.radius < 0 && this.velocity.y < 0))
             this.velocity.y = -this.velocity.y * 0.5;
     };
     return body;
@@ -58,30 +60,25 @@ var player = /** @class */ (function (_super) {
         var _this = _super.call(this, center, radius) || this;
         _this.draw = function (ctx) {
             drawCircle(ctx, getPlayer().radius, getPlayer().center);
-            fillCircle(ctx, getPlayer().radius, getPlayer().center, 'crimson');
+            fillCircle(ctx, getPlayer().radius, getPlayer().center, 'crimson', _this.hp / player.maxhp);
         };
         _this.id = 'player';
         _this.score = 0;
-        _this._hp = 100;
+        _this._hp = player.maxhp;
         return _this;
     }
-    Object.defineProperty(player.prototype, "radius", {
-        get: function () {
-            return this._radius * sizeMult();
-        },
-        set: function (value) {
-            this._radius = value / sizeMult();
-        },
-        enumerable: false,
-        configurable: true
-    });
     Object.defineProperty(player.prototype, "hp", {
         get: function () {
             return this._hp;
         },
         set: function (value) {
-            if (value <= 0)
+            if (value <= 0) {
                 restart();
+                this._hp = 0;
+                return;
+            }
+            if (value >= player.maxhp)
+                value = player.maxhp;
             this._hp = value;
         },
         enumerable: false,
@@ -94,24 +91,33 @@ var player = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
+    player.prototype.onCoinCollect = function () {
+        this.score++;
+        this.hp += 5;
+    };
     Object.defineProperty(player.prototype, "coinSpawnCooldown", {
         get: function () {
-            return fps * 3 / Math.sqrt(1 + this.score / 3);
+            return (fps * 3) / Math.sqrt(1 + this.score / 3);
         },
         enumerable: false,
         configurable: true
     });
+    player.maxhp = 100;
     return player;
 }(body));
 var enemy = /** @class */ (function (_super) {
     __extends(enemy, _super);
     function enemy(center, radius) {
         var _this = _super.call(this, center, radius) || this;
-        _this.onPlayerHit = function () { };
+        _this.damage = 100;
         _this.ai = function () { };
         return _this;
     }
-    enemy.prototype.AI = function () {
+    enemy.prototype.onPlayerHit = function () {
+        getPlayer().hp -= this.damage;
+    };
+    enemy.prototype.update = function () {
+        _super.prototype.update.call(this);
         if (!this.isDrawn)
             return;
         if (this.collider.colliding(getPlayer().collider))
@@ -126,15 +132,14 @@ var boss1 = /** @class */ (function (_super) {
         var _this = _super.call(this, center, radius) || this;
         _this.id = 'boss1';
         _this.speed = 2.5 * sizeMult();
-        _this.onPlayerHit = function () {
-            getPlayer().hp -= 100;
-        };
         _this.attackTimer = 0;
         _this.ai = function () {
             var diff = getPlayer().center.Sub(_this.center);
             var dist = diff.length;
-            if (dist > _this.radius * 4 + _this.radius * 20 * Math.random())
-                _this.velocity = getPlayer().center.Sub(_this.center).normalized.Mult(_this.speed);
+            if (dist > _this.radius * 4 + _this.radius * 20 * sizeMult() * Math.random())
+                _this.velocity = getPlayer()
+                    .center.Sub(_this.center)
+                    .normalized.Mult(_this.speed);
             _this.attackTimer++;
             if (_this.attackTimer >= _this.attackCooldown) {
                 _this.rangedAttack(getPlayer().score > 5 && Math.random() < 0.2);
@@ -149,7 +154,7 @@ var boss1 = /** @class */ (function (_super) {
     }
     Object.defineProperty(boss1.prototype, "attackCooldown", {
         get: function () {
-            return 40 + 80 / (getPlayer().score > 9 ? Math.sqrt(getPlayer().score - 8) : 1);
+            return (40 + 80 / (getPlayer().score > 9 ? Math.sqrt(getPlayer().score - 8) : 1));
         },
         enumerable: false,
         configurable: true
@@ -203,11 +208,15 @@ var bullet = /** @class */ (function (_super) {
         if (lifetime === void 0) { lifetime = 9; }
         var _this = _super.call(this, center, radius) || this;
         _this.zIndex = -1;
+        _this.damage = 35;
         _this.onPlayerHit = function () {
-            getPlayer().hp -= 100;
+            _super.prototype.onPlayerHit.call(_this);
+            _this.delete();
         };
         _this.preUpdate = function (timeLeft) { };
-        _this.onTimeout = function () { _this.delete(); };
+        _this.onTimeout = function () {
+            _this.delete();
+        };
         _this.velocity = velocity;
         _this.timer = new Timer(frameInterval, lifetime * fps, function (c) {
             _this.preUpdate(c);
@@ -235,7 +244,7 @@ var coin = /** @class */ (function (_super) {
         _this.pos = pos;
         _this.zIndex = -2;
         _this.onPlayerCollide = function () {
-            getPlayer().score++;
+            getPlayer().onCoinCollect();
             var alpha = 1;
             var timeLeft = fps * 2;
             new Timer(frameInterval, timeLeft, function (counter) {
@@ -258,7 +267,6 @@ var coin = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
-    coin.prototype.update = function () {
-    };
+    coin.prototype.update = function () { };
     return coin;
 }(drawable));

@@ -24,7 +24,8 @@ function restart() {
         if (count == 1) {
             if (getPlayer().score > 0) {
                 var pos = randomPoint();
-                while (pos.Sub(getPlayer().center).length < (canv.width + canv.height) / 3) {
+                while (pos.Sub(getPlayer().center).length <
+                    (canv.width + canv.height) / 3) {
                     pos = randomPoint();
                 }
                 boss = new boss1(pos, 55 * sizeMult());
@@ -69,8 +70,6 @@ function updateBodies(bodies) {
         if (!b)
             return;
         b.update();
-        if (b instanceof enemy)
-            b.AI();
     });
 }
 function onKeyPress(key) {
@@ -78,7 +77,9 @@ function onKeyPress(key) {
         restart();
 }
 function onClick(event) {
-    getPlayer().velocity = CursorPos(event).Sub(getPlayer().center).normalized.Mult(getPlayer().speed);
+    getPlayer().velocity = CursorPos(event)
+        .Sub(getPlayer().center)
+        .normalized.Mult(getPlayer().speed);
 }
 function CursorPos(event) {
     return new Vector2(event.clientX, event.clientY);
