@@ -72,6 +72,8 @@ var player = /** @class */ (function (_super) {
             return this._hp;
         },
         set: function (value) {
+            if (value < this.hp)
+                playSound('./hit.mp3');
             if (value <= 0) {
                 restart();
                 this._hp = 0;
