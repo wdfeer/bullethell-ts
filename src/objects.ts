@@ -4,11 +4,11 @@ class body extends drawable {
 	center: Vector2 = Vector2.Zero;
 	velocity: Vector2 = Vector2.Zero;
 	protected _radius: number = 0;
-	public get radius(): number {
-		return this._radius;
+	public get radius() {
+		return this._radius * sizeMult();
 	}
 	public set radius(value: number) {
-		this._radius = value;
+		this._radius = value / sizeMult();
 	}
 	get collider() {
 		return new CircleCollider(this.center, this.radius);
@@ -35,26 +35,37 @@ class body extends drawable {
 class player extends body {
 	draw = (ctx: CanvasRenderingContext2D) => {
 		drawCircle(ctx, getPlayer().radius, getPlayer().center);
-		fillCircle(ctx, getPlayer().radius, getPlayer().center, 'crimson');
+		fillCircle(
+			ctx,
+			getPlayer().radius,
+			getPlayer().center,
+			'crimson',
+			this.hp / player.maxhp
+		);
 	};
 	id = 'player';
-	get radius() {
-		return this._radius * sizeMult();
-	}
-	set radius(value: number) {
-		this._radius = value / sizeMult();
-	}
+
 	score: number = 0;
-	private _hp: number = 100;
+	static readonly maxhp: number = 100;
+	private _hp: number = player.maxhp;
 	public get hp(): number {
 		return this._hp;
 	}
 	public set hp(value: number) {
-		if (value <= 0) restart();
+		if (value <= 0) {
+			restart();
+			this._hp = 0;
+			return;
+		}
+		if (value >= player.maxhp) value = player.maxhp;
 		this._hp = value;
 	}
 	get speed() {
 		return (3 + this.score / 2) * sizeMult();
+	}
+	onCoinCollect() {
+		this.score++;
+		this.hp += 5;
 	}
 	get coinSpawnCooldown() {
 		return (fps * 3) / Math.sqrt(1 + this.score / 3);
@@ -64,12 +75,17 @@ class player extends body {
 	}
 }
 abstract class enemy extends body {
+	damage: number = 100;
 	constructor(center: Vector2, radius: number) {
 		super(center, radius);
 	}
-	onPlayerHit = () => {};
 	ai = () => {};
-	AI(): void {
+	onPlayerHit() {
+		getPlayer().hp -= this.damage;
+	}
+	update() {
+		super.update();
+
 		if (!this.isDrawn) return;
 		if (this.collider.colliding(getPlayer().collider)) this.onPlayerHit();
 		this.ai();
@@ -78,9 +94,6 @@ abstract class enemy extends body {
 class boss1 extends enemy {
 	id = 'boss1';
 	speed = 2.5 * sizeMult();
-	onPlayerHit = () => {
-		getPlayer().hp -= 100;
-	};
 	get attackCooldown(): number {
 		return (
 			40 + 80 / (getPlayer().score > 9 ? Math.sqrt(getPlayer().score - 8) : 1)
@@ -90,7 +103,8 @@ class boss1 extends enemy {
 	ai = () => {
 		let diff: Vector2 = getPlayer().center.Sub(this.center);
 		let dist: number = diff.length;
-		if (dist > this.radius * 4 + this.radius * 20 * Math.random())
+
+		if (dist > this.radius * 4 + this.radius * 20 * sizeMult() * Math.random())
 			this.velocity = getPlayer()
 				.center.Sub(this.center)
 				.normalized.Mult(this.speed);
@@ -169,8 +183,10 @@ function shootEvenlyInACircle(
 }
 class bullet extends enemy {
 	zIndex = -1;
+	damage = 35;
 	onPlayerHit = () => {
-		getPlayer().hp -= 100;
+		super.onPlayerHit();
+		this.delete();
 	};
 	timer: Timer;
 	preUpdate = (timeLeft: number) => {};
@@ -205,7 +221,7 @@ class coin extends drawable {
 	}
 	collider: CircleCollider;
 	onPlayerCollide: () => void = () => {
-		getPlayer().score++;
+		getPlayer().onCoinCollect();
 
 		let alpha = 1;
 		let timeLeft = fps * 2;

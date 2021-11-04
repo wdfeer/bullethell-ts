@@ -10,4 +10,3 @@ window.onkeydown = (event: KeyboardEvent) => {
 	onKeyPress(event.key);
 };
 canv.addEventListener('click', (event) => onClick(event));
-canv.addEventListener('drag', (event) => onDrag(event));

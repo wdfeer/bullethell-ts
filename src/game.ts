@@ -73,7 +73,6 @@ function updateBodies(bodies: body[]): void {
 	bodies.forEach((b) => {
 		if (!b) return;
 		b.update();
-		if (b instanceof enemy) b.AI();
 	});
 }
 
@@ -85,7 +84,6 @@ function onClick(event: MouseEvent): void {
 		.Sub(getPlayer().center)
 		.normalized.Mult(getPlayer().speed);
 }
-function onDrag(event: MouseEvent) {}
 
 function CursorPos(event: MouseEvent): Vector2 {
 	return new Vector2(event.clientX, event.clientY);
