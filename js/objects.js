@@ -211,7 +211,7 @@ var bullet = /** @class */ (function (_super) {
         _this.zIndex = -1;
         _this.damage = 35;
         _this.onPlayerHit = function () {
-            // super.onPlayerHit();
+            _super.prototype.onPlayerHit.call(_this);
             _this.delete();
         };
         _this.preUpdate = function (timeLeft) { };
