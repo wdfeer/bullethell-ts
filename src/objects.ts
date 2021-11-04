@@ -186,7 +186,7 @@ class bullet extends enemy {
 	zIndex = -1;
 	damage = 35;
 	onPlayerHit = () => {
-		super.onPlayerHit();
+		// super.onPlayerHit();
 		this.delete();
 	};
 	timer: Timer;
