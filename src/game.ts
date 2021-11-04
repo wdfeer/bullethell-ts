@@ -11,7 +11,7 @@ function randomPoint(): Vector2 {
 function getBodies(): body[] {
 	return drawables.filter((x) => x instanceof body) as body[];
 }
-function getPlayer() {
+function getPlayer(): player {
 	return drawables.filter((x) => x instanceof player)[0] as player;
 }
 var boss: enemy;
@@ -41,7 +41,7 @@ function getCoins(): coin[] {
 	return drawables.filter((x) => x instanceof coin) as coin[];
 }
 
-new Timer(1000 / fps, 99999999, gameUpdate);
+var updateTimer = new Timer(1000 / fps, 99999999, gameUpdate);
 function gameUpdate(): void {
 	updateCoinSpawn();
 
@@ -62,11 +62,7 @@ function updateCoinSpawn(): void {
 }
 function updateCoins(coins: coin[]): void {
 	coins.forEach((c) => {
-		let plColliding = c.collider.colliding(getPlayer().collider);
-		if (plColliding) c.onPlayerCollide();
-		if (plColliding || (boss && c.collider.colliding(boss.collider))) {
-			c.delete();
-		}
+		c.update();
 	});
 }
 function updateBodies(bodies: body[]): void {

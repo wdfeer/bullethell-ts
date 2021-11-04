@@ -87,7 +87,8 @@ abstract class enemy extends body {
 		super.update();
 
 		if (!this.isDrawn) return;
-		if (this.collider.colliding(getPlayer().collider)) this.onPlayerHit();
+		let plColliding = this.collider.colliding(getPlayer().collider);
+		if (plColliding) this.onPlayerHit();
 		this.ai();
 	}
 }
@@ -135,8 +136,8 @@ class boss1 extends enemy {
 			};
 			b.preUpdate = (timeLeft) => {
 				if (timeLeft <= 600) {
-					this.alpha = timeLeft / 600;
-					this.onPlayerHit = () => {};
+					b.alpha = timeLeft / 600;
+					b.onPlayerHit = () => {};
 				}
 			};
 			b.onTimeout = () => {
@@ -185,7 +186,7 @@ class bullet extends enemy {
 	zIndex = -1;
 	damage = 35;
 	onPlayerHit = () => {
-		super.onPlayerHit();
+		// super.onPlayerHit();
 		this.delete();
 	};
 	timer: Timer;
@@ -247,5 +248,11 @@ class coin extends drawable {
 		});
 		this.collider = new CircleCollider(pos, coin.radius);
 	}
-	update() {}
+	update() {
+		let plColliding = this.collider.colliding(getPlayer().collider);
+		if (plColliding) this.onPlayerCollide();
+		if (plColliding || (boss && this.collider.colliding(boss.collider))) {
+			this.delete();
+		}
+	}
 }
