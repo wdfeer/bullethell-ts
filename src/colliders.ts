@@ -12,12 +12,12 @@ class CircleCollider extends Hitbox {
 		this.radius = radius;
 	}
 	colliding(other: Vector2 | CircleCollider) {
-		if (other instanceof Vector2)
-			return other.Sub(this.position).length <= this.radius;
-		else {
-			return (
-				other.position.Sub(this.position).length < this.radius + other.radius
-			);
+		if (other instanceof Vector2) {
+			let dist: number = other.Sub(this.position).length;
+			return dist <= this.radius;
+		} else {
+			let dist: number = other.position.Sub(this.position).length;
+			return dist < this.radius + other.radius;
 		}
 	}
 }

@@ -1,4 +1,7 @@
 class Vector2 {
+	clone(): Vector2 {
+		return new Vector2(this.x, this.y);
+	}
 	x: number;
 	y: number;
 	constructor(x: number, y: number) {
@@ -6,7 +9,6 @@ class Vector2 {
 		this.y = y;
 	}
 
-	//#region Basic Math Operations
 	add(other: Vector2) {
 		this.x += other.x;
 		this.y += other.y;
@@ -23,6 +25,7 @@ class Vector2 {
 		this.x /= by;
 		this.y /= by;
 	}
+
 	Add(other: Vector2): Vector2 {
 		return new Vector2(this.x + other.x, this.y + other.y);
 	}
@@ -35,7 +38,7 @@ class Vector2 {
 	Div(by: number): Vector2 {
 		return new Vector2(this.x / by, this.y / by);
 	}
-	//#endregion
+
 	public get length(): number {
 		return Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2));
 	}
