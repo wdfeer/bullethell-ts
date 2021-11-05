@@ -8,7 +8,7 @@ function randomPoint(): Vector2 {
 	return new Vector2(Math.random() * canv.width, Math.random() * canv.height);
 }
 
-var currentBoss: enemy;
+var currentBoss: boss;
 let bossTimer: SecTimer;
 function restart(): void {
 	drawables = [];
@@ -24,7 +24,7 @@ function restart(): void {
 				) {
 					pos = randomPoint();
 				}
-				currentBoss = new boss1(pos, 55 * sizeMult());
+				currentBoss = new boss1(pos);
 			} else timer.counter += 4;
 		}
 	});

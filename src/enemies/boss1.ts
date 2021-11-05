@@ -1,12 +1,11 @@
-class boss1 extends enemy {
-	id = 'boss1';
-	speed = 2.5 * sizeMult();
-	get attackCooldown(): number {
-		return (
-			40 + 80 / (getPlayer().score > 9 ? Math.sqrt(getPlayer().score - 8) : 1)
-		);
-	}
-	attackTimer = 0;
+class boss1 extends boss {
+	attacks = [
+		this.rangedAttack,
+		this.rangedAttack,
+		() => {
+			this.rangedAttack(false);
+		},
+	];
 	ai = () => {
 		let diff: Vector2 = getPlayer().center.Sub(this.center);
 		let dist: number = diff.length;
@@ -60,8 +59,8 @@ class boss1 extends enemy {
 			}
 		});
 	}
-	constructor(center: Vector2, radius: number) {
-		super(center, radius);
+	constructor(center: Vector2) {
+		super(center, 55 * sizeMult());
 		this.draw = (ctx) => {
 			fillCircle(ctx, this.radius, this.center, '#ff10a0');
 			fillCircle(ctx, this.radius * 0.9, this.center, 'black');
