@@ -217,16 +217,17 @@ var boss1 = /** @class */ (function (_super) {
     };
     return boss1;
 }(enemy));
-function shootEvenlyInACircle(count, bulletRadius, pos, velocity, spawnRadius) {
+function shootEvenlyInACircle(count, bulletRadius, position, velocity, spawnRadius, offsetInRadians) {
     if (spawnRadius === void 0) { spawnRadius = 0; }
+    if (offsetInRadians === void 0) { offsetInRadians = 0; }
     var bullets = [];
-    var angle = 0;
+    var angle = offsetInRadians;
     for (var i = 0; i < count; i++) {
         var Vy = Math.sin(angle) * velocity;
         var Vx = Math.cos(angle) * velocity;
         var V = new Vector2(Vx, Vy);
-        bullets.push(new bullet(pos.Add(V.normalized.Mult(spawnRadius)), V, bulletRadius));
-        angle += 360 / count;
+        bullets.push(new bullet(position.Add(V.normalized.Mult(spawnRadius)), V, bulletRadius));
+        angle += (Math.PI * 2) / count;
     }
     return bullets;
 }
