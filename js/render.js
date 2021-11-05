@@ -19,20 +19,14 @@ var drawable = /** @class */ (function () {
     };
     return drawable;
 }());
-function setDrawableWithIdOrPush(drawable, id) {
-    if (!setDrawableWithId(drawable, id))
-        drawables.push(drawable);
-}
-function setDrawableWithId(drawable, id) {
-    for (var i = 0; i < drawables.length; i++) {
-        if (drawables[i].id != id)
-            continue;
-        drawables[i] = drawable;
-        return true;
-    }
-    return false;
-}
 var drawables = [];
+function getDrawableWithId(id) {
+    for (var i = 0; i < drawables.length; i++) {
+        if (drawables[i] && drawables[i].id == id)
+            return drawables[i];
+    }
+    return null;
+}
 function render() {
     var context = canv.getContext('2d');
     context.clearRect(0, 0, canv.width, canv.height);

@@ -71,6 +71,8 @@ var player = /** @class */ (function (_super) {
         };
         _this.id = 'player';
         _this.score = 0;
+        _this.scoreAlpha = 1;
+        _this.scoreFadeTimer = null;
         _this._hp = player.maxhp;
         return _this;
     }
@@ -102,9 +104,23 @@ var player = /** @class */ (function (_super) {
         configurable: true
     });
     player.prototype.onCoinCollect = function () {
+        var _this = this;
         this.score++;
         this.hp += 5;
         playSound('./sounds/score.mp3', 0.25);
+        this.scoreAlpha = 1;
+        var timeLeft = fps * (1 + 2 * Math.pow(0.9, this.score));
+        if (this.scoreFadeTimer)
+            this.scoreFadeTimer.end();
+        this.scoreFadeTimer = new Timer(frameInterval, timeLeft, function (counter) {
+            if (counter < timeLeft / 3) {
+                _this.scoreAlpha = counter / (timeLeft / 3);
+            }
+        });
+        if (!getDrawableWithId('score'))
+            new drawable(function (ctx) {
+                drawCenteredText(ctx, String(getPlayer().score), undefined, _this.scoreAlpha);
+            }, undefined, 'score');
     };
     Object.defineProperty(player.prototype, "coinSpawnCooldown", {
         get: function () {
@@ -258,16 +274,6 @@ var coin = /** @class */ (function (_super) {
         _this.zIndex = -2;
         _this.onPlayerCollide = function () {
             getPlayer().onCoinCollect();
-            var alpha = 1;
-            var timeLeft = fps * 2;
-            new Timer(frameInterval, timeLeft, function (counter) {
-                if (counter < timeLeft / 3) {
-                    alpha = counter / (timeLeft / 3);
-                }
-            });
-            new drawable(function (ctx) {
-                drawCenteredText(ctx, String(getPlayer().score), undefined, alpha);
-            }, undefined, 'score');
             _this.delete();
         };
         return _this;
