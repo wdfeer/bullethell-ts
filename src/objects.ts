@@ -44,6 +44,8 @@ class player extends body {
 	id = 'player';
 
 	score: number = 0;
+	scoreAlpha: number = 1;
+	scoreFadeTimer: Timer | null = null;
 	static readonly maxhp: number = 100;
 	private _hp: number = player.maxhp;
 	public get hp(): number {
@@ -68,6 +70,28 @@ class player extends body {
 		this.hp += 5;
 
 		playSound('./sounds/score.mp3', 0.25);
+
+		this.scoreAlpha = 1;
+		let timeLeft = fps * (1 + 2 * Math.pow(0.9, this.score));
+		if (this.scoreFadeTimer) this.scoreFadeTimer.end();
+		this.scoreFadeTimer = new Timer(frameInterval, timeLeft, (counter) => {
+			if (counter < timeLeft / 3) {
+				this.scoreAlpha = counter / (timeLeft / 3);
+			}
+		});
+		if (!getDrawableWithId('score'))
+			new drawable(
+				(ctx) => {
+					drawCenteredText(
+						ctx,
+						String(getPlayer().score),
+						undefined,
+						this.scoreAlpha
+					);
+				},
+				undefined,
+				'score'
+			);
 	}
 	get coinSpawnCooldown() {
 		return (fps * 3) / Math.sqrt(1 + this.score / 3);
@@ -228,22 +252,6 @@ class coin extends stationaryCircle {
 	}
 	onPlayerCollide: () => void = () => {
 		getPlayer().onCoinCollect();
-
-		let alpha = 1;
-		let timeLeft = fps * 2;
-		new Timer(frameInterval, timeLeft, (counter) => {
-			if (counter < timeLeft / 3) {
-				alpha = counter / (timeLeft / 3);
-			}
-		});
-		new drawable(
-			(ctx) => {
-				drawCenteredText(ctx, String(getPlayer().score), undefined, alpha);
-			},
-			undefined,
-			'score'
-		);
-
 		this.delete();
 	};
 	constructor(public center: Vector2) {

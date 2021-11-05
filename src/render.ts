@@ -17,18 +17,13 @@ class drawable {
 		drawables.push(this);
 	}
 }
-function setDrawableWithIdOrPush(drawable: drawable, id: string): void {
-	if (!setDrawableWithId(drawable, id)) drawables.push(drawable);
-}
-function setDrawableWithId(drawable: drawable, id: string): boolean {
-	for (let i = 0; i < drawables.length; i++) {
-		if (drawables[i].id != id) continue;
-		drawables[i] = drawable;
-		return true;
-	}
-	return false;
-}
 var drawables: drawable[] = [];
+function getDrawableWithId(id: string): drawable | null {
+	for (let i = 0; i < drawables.length; i++) {
+		if (drawables[i] && drawables[i].id == id) return drawables[i];
+	}
+	return null;
+}
 
 function render(): void {
 	let context = canv.getContext('2d')!;
