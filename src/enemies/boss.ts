@@ -1,5 +1,4 @@
 abstract class boss extends enemy {
-	id = 'boss1';
 	speed = 2 * sizeMult();
 	get attackCooldown(): number {
 		return (
@@ -9,10 +8,11 @@ abstract class boss extends enemy {
 	attackTimer = 0;
 	attack() {
 		this.attacks[this.currentAttack]();
+		this.currentAttack++;
 		this.attackTimer = 0;
 	}
 	attacks: ((arg?: any) => void)[] = [];
-	private _currentAttack = 0;
+	private _currentAttack: number = 0;
 	public get currentAttack() {
 		return this._currentAttack;
 	}

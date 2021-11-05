@@ -1,9 +1,13 @@
 class boss1 extends boss {
 	attacks = [
-		this.rangedAttack,
-		this.rangedAttack,
 		() => {
-			this.rangedAttack(false);
+			this.rangedAttack([6, 12], false);
+		},
+		() => {
+			this.rangedAttack([8, 16], false);
+		},
+		() => {
+			this.rangedAttack([5, 7], true);
 		},
 	];
 	ai = () => {
@@ -16,13 +20,12 @@ class boss1 extends boss {
 				.normalized.Mult(this.speed);
 		this.attackTimer++;
 		if (this.attackTimer >= this.attackCooldown) {
-			this.rangedAttack(getPlayer().score > 5 && Math.random() < 0.2);
-			this.attackTimer = 0;
+			this.attack();
 		}
 	};
-	rangedAttack(homing: boolean = false) {
+	rangedAttack(counts: [number, number], homing: boolean = false) {
 		let bullets = shootEvenlyInACircle(
-			Math.random() < 0.6 ? 6 : 12,
+			Math.random() < 0.6 ? counts[0] : counts[1],
 			(homing ? 10 : 12) * sizeMult(),
 			this.center,
 			(1 + 3 * Math.random()) * sizeMult()
