@@ -1,4 +1,20 @@
 abstract class boss extends enemy {
+	baseRadius: number;
+	baseTimeLeft: number = 30 * fps;
+	timer: Timer = new Timer(frameInterval, this.baseTimeLeft, (counter) => {
+		this.radius =
+			this.baseRadius * 0.35 +
+			this.baseRadius * 0.65 * (counter / this.baseTimeLeft);
+		if (counter == 1) {
+			this.onTimeout();
+			this.delete();
+		}
+	});
+	abstract onTimeout(): void;
+	delete() {
+		super.delete();
+		this.timer.end();
+	}
 	speed = 2 * sizeMult();
 	get attackCooldown(): number {
 		return (
@@ -23,5 +39,6 @@ abstract class boss extends enemy {
 	}
 	constructor(center: Vector2, radius: number) {
 		super(center, radius);
+		this.baseRadius = radius;
 	}
 }

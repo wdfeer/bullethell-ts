@@ -1,4 +1,5 @@
 class boss2 extends boss {
+	onTimeout() {}
 	attacks = [];
 	rangedAttack() {}
 	constructor(center: Vector2) {

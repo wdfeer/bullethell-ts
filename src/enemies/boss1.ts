@@ -1,13 +1,17 @@
 class boss1 extends boss {
+	onTimeout() {
+		this.rangedAttack([11, 15], [4, 4], true);
+		this.rangedAttack([20, 24], [3, 5], false);
+	}
 	attacks = [
 		() => {
-			this.rangedAttack([6, 12], false);
+			this.rangedAttack([6, 12], [3, 3], false);
 		},
 		() => {
-			this.rangedAttack([8, 16], false);
+			this.rangedAttack([8, 16], [1.5, 2.5], false);
 		},
 		() => {
-			this.rangedAttack([5, 7], true);
+			this.rangedAttack([5, 7], [3, 4], true);
 		},
 	];
 	ai = () => {
@@ -23,14 +27,20 @@ class boss1 extends boss {
 			this.attack();
 		}
 	};
-	rangedAttack(counts: [number, number], homing: boolean = false) {
+	rangedAttack(
+		counts: [number, number] = [6, 12],
+		speeds: [number, number],
+		homing: boolean = false
+	) {
 		let bullets = shootEvenlyInACircle(
-			Math.random() < 0.6 ? counts[0] : counts[1],
+			Math.random() < 0.5 ? counts[0] : counts[1],
 			(homing ? 10 : 12) * sizeMult(),
 			this.center,
-			(1 + 3 * Math.random()) * sizeMult()
+			1,
+			this.radius
 		);
 		bullets.forEach((b) => {
+			b.velocity.mult(Math.random() < 0.5 ? speeds[0] : speeds[1] * sizeMult());
 			b.velocity.add(this.velocity);
 			b.draw = (ctx) => {
 				drawCircle(ctx, b.radius, b.center, 'black', b.alpha);

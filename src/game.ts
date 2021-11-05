@@ -12,6 +12,7 @@ var currentBoss: boss;
 let bossTimer: SecTimer;
 function restart(): void {
 	drawables = [];
+	if (currentBoss) currentBoss.delete();
 	new player(new Vector2(canv.width / 2, canv.height / 2), 8.5 * sizeMult());
 	if (bossTimer) bossTimer.end();
 	bossTimer = new SecTimer(9, (count, timer) => {
