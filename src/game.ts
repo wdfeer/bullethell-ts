@@ -8,6 +8,11 @@ function randomPoint(): Vector2 {
 	return new Vector2(Math.random() * canv.width, Math.random() * canv.height);
 }
 
+function getCircles(): stationaryCircle[] {
+	return drawables.filter(
+		(x) => x instanceof stationaryCircle
+	) as stationaryCircle[];
+}
 function getBodies(): body[] {
 	return drawables.filter((x) => x instanceof body) as body[];
 }

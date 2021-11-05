@@ -1,8 +1,6 @@
-class body extends drawable {
+class stationaryCircle extends drawable {
 	alpha: number = 1;
-
-	center: Vector2 = Vector2.Zero;
-	velocity: Vector2 = Vector2.Zero;
+	center: Vector2;
 	protected _radius: number = 0;
 	public get radius() {
 		return this._radius * sizeMult();
@@ -17,6 +15,12 @@ class body extends drawable {
 		super();
 		this.center = center;
 		this.radius = radius;
+	}
+}
+class body extends stationaryCircle {
+	velocity: Vector2 = Vector2.Zero;
+	constructor(center: Vector2, radius: number) {
+		super(center, radius);
 	}
 	update() {
 		this.center.add(this.velocity);
@@ -34,14 +38,8 @@ class body extends drawable {
 }
 class player extends body {
 	draw = (ctx: CanvasRenderingContext2D) => {
-		drawCircle(ctx, getPlayer().radius, getPlayer().center);
-		fillCircle(
-			ctx,
-			getPlayer().radius,
-			getPlayer().center,
-			'crimson',
-			this.hp / player.maxhp
-		);
+		drawCircle(ctx, this.radius, this.center);
+		fillCircle(ctx, this.radius, this.center, 'crimson', this.alpha);
 	};
 	id = 'player';
 
@@ -60,6 +58,7 @@ class player extends body {
 		}
 		if (value >= player.maxhp) value = player.maxhp;
 		this._hp = value;
+		this.alpha = this.hp / player.maxhp;
 	}
 	get speed() {
 		return (3 + this.score / 2) * sizeMult();
@@ -218,12 +217,15 @@ class bullet extends enemy {
 		super.update();
 	}
 }
-class coin extends drawable {
+class coin extends stationaryCircle {
+	draw = (ctx: CanvasRenderingContext2D) => {
+		drawCircle(ctx, coin.radius, this.center, 'green');
+		fillCircle(ctx, coin.radius, this.center, '#faffde', this.alpha);
+	};
 	zIndex = -2;
 	static get radius() {
 		return 22 * sizeMult();
 	}
-	collider: CircleCollider;
 	onPlayerCollide: () => void = () => {
 		getPlayer().onCoinCollect();
 
@@ -244,12 +246,8 @@ class coin extends drawable {
 
 		this.delete();
 	};
-	constructor(public pos: Vector2) {
-		super((ctx) => {
-			drawCircle(ctx, coin.radius, pos, 'green');
-			fillCircle(ctx, coin.radius, pos, '#faffde');
-		});
-		this.collider = new CircleCollider(pos, coin.radius);
+	constructor(public center: Vector2) {
+		super(center, coin.radius);
 	}
 	update() {
 		let plColliding = this.collider.colliding(getPlayer().collider);

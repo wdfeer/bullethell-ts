@@ -31,17 +31,17 @@ function setDrawableWithId(drawable: drawable, id: string): boolean {
 var drawables: drawable[] = [];
 
 function render(): void {
-	let ctx = canv.getContext('2d')!;
-	ctx.clearRect(0, 0, canv.width, canv.height);
+	let context = canv.getContext('2d')!;
+	context.clearRect(0, 0, canv.width, canv.height);
 
-	let getZ = (d: drawable) => {
+	let getZ = (d?: drawable) => {
 		if (d) return d.zIndex;
 		return 0;
 	};
 	for (let i = drawables.min(getZ); i <= drawables.max(getZ); i++) {
 		drawables.forEach((d) => {
 			if (d.zIndex == i) {
-				d.Draw(ctx);
+				d.Draw(context);
 			}
 		});
 	}
