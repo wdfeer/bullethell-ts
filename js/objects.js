@@ -98,7 +98,7 @@ var player = /** @class */ (function (_super) {
     });
     Object.defineProperty(player.prototype, "speed", {
         get: function () {
-            return (3 + this.score / 2) * sizeMult();
+            return (7 - 4 * Math.pow(0.9, this.score)) * sizeMult();
         },
         enumerable: false,
         configurable: true
