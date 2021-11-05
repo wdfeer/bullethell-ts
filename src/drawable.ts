@@ -2,7 +2,7 @@ type draw = (ctx: CanvasRenderingContext2D) => void;
 class drawable {
 	isDrawn: boolean = true;
 	draw: draw;
-	Draw(ctx: CanvasRenderingContext2D) {
+	render(ctx: CanvasRenderingContext2D) {
 		if (this.isDrawn) this.draw(ctx);
 	}
 	zIndex: number;

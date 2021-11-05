@@ -21,7 +21,7 @@ function render(): void {
 	for (let i = drawables.min(getZ); i <= drawables.max(getZ); i++) {
 		drawables.forEach((d) => {
 			if (d.zIndex == i) {
-				d.Draw(context);
+				d.render(context);
 			}
 		});
 	}

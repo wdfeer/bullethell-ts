@@ -27,13 +27,15 @@ class coin extends stationaryCircle {
 
 		this.delete();
 	};
-	constructor(public center: Vector2) {
+	constructor(center: Vector2) {
 		super(center, coin.radius);
 	}
 	update() {
 		let plColliding = this.collider.colliding(getPlayer().collider);
+		let bossColliding =
+			currentBoss && this.collider.colliding(currentBoss.collider);
 		if (plColliding) this.onPlayerCollide();
-		if (plColliding || (boss && this.collider.colliding(boss.collider))) {
+		if (plColliding || bossColliding) {
 			this.delete();
 		}
 	}

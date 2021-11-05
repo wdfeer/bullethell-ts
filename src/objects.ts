@@ -1,6 +1,12 @@
 class stationaryCircle extends drawable {
 	alpha: number = 1;
-	center: Vector2;
+	protected _center: Vector2 = Vector2.Zero;
+	public get center(): Vector2 {
+		return this._center;
+	}
+	public set center(value: Vector2) {
+		this._center = value;
+	}
 	protected _radius: number = 0;
 	public get radius() {
 		return this._radius * sizeMult();
@@ -13,7 +19,7 @@ class stationaryCircle extends drawable {
 	}
 	constructor(center: Vector2, radius: number) {
 		super();
-		this.center = center;
+		this._center = center;
 		this.radius = radius;
 	}
 }
