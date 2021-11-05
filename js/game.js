@@ -7,6 +7,9 @@ function sizeMult() {
 function randomPoint() {
     return new Vector2(Math.random() * canv.width, Math.random() * canv.height);
 }
+function getCircles() {
+    return drawables.filter(function (x) { return x instanceof stationaryCircle; });
+}
 function getBodies() {
     return drawables.filter(function (x) { return x instanceof body; });
 }

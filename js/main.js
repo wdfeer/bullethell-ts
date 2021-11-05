@@ -2,7 +2,21 @@
 var canv = document.querySelector('canvas');
 canv.width = window.innerWidth;
 canv.height = window.innerHeight;
+function isOffscreenX(x) {
+    return x > window.innerWidth;
+}
+function isOffscreenY(y) {
+    return y > window.innerHeight;
+}
 window.onresize = function () {
+    getCircles().forEach(function (renderObject) {
+        if (isOffscreenX(renderObject.center.x))
+            renderObject.center.x =
+                (window.innerWidth * renderObject.center.x) / canv.width;
+        if (isOffscreenY(renderObject.center.y))
+            renderObject.center.y =
+                (window.innerHeight * renderObject.center.y) / canv.height;
+    });
     canv.width = window.innerWidth;
     canv.height = window.innerHeight;
 };

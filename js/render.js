@@ -34,8 +34,8 @@ function setDrawableWithId(drawable, id) {
 }
 var drawables = [];
 function render() {
-    var ctx = canv.getContext('2d');
-    ctx.clearRect(0, 0, canv.width, canv.height);
+    var context = canv.getContext('2d');
+    context.clearRect(0, 0, canv.width, canv.height);
     var getZ = function (d) {
         if (d)
             return d.zIndex;
@@ -44,7 +44,7 @@ function render() {
     var _loop_1 = function (i) {
         drawables.forEach(function (d) {
             if (d.zIndex == i) {
-                d.Draw(ctx);
+                d.Draw(context);
             }
         });
     };

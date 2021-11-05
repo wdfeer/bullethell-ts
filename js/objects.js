@@ -14,19 +14,17 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-var body = /** @class */ (function (_super) {
-    __extends(body, _super);
-    function body(center, radius) {
+var stationaryCircle = /** @class */ (function (_super) {
+    __extends(stationaryCircle, _super);
+    function stationaryCircle(center, radius) {
         var _this = _super.call(this) || this;
         _this.alpha = 1;
-        _this.center = Vector2.Zero;
-        _this.velocity = Vector2.Zero;
         _this._radius = 0;
         _this.center = center;
         _this.radius = radius;
         return _this;
     }
-    Object.defineProperty(body.prototype, "radius", {
+    Object.defineProperty(stationaryCircle.prototype, "radius", {
         get: function () {
             return this._radius * sizeMult();
         },
@@ -36,13 +34,22 @@ var body = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
-    Object.defineProperty(body.prototype, "collider", {
+    Object.defineProperty(stationaryCircle.prototype, "collider", {
         get: function () {
             return new CircleCollider(this.center, this.radius);
         },
         enumerable: false,
         configurable: true
     });
+    return stationaryCircle;
+}(drawable));
+var body = /** @class */ (function (_super) {
+    __extends(body, _super);
+    function body(center, radius) {
+        var _this = _super.call(this, center, radius) || this;
+        _this.velocity = Vector2.Zero;
+        return _this;
+    }
     body.prototype.update = function () {
         this.center.add(this.velocity);
         if ((this.center.x + this.radius > canv.width && this.velocity.x > 0) ||
@@ -53,14 +60,14 @@ var body = /** @class */ (function (_super) {
             this.velocity.y = -this.velocity.y * 0.5;
     };
     return body;
-}(drawable));
+}(stationaryCircle));
 var player = /** @class */ (function (_super) {
     __extends(player, _super);
     function player(center, radius) {
         var _this = _super.call(this, center, radius) || this;
         _this.draw = function (ctx) {
-            drawCircle(ctx, getPlayer().radius, getPlayer().center);
-            fillCircle(ctx, getPlayer().radius, getPlayer().center, 'crimson', _this.hp / player.maxhp);
+            drawCircle(ctx, _this.radius, _this.center);
+            fillCircle(ctx, _this.radius, _this.center, 'crimson', _this.alpha);
         };
         _this.id = 'player';
         _this.score = 0;
@@ -82,6 +89,7 @@ var player = /** @class */ (function (_super) {
             if (value >= player.maxhp)
                 value = player.maxhp;
             this._hp = value;
+            this.alpha = this.hp / player.maxhp;
         },
         enumerable: false,
         configurable: true
@@ -240,12 +248,13 @@ var bullet = /** @class */ (function (_super) {
 }(enemy));
 var coin = /** @class */ (function (_super) {
     __extends(coin, _super);
-    function coin(pos) {
-        var _this = _super.call(this, function (ctx) {
-            drawCircle(ctx, coin.radius, pos, 'green');
-            fillCircle(ctx, coin.radius, pos, '#faffde');
-        }) || this;
-        _this.pos = pos;
+    function coin(center) {
+        var _this = _super.call(this, center, coin.radius) || this;
+        _this.center = center;
+        _this.draw = function (ctx) {
+            drawCircle(ctx, coin.radius, _this.center, 'green');
+            fillCircle(ctx, coin.radius, _this.center, '#faffde', _this.alpha);
+        };
         _this.zIndex = -2;
         _this.onPlayerCollide = function () {
             getPlayer().onCoinCollect();
@@ -261,7 +270,6 @@ var coin = /** @class */ (function (_super) {
             }, undefined, 'score');
             _this.delete();
         };
-        _this.collider = new CircleCollider(pos, coin.radius);
         return _this;
     }
     Object.defineProperty(coin, "radius", {
@@ -280,4 +288,4 @@ var coin = /** @class */ (function (_super) {
         }
     };
     return coin;
-}(drawable));
+}(stationaryCircle));
