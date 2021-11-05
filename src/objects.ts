@@ -191,20 +191,21 @@ class boss1 extends enemy {
 function shootEvenlyInACircle(
 	count: number,
 	bulletRadius: number,
-	pos: Vector2,
+	position: Vector2,
 	velocity: number,
-	spawnRadius: number = 0
+	spawnRadius: number = 0,
+	offsetInRadians: number = 0
 ): bullet[] {
 	let bullets: bullet[] = [];
-	let angle = 0;
+	let angle = offsetInRadians;
 	for (let i = 0; i < count; i++) {
 		let Vy = Math.sin(angle) * velocity;
 		let Vx = Math.cos(angle) * velocity;
 		let V = new Vector2(Vx, Vy);
 		bullets.push(
-			new bullet(pos.Add(V.normalized.Mult(spawnRadius)), V, bulletRadius)
+			new bullet(position.Add(V.normalized.Mult(spawnRadius)), V, bulletRadius)
 		);
-		angle += 360 / count;
+		angle += (Math.PI * 2) / count;
 	}
 	return bullets;
 }
