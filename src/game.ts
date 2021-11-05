@@ -8,17 +8,6 @@ function randomPoint(): Vector2 {
 	return new Vector2(Math.random() * canv.width, Math.random() * canv.height);
 }
 
-function getCircles(): stationaryCircle[] {
-	return drawables.filter(
-		(x) => x instanceof stationaryCircle
-	) as stationaryCircle[];
-}
-function getBodies(): body[] {
-	return drawables.filter((x) => x instanceof body) as body[];
-}
-function getPlayer(): player {
-	return drawables.filter((x) => x instanceof player)[0] as player;
-}
 var boss: enemy;
 let bossTimer: SecTimer;
 function restart(): void {

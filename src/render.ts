@@ -1,22 +1,3 @@
-type draw = (ctx: CanvasRenderingContext2D) => void;
-class drawable {
-	isDrawn: boolean = true;
-	draw: draw;
-	Draw(ctx: CanvasRenderingContext2D) {
-		if (this.isDrawn) this.draw(ctx);
-	}
-	zIndex: number;
-	id: string;
-	delete() {
-		delete drawables[drawables.indexOf(this)];
-	}
-	constructor(draw: draw = () => {}, zIndex: number = 0, id: string = '') {
-		this.draw = draw;
-		this.zIndex = zIndex;
-		this.id = id;
-		drawables.push(this);
-	}
-}
 function setDrawableWithIdOrPush(drawable: drawable, id: string): void {
 	if (!setDrawableWithId(drawable, id)) drawables.push(drawable);
 }
@@ -28,7 +9,6 @@ function setDrawableWithId(drawable: drawable, id: string): boolean {
 	}
 	return false;
 }
-var drawables: drawable[] = [];
 
 function render(): void {
 	let context = canv.getContext('2d')!;
