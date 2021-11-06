@@ -11,12 +11,13 @@ function randomPoint(): Vector2 {
 var currentBoss: boss;
 let bossTimer: SecTimer;
 function restart(): void {
+	if (bossTimer) bossTimer.end();
+	if (victoryTimer) victoryTimer.end();
 	if (updateTimer) updateTimer.end();
 	updateTimer = new Timer(frameInterval, 9999999, gameUpdate);
 	drawables = [];
 	if (currentBoss) currentBoss.delete();
 	new player(new Vector2(canv.width / 2, canv.height / 2), 8.5 * sizeMult());
-	if (bossTimer) bossTimer.end();
 	bossTimer = new SecTimer(9, (count, timer) => {
 		if (count == 1) {
 			if (getPlayer().score > 0) {

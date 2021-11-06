@@ -1,13 +1,7 @@
 abstract class boss extends enemy {
 	baseRadius: number;
-	baseTimeLeft: number = 30 * fps;
-	timer: Timer = new Timer(frameInterval, this.baseTimeLeft, (counter) => {
-		this.preTick(counter);
-		if (counter == 1) {
-			this.onTimeout();
-			this.delete();
-		}
-	});
+	baseTimeLeft: number;
+	timer: Timer;
 	preTick(timeLeft: number) {
 		this.radius =
 			this.baseRadius * 0.35 +
@@ -40,8 +34,16 @@ abstract class boss extends enemy {
 		else if (value >= this.attacks.length) value = 0;
 		this._currentAttack = value;
 	}
-	constructor(center: Vector2, radius: number) {
+	constructor(center: Vector2, radius: number, timeLeft: number) {
 		super(center, radius);
+		this.baseTimeLeft = timeLeft;
 		this.baseRadius = radius;
+		this.timer = new Timer(frameInterval, this.baseTimeLeft, (counter) => {
+			this.preTick(counter);
+			if (counter == 1) {
+				this.onTimeout();
+				this.delete();
+			}
+		});
 	}
 }

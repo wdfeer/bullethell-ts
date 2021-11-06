@@ -1,7 +1,18 @@
 class boss1 extends boss {
+	fillColor: color = { r: 0, g: 0, b: 0 };
+	preTick(timeLeft: number) {
+		super.preTick(timeLeft);
+		if (timeLeft <= 180) {
+			this.fillColor.r = (1 - timeLeft / 180) * 255;
+			if (timeLeft <= 30) {
+				this.fillColor.g = (1 - timeLeft / 30) * 255;
+				this.fillColor.b = (1 - timeLeft / 30) * 255;
+			}
+		}
+	}
 	onTimeout() {
 		this.rangedAttack([15, 18], [4, 4], [8, 9], true);
-		this.rangedAttack([6, 8], [3, 5], [24, 24], false);
+		this.rangedAttack([8, 9], [3, 5], [24, 24], false, 'rgb(36,36,36)');
 
 		initiateVictory(8);
 	}
@@ -34,7 +45,7 @@ class boss1 extends boss {
 		speeds: [number, number],
 		sizes: [number, number],
 		homing: boolean = false,
-		color: string = ''
+		fillColor: string = '#ef4099'
 	): bullet[] {
 		let bullets = shootEvenlyInACircle(
 			Math.random() < 0.5 ? counts[0] : counts[1],
@@ -54,7 +65,7 @@ class boss1 extends boss {
 					ctx,
 					b.radius,
 					b.center,
-					homing ? '#9940ef' : '#ef4099',
+					homing && fillColor == '#ef4099' ? '#9940ef' : fillColor,
 					b.alpha
 				);
 			};
@@ -81,10 +92,15 @@ class boss1 extends boss {
 		return bullets;
 	}
 	constructor(center: Vector2) {
-		super(center, 55 * sizeMult());
+		super(center, 55 * sizeMult(), 30 * fps);
 		this.draw = (ctx) => {
 			fillCircle(ctx, this.radius, this.center, '#ff10a0');
-			fillCircle(ctx, this.radius * 0.9, this.center, 'black');
+			fillCircle(
+				ctx,
+				this.radius * 0.9,
+				this.center,
+				`rgb(${this.fillColor.r},${this.fillColor.g}, ${this.fillColor.b})`
+			);
 		};
 	}
 }

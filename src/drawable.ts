@@ -1,3 +1,4 @@
+type color = { r: number; g: number; b: number; a?: number };
 type draw = (ctx: CanvasRenderingContext2D) => void;
 class drawable {
 	isDrawn: boolean = true;
