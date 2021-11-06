@@ -5,7 +5,7 @@ class bullet extends enemy {
 		super.onPlayerHit();
 		this.delete();
 	};
-	timer: Timer;
+	fadeTimer: Timer;
 	preUpdate = (timeLeft: number) => {};
 	onTimeout = () => {
 		this.delete();
@@ -18,13 +18,13 @@ class bullet extends enemy {
 	) {
 		super(center, radius);
 		this.velocity = velocity;
-		this.timer = new Timer(frameInterval, lifetime * fps, (c) => {
+		this.fadeTimer = new Timer(frameInterval, lifetime * fps, (c) => {
 			this.preUpdate(c);
 			if (c == 1) this.onTimeout();
 		});
 	}
 	delete() {
-		this.timer.end();
+		this.fadeTimer.end();
 		super.delete();
 	}
 	update() {

@@ -34,6 +34,14 @@ function restart(): void {
 }
 restart();
 
+function initiateVictory(counter: number) {
+	victoryTimer = new SecTimer(counter, (count) => {
+		if (count == 1) victory(getPlayer().score);
+		getDrawablesOfType(bullet).forEach((b) => {
+			b.fadeTimer.end();
+		});
+	});
+}
 var victoryTimer: Timer;
 function victory(score: number) {
 	updateTimer.end();

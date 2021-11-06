@@ -1,10 +1,9 @@
 class boss1 extends boss {
 	onTimeout() {
-		this.rangedAttack([11, 15], [4, 4], [6, 6], true);
-		this.rangedAttack([20, 24], [3, 5], [6, 6], false);
-		victoryTimer = new SecTimer(6, (counter) => {
-			if (counter == 1) victory(getPlayer().score);
-		});
+		this.rangedAttack([15, 18], [4, 4], [8, 9], true);
+		this.rangedAttack([6, 8], [3, 5], [24, 24], false);
+
+		initiateVictory(8);
 	}
 	attacks = [
 		() => {
@@ -34,8 +33,9 @@ class boss1 extends boss {
 		counts: [number, number] = [6, 12],
 		speeds: [number, number],
 		sizes: [number, number],
-		homing: boolean = false
-	) {
+		homing: boolean = false,
+		color: string = ''
+	): bullet[] {
 		let bullets = shootEvenlyInACircle(
 			Math.random() < 0.5 ? counts[0] : counts[1],
 			sizeMult(),
@@ -69,14 +69,16 @@ class boss1 extends boss {
 			};
 			if (homing) {
 				b.ai = () => {
-					let direction = getPlayer().center.Sub(b.center).normalized;
-					let dist = getPlayer().center.Sub(b.center).length;
+					let diff = getPlayer().center.Sub(b.center);
+					let direction = diff.normalized;
+					let dist = diff.length;
 					b.velocity.add(
-						direction.Div(dist > 1 ? dist * dist : 1).Mult(480 * sizeMult())
+						direction.Div(dist > 20 ? dist * dist : 20).Mult(480 * sizeMult())
 					);
 				};
 			}
 		});
+		return bullets;
 	}
 	constructor(center: Vector2) {
 		super(center, 55 * sizeMult());
