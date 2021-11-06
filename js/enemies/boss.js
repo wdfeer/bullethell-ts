@@ -63,6 +63,7 @@ var boss = /** @class */ (function (_super) {
     });
     boss.prototype.update = function () {
         this.preTick(this.timeLeft);
+        this.timeLeft--;
         if (this.timeLeft == 1) {
             this.onTimeout();
             this.delete();

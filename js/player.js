@@ -26,6 +26,7 @@ var player = /** @class */ (function (_super) {
         _this.score = 0;
         _this.scoreAlpha = 1;
         _this.scoreFadeTimer = null;
+        _this.godmode = false;
         _this._hp = player.maxhp;
         return _this;
     }
@@ -36,6 +37,8 @@ var player = /** @class */ (function (_super) {
         set: function (value) {
             if (value < this.hp)
                 playSound('./sounds/hit.mp3');
+            if (this.godmode)
+                return;
             if (value <= 0) {
                 restart();
                 this._hp = 0;
