@@ -7,19 +7,15 @@ function sizeMult() {
 function randomPoint() {
     return new Vector2(Math.random() * canv.width, Math.random() * canv.height);
 }
-function getCircles() {
-    return drawables.filter(function (x) { return x instanceof stationaryCircle; });
-}
-function getBodies() {
-    return drawables.filter(function (x) { return x instanceof body; });
-}
-function getPlayer() {
-    return drawables.filter(function (x) { return x instanceof player; })[0];
-}
-var boss;
+var currentBoss;
 var bossTimer;
 function restart() {
+    if (updateTimer)
+        updateTimer.end();
+    updateTimer = new Timer(frameInterval, 9999999, gameUpdate);
     drawables = [];
+    if (currentBoss)
+        currentBoss.delete();
     new player(new Vector2(canv.width / 2, canv.height / 2), 8.5 * sizeMult());
     if (bossTimer)
         bossTimer.end();
@@ -31,7 +27,7 @@ function restart() {
                     (canv.width + canv.height) / 3) {
                     pos = randomPoint();
                 }
-                boss = new boss1(pos, 55 * sizeMult());
+                currentBoss = new boss1(pos);
             }
             else
                 timer.counter += 4;
@@ -39,15 +35,26 @@ function restart() {
     });
 }
 restart();
-function getCoins() {
-    return drawables.filter(function (x) { return x instanceof coin; });
+var victoryTimer;
+function victory(score) {
+    updateTimer.end();
+    new drawable(function (ctx) {
+        ctx.globalAlpha = 0.5;
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canv.width, canv.height);
+    }, 1, 'victoryShade');
+    new drawable(function (ctx) {
+        drawCenteredText(ctx, "Victory!", new Vector2(0, -120 * sizeMult()));
+        drawCenteredText(ctx, "Score: " + score);
+        drawCenteredText(ctx, "Press R to restart", new Vector2(0, 120 * sizeMult()), undefined, undefined, 56);
+    }, 2, 'victoryText');
 }
-var updateTimer = new Timer(1000 / fps, 99999999, gameUpdate);
+var updateTimer;
+var renderTimer = new Timer(frameInterval, 9999999, render);
 function gameUpdate() {
     updateCoinSpawn();
     updateCoins(getCoins());
     updateBodies(getBodies());
-    render();
 }
 var coinTimer = 0;
 function updateCoinSpawn() {

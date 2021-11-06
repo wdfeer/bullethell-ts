@@ -1,32 +1,4 @@
 "use strict";
-var drawable = /** @class */ (function () {
-    function drawable(draw, zIndex, id) {
-        if (draw === void 0) { draw = function () { }; }
-        if (zIndex === void 0) { zIndex = 0; }
-        if (id === void 0) { id = ''; }
-        this.isDrawn = true;
-        this.draw = draw;
-        this.zIndex = zIndex;
-        this.id = id;
-        drawables.push(this);
-    }
-    drawable.prototype.Draw = function (ctx) {
-        if (this.isDrawn)
-            this.draw(ctx);
-    };
-    drawable.prototype.delete = function () {
-        delete drawables[drawables.indexOf(this)];
-    };
-    return drawable;
-}());
-var drawables = [];
-function getDrawableWithId(id) {
-    for (var i = 0; i < drawables.length; i++) {
-        if (drawables[i] && drawables[i].id == id)
-            return drawables[i];
-    }
-    return null;
-}
 function render() {
     var context = canv.getContext('2d');
     context.clearRect(0, 0, canv.width, canv.height);
@@ -38,7 +10,7 @@ function render() {
     var _loop_1 = function (i) {
         drawables.forEach(function (d) {
             if (d.zIndex == i) {
-                d.Draw(context);
+                d.render(context);
             }
         });
     };
@@ -64,13 +36,16 @@ function fillCircle(ctx, radius, center, color, alpha) {
     ctx.fillStyle = color;
     ctx.fill();
 }
-function drawCenteredText(ctx, text, color, alpha, fontStyle) {
+function drawCenteredText(ctx, text, offset, color, alpha, fontSize) {
+    if (offset === void 0) { offset = Vector2.Zero; }
     if (color === void 0) { color = 'black'; }
     if (alpha === void 0) { alpha = 1; }
-    if (fontStyle === void 0) { fontStyle = '96px Bahnschrift'; }
+    if (fontSize === void 0) { fontSize = 80; }
     ctx.globalAlpha = alpha;
     ctx.fillStyle = color;
-    ctx.font = fontStyle;
+    ctx.font = Math.floor(80 * sizeMult()) + "px Bahnschrift";
     ctx.textAlign = 'center';
-    ctx.fillText(text, ctx.canvas.width / 2, ctx.canvas.height / 2);
+    var pos = new Vector2(ctx.canvas.width / 2, ctx.canvas.height / 2);
+    pos.add(offset);
+    ctx.fillText(text, pos.x, pos.y);
 }
