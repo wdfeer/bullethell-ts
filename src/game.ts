@@ -32,10 +32,6 @@ function restart(): void {
 }
 restart();
 
-function getCoins(): coin[] {
-	return drawables.filter((x) => x instanceof coin) as coin[];
-}
-
 var updateTimer = new Timer(1000 / fps, 99999999, gameUpdate);
 function gameUpdate(): void {
 	updateCoinSpawn();

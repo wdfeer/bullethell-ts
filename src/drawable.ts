@@ -30,3 +30,6 @@ function getBodies(): body[] {
 function getPlayer(): player {
 	return drawables.filter((x) => x instanceof player)[0] as player;
 }
+function getCoins(): coin[] {
+	return drawables.filter((x) => x instanceof coin) as coin[];
+}

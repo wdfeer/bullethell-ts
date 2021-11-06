@@ -2,14 +2,17 @@ abstract class boss extends enemy {
 	baseRadius: number;
 	baseTimeLeft: number = 30 * fps;
 	timer: Timer = new Timer(frameInterval, this.baseTimeLeft, (counter) => {
-		this.radius =
-			this.baseRadius * 0.35 +
-			this.baseRadius * 0.65 * (counter / this.baseTimeLeft);
+		this.preTick(counter);
 		if (counter == 1) {
 			this.onTimeout();
 			this.delete();
 		}
 	});
+	preTick(timeLeft: number) {
+		this.radius =
+			this.baseRadius * 0.35 +
+			this.baseRadius * 0.65 * (timeLeft / this.baseTimeLeft);
+	}
 	abstract onTimeout(): void;
 	delete() {
 		super.delete();
