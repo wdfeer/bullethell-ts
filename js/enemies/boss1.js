@@ -17,7 +17,8 @@ var __extends = (this && this.__extends) || (function () {
 var boss1 = /** @class */ (function (_super) {
     __extends(boss1, _super);
     function boss1(center) {
-        var _this = _super.call(this, center, 55 * sizeMult()) || this;
+        var _this = _super.call(this, center, 55 * sizeMult(), 30 * fps) || this;
+        _this.fillColor = { r: 0, g: 0, b: 0 };
         _this.attacks = [
             function () {
                 _this.rangedAttack([6, 12], [3, 3], [12, 12], false);
@@ -43,20 +44,30 @@ var boss1 = /** @class */ (function (_super) {
         };
         _this.draw = function (ctx) {
             fillCircle(ctx, _this.radius, _this.center, '#ff10a0');
-            fillCircle(ctx, _this.radius * 0.9, _this.center, 'black');
+            fillCircle(ctx, _this.radius * 0.9, _this.center, "rgb(" + _this.fillColor.r + "," + _this.fillColor.g + ", " + _this.fillColor.b + ")");
         };
         return _this;
     }
+    boss1.prototype.preTick = function (timeLeft) {
+        _super.prototype.preTick.call(this, timeLeft);
+        if (timeLeft <= 180) {
+            this.fillColor.r = (1 - timeLeft / 180) * 255;
+            if (timeLeft <= 30) {
+                this.fillColor.g = (1 - timeLeft / 30) * 255;
+                this.fillColor.b = (1 - timeLeft / 30) * 255;
+            }
+        }
+    };
     boss1.prototype.onTimeout = function () {
         this.rangedAttack([15, 18], [4, 4], [8, 9], true);
-        this.rangedAttack([6, 8], [3, 5], [24, 24], false);
+        this.rangedAttack([8, 9], [3, 5], [24, 24], false, 'rgb(36,36,36)');
         initiateVictory(8);
     };
-    boss1.prototype.rangedAttack = function (counts, speeds, sizes, homing, color) {
+    boss1.prototype.rangedAttack = function (counts, speeds, sizes, homing, fillColor) {
         var _this = this;
         if (counts === void 0) { counts = [6, 12]; }
         if (homing === void 0) { homing = false; }
-        if (color === void 0) { color = ''; }
+        if (fillColor === void 0) { fillColor = '#ef4099'; }
         var bullets = shootEvenlyInACircle(Math.random() < 0.5 ? counts[0] : counts[1], sizeMult(), this.center, 1, this.radius);
         bullets.forEach(function (b) {
             b.radius *= Math.random() < 0.5 ? sizes[0] : sizes[1];
@@ -64,7 +75,7 @@ var boss1 = /** @class */ (function (_super) {
             b.velocity.add(_this.velocity);
             b.draw = function (ctx) {
                 drawCircle(ctx, b.radius, b.center, 'black', b.alpha);
-                fillCircle(ctx, b.radius, b.center, homing ? '#9940ef' : '#ef4099', b.alpha);
+                fillCircle(ctx, b.radius, b.center, homing && fillColor == '#ef4099' ? '#9940ef' : fillColor, b.alpha);
             };
             b.preUpdate = function (timeLeft) {
                 if (timeLeft <= 60) {

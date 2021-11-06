@@ -16,9 +16,14 @@ var __extends = (this && this.__extends) || (function () {
 })();
 var boss = /** @class */ (function (_super) {
     __extends(boss, _super);
-    function boss(center, radius) {
+    function boss(center, radius, timeLeft) {
         var _this = _super.call(this, center, radius) || this;
-        _this.baseTimeLeft = 30 * fps;
+        _this.speed = 2 * sizeMult();
+        _this.attackTimer = 0;
+        _this.attacks = [];
+        _this._currentAttack = 0;
+        _this.baseTimeLeft = timeLeft;
+        _this.baseRadius = radius;
         _this.timer = new Timer(frameInterval, _this.baseTimeLeft, function (counter) {
             _this.preTick(counter);
             if (counter == 1) {
@@ -26,11 +31,6 @@ var boss = /** @class */ (function (_super) {
                 _this.delete();
             }
         });
-        _this.speed = 2 * sizeMult();
-        _this.attackTimer = 0;
-        _this.attacks = [];
-        _this._currentAttack = 0;
-        _this.baseRadius = radius;
         return _this;
     }
     boss.prototype.preTick = function (timeLeft) {
