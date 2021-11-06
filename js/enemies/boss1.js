@@ -48,17 +48,15 @@ var boss1 = /** @class */ (function (_super) {
         return _this;
     }
     boss1.prototype.onTimeout = function () {
-        this.rangedAttack([11, 15], [4, 4], [6, 6], true);
-        this.rangedAttack([20, 24], [3, 5], [6, 6], false);
-        victoryTimer = new SecTimer(6, function (counter) {
-            if (counter == 1)
-                victory(getPlayer().score);
-        });
+        this.rangedAttack([15, 18], [4, 4], [8, 9], true);
+        this.rangedAttack([6, 8], [3, 5], [24, 24], false);
+        initiateVictory(8);
     };
-    boss1.prototype.rangedAttack = function (counts, speeds, sizes, homing) {
+    boss1.prototype.rangedAttack = function (counts, speeds, sizes, homing, color) {
         var _this = this;
         if (counts === void 0) { counts = [6, 12]; }
         if (homing === void 0) { homing = false; }
+        if (color === void 0) { color = ''; }
         var bullets = shootEvenlyInACircle(Math.random() < 0.5 ? counts[0] : counts[1], sizeMult(), this.center, 1, this.radius);
         bullets.forEach(function (b) {
             b.radius *= Math.random() < 0.5 ? sizes[0] : sizes[1];
@@ -79,12 +77,14 @@ var boss1 = /** @class */ (function (_super) {
             };
             if (homing) {
                 b.ai = function () {
-                    var direction = getPlayer().center.Sub(b.center).normalized;
-                    var dist = getPlayer().center.Sub(b.center).length;
-                    b.velocity.add(direction.Div(dist > 1 ? dist * dist : 1).Mult(480 * sizeMult()));
+                    var diff = getPlayer().center.Sub(b.center);
+                    var direction = diff.normalized;
+                    var dist = diff.length;
+                    b.velocity.add(direction.Div(dist > 20 ? dist * dist : 20).Mult(480 * sizeMult()));
                 };
             }
         });
+        return bullets;
     };
     return boss1;
 }(boss));

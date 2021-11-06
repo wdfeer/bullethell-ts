@@ -35,6 +35,15 @@ function restart() {
     });
 }
 restart();
+function initiateVictory(counter) {
+    victoryTimer = new SecTimer(counter, function (count) {
+        if (count == 1)
+            victory(getPlayer().score);
+        getDrawablesOfType(bullet).forEach(function (b) {
+            b.fadeTimer.end();
+        });
+    });
+}
 var victoryTimer;
 function victory(score) {
     updateTimer.end();

@@ -30,7 +30,7 @@ var bullet = /** @class */ (function (_super) {
             _this.delete();
         };
         _this.velocity = velocity;
-        _this.timer = new Timer(frameInterval, lifetime * fps, function (c) {
+        _this.fadeTimer = new Timer(frameInterval, lifetime * fps, function (c) {
             _this.preUpdate(c);
             if (c == 1)
                 _this.onTimeout();
@@ -38,7 +38,7 @@ var bullet = /** @class */ (function (_super) {
         return _this;
     }
     bullet.prototype.delete = function () {
-        this.timer.end();
+        this.fadeTimer.end();
         _super.prototype.delete.call(this);
     };
     bullet.prototype.update = function () {
