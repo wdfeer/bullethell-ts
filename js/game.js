@@ -10,6 +10,7 @@ function randomPoint() {
 var currentBoss;
 var bossTimer;
 function restart() {
+    paused = false;
     if (bossTimer)
         bossTimer.end();
     if (victoryTimer)
@@ -41,9 +42,6 @@ function initiateVictory(counter) {
     victoryTimer = new SecTimer(counter, function (count) {
         if (count == 1)
             victory(getPlayer().score);
-        getDrawablesOfType(bullet).forEach(function (b) {
-            b.fadeTimer.end();
-        });
     });
 }
 var victoryTimer;
@@ -59,6 +57,27 @@ function victory(score) {
         drawCenteredText(ctx, "Score: " + score);
         drawCenteredText(ctx, "Press R to restart", new Vector2(0, 120 * sizeMult()), undefined, undefined, 56);
     }, 2, 'victoryText');
+}
+var paused = false;
+function pause() {
+    var _a, _b;
+    if (paused) {
+        updateTimer = new Timer(frameInterval, 9999999, gameUpdate);
+        (_a = getDrawableWithId('pauseShade')) === null || _a === void 0 ? void 0 : _a.delete();
+        (_b = getDrawableWithId('pauseText')) === null || _b === void 0 ? void 0 : _b.delete();
+    }
+    else {
+        updateTimer.end();
+        new drawable(function (ctx) {
+            ctx.globalAlpha = 0.5;
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canv.width, canv.height);
+        }, 1, 'pauseShade');
+        new drawable(function (ctx) {
+            drawCenteredText(ctx, 'Paused');
+        }, 1, 'pauseText');
+    }
+    paused = !paused;
 }
 var updateTimer;
 var renderTimer = new Timer(frameInterval, 9999999, render);
@@ -88,9 +107,11 @@ function updateBodies(bodies) {
         b.update();
     });
 }
-function onKeyPress(key) {
-    if (key == 'r')
+function onKeyPress(keyCode) {
+    if (keyCode == 'KeyR')
         restart();
+    else if (keyCode == 'Space')
+        pause();
 }
 function onClick(event) {
     getPlayer().velocity = CursorPos(event)

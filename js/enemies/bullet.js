@@ -25,23 +25,27 @@ var bullet = /** @class */ (function (_super) {
             _super.prototype.onPlayerHit.call(_this);
             _this.delete();
         };
-        _this.preUpdate = function (timeLeft) { };
+        _this.preUpdate = function (timeLeft) {
+            if (timeLeft <= 60) {
+                _this.alpha = timeLeft / 60;
+                _this.onPlayerHit = function () { };
+            }
+        };
         _this.onTimeout = function () {
             _this.delete();
         };
+        _this.timeLeft = 600;
         _this.velocity = velocity;
-        _this.fadeTimer = new Timer(frameInterval, lifetime * fps, function (c) {
-            _this.preUpdate(c);
-            if (c == 1)
-                _this.onTimeout();
-        });
         return _this;
     }
     bullet.prototype.delete = function () {
-        this.fadeTimer.end();
         _super.prototype.delete.call(this);
     };
     bullet.prototype.update = function () {
+        this.preUpdate(this.timeLeft);
+        this.timeLeft--;
+        if (this.timeLeft <= 1)
+            this.delete();
         _super.prototype.update.call(this);
     };
     return bullet;

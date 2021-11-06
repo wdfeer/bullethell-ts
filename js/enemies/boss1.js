@@ -77,12 +77,6 @@ var boss1 = /** @class */ (function (_super) {
                 drawCircle(ctx, b.radius, b.center, 'black', b.alpha);
                 fillCircle(ctx, b.radius, b.center, homing && fillColor == '#ef4099' ? '#9940ef' : fillColor, b.alpha);
             };
-            b.preUpdate = function (timeLeft) {
-                if (timeLeft <= 60) {
-                    b.alpha = timeLeft / 60;
-                    b.onPlayerHit = function () { };
-                }
-            };
             b.onTimeout = function () {
                 b.delete();
             };

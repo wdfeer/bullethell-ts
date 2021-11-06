@@ -23,14 +23,8 @@ var boss = /** @class */ (function (_super) {
         _this.attacks = [];
         _this._currentAttack = 0;
         _this.baseTimeLeft = timeLeft;
+        _this.timeLeft = timeLeft;
         _this.baseRadius = radius;
-        _this.timer = new Timer(frameInterval, _this.baseTimeLeft, function (counter) {
-            _this.preTick(counter);
-            if (counter == 1) {
-                _this.onTimeout();
-                _this.delete();
-            }
-        });
         return _this;
     }
     boss.prototype.preTick = function (timeLeft) {
@@ -40,7 +34,6 @@ var boss = /** @class */ (function (_super) {
     };
     boss.prototype.delete = function () {
         _super.prototype.delete.call(this);
-        this.timer.end();
     };
     Object.defineProperty(boss.prototype, "attackCooldown", {
         get: function () {
@@ -68,5 +61,13 @@ var boss = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
+    boss.prototype.update = function () {
+        this.preTick(this.timeLeft);
+        if (this.timeLeft == 1) {
+            this.onTimeout();
+            this.delete();
+        }
+        _super.prototype.update.call(this);
+    };
     return boss;
 }(enemy));

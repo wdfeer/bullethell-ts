@@ -28,6 +28,6 @@ function playSound(src, volume) {
     audio.play();
 }
 window.onkeydown = function (event) {
-    onKeyPress(event.key);
+    onKeyPress(event.code);
 };
 canv.addEventListener('click', function (event) { return onClick(event); });
