@@ -8,21 +8,13 @@ function randomPoint(): Vector2 {
 	return new Vector2(Math.random() * canv.width, Math.random() * canv.height);
 }
 
-function getCircles(): stationaryCircle[] {
-	return drawables.filter(
-		(x) => x instanceof stationaryCircle
-	) as stationaryCircle[];
-}
-function getBodies(): body[] {
-	return drawables.filter((x) => x instanceof body) as body[];
-}
-function getPlayer(): player {
-	return drawables.filter((x) => x instanceof player)[0] as player;
-}
-var boss: enemy;
+var currentBoss: boss;
 let bossTimer: SecTimer;
 function restart(): void {
+	if (updateTimer) updateTimer.end();
+	updateTimer = new Timer(frameInterval, 9999999, gameUpdate);
 	drawables = [];
+	if (currentBoss) currentBoss.delete();
 	new player(new Vector2(canv.width / 2, canv.height / 2), 8.5 * sizeMult());
 	if (bossTimer) bossTimer.end();
 	bossTimer = new SecTimer(9, (count, timer) => {
@@ -35,25 +27,50 @@ function restart(): void {
 				) {
 					pos = randomPoint();
 				}
-				boss = new boss1(pos, 55 * sizeMult());
+				currentBoss = new boss1(pos);
 			} else timer.counter += 4;
 		}
 	});
 }
 restart();
 
-function getCoins(): coin[] {
-	return drawables.filter((x) => x instanceof coin) as coin[];
+var victoryTimer: Timer;
+function victory(score: number) {
+	updateTimer.end();
+	new drawable(
+		(ctx) => {
+			ctx.globalAlpha = 0.5;
+			ctx.fillStyle = 'white';
+			ctx.fillRect(0, 0, canv.width, canv.height);
+		},
+		1,
+		'victoryShade'
+	);
+	new drawable(
+		(ctx) => {
+			drawCenteredText(ctx, `Victory!`, new Vector2(0, -120 * sizeMult()));
+			drawCenteredText(ctx, `Score: ${score}`);
+			drawCenteredText(
+				ctx,
+				`Press R to restart`,
+				new Vector2(0, 120 * sizeMult()),
+				undefined,
+				undefined,
+				56
+			);
+		},
+		2,
+		'victoryText'
+	);
 }
 
-var updateTimer = new Timer(1000 / fps, 99999999, gameUpdate);
+var updateTimer: Timer;
+var renderTimer: Timer = new Timer(frameInterval, 9999999, render);
 function gameUpdate(): void {
 	updateCoinSpawn();
 
 	updateCoins(getCoins());
 	updateBodies(getBodies());
-
-	render();
 }
 var coinTimer = 0;
 function updateCoinSpawn(): void {

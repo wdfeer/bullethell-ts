@@ -1,30 +1,3 @@
-type draw = (ctx: CanvasRenderingContext2D) => void;
-class drawable {
-	isDrawn: boolean = true;
-	draw: draw;
-	Draw(ctx: CanvasRenderingContext2D) {
-		if (this.isDrawn) this.draw(ctx);
-	}
-	zIndex: number;
-	id: string;
-	delete() {
-		delete drawables[drawables.indexOf(this)];
-	}
-	constructor(draw: draw = () => {}, zIndex: number = 0, id: string = '') {
-		this.draw = draw;
-		this.zIndex = zIndex;
-		this.id = id;
-		drawables.push(this);
-	}
-}
-var drawables: drawable[] = [];
-function getDrawableWithId(id: string): drawable | null {
-	for (let i = 0; i < drawables.length; i++) {
-		if (drawables[i] && drawables[i].id == id) return drawables[i];
-	}
-	return null;
-}
-
 function render(): void {
 	let context = canv.getContext('2d')!;
 	context.clearRect(0, 0, canv.width, canv.height);
@@ -36,7 +9,7 @@ function render(): void {
 	for (let i = drawables.min(getZ); i <= drawables.max(getZ); i++) {
 		drawables.forEach((d) => {
 			if (d.zIndex == i) {
-				d.Draw(context);
+				d.render(context);
 			}
 		});
 	}
@@ -73,13 +46,16 @@ function fillCircle(
 function drawCenteredText(
 	ctx: CanvasRenderingContext2D,
 	text: string,
+	offset: Vector2 = Vector2.Zero,
 	color: string = 'black',
 	alpha: number = 1,
-	fontStyle: string = '96px Bahnschrift'
+	fontSize: number = 80
 ) {
 	ctx.globalAlpha = alpha;
 	ctx.fillStyle = color;
-	ctx.font = fontStyle;
+	ctx.font = `${Math.floor(80 * sizeMult())}px Bahnschrift`;
 	ctx.textAlign = 'center';
-	ctx.fillText(text, ctx.canvas.width / 2, ctx.canvas.height / 2);
+	let pos: Vector2 = new Vector2(ctx.canvas.width / 2, ctx.canvas.height / 2);
+	pos.add(offset);
+	ctx.fillText(text, pos.x, pos.y);
 }
