@@ -1,15 +1,3 @@
-function setDrawableWithIdOrPush(drawable: drawable, id: string): void {
-	if (!setDrawableWithId(drawable, id)) drawables.push(drawable);
-}
-function setDrawableWithId(drawable: drawable, id: string): boolean {
-	for (let i = 0; i < drawables.length; i++) {
-		if (drawables[i].id != id) continue;
-		drawables[i] = drawable;
-		return true;
-	}
-	return false;
-}
-
 function render(): void {
 	let context = canv.getContext('2d')!;
 	context.clearRect(0, 0, canv.width, canv.height);
@@ -58,13 +46,16 @@ function fillCircle(
 function drawCenteredText(
 	ctx: CanvasRenderingContext2D,
 	text: string,
+	offset: Vector2 = Vector2.Zero,
 	color: string = 'black',
 	alpha: number = 1,
-	fontStyle: string = '96px Bahnschrift'
+	fontSize: number = 80
 ) {
 	ctx.globalAlpha = alpha;
 	ctx.fillStyle = color;
-	ctx.font = fontStyle;
+	ctx.font = `${Math.floor(80 * sizeMult())}px Bahnschrift`;
 	ctx.textAlign = 'center';
-	ctx.fillText(text, ctx.canvas.width / 2, ctx.canvas.height / 2);
+	let pos: Vector2 = new Vector2(ctx.canvas.width / 2, ctx.canvas.height / 2);
+	pos.add(offset);
+	ctx.fillText(text, pos.x, pos.y);
 }

@@ -2,6 +2,9 @@ class boss1 extends boss {
 	onTimeout() {
 		this.rangedAttack([11, 15], [4, 4], [6, 6], true);
 		this.rangedAttack([20, 24], [3, 5], [6, 6], false);
+		victoryTimer = new SecTimer(6, (counter) => {
+			if (counter == 1) victory(getPlayer().score);
+		});
 	}
 	attacks = [
 		() => {

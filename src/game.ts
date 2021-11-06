@@ -11,6 +11,8 @@ function randomPoint(): Vector2 {
 var currentBoss: boss;
 let bossTimer: SecTimer;
 function restart(): void {
+	if (updateTimer) updateTimer.end();
+	updateTimer = new Timer(frameInterval, 9999999, gameUpdate);
 	drawables = [];
 	if (currentBoss) currentBoss.delete();
 	new player(new Vector2(canv.width / 2, canv.height / 2), 8.5 * sizeMult());
@@ -32,14 +34,43 @@ function restart(): void {
 }
 restart();
 
-var updateTimer = new Timer(1000 / fps, 99999999, gameUpdate);
+var victoryTimer: Timer;
+function victory(score: number) {
+	updateTimer.end();
+	new drawable(
+		(ctx) => {
+			ctx.globalAlpha = 0.5;
+			ctx.fillStyle = 'white';
+			ctx.fillRect(0, 0, canv.width, canv.height);
+		},
+		1,
+		'victoryShade'
+	);
+	new drawable(
+		(ctx) => {
+			drawCenteredText(ctx, `Victory!`, new Vector2(0, -120 * sizeMult()));
+			drawCenteredText(ctx, `Score: ${score}`);
+			drawCenteredText(
+				ctx,
+				`Press R to restart`,
+				new Vector2(0, 120 * sizeMult()),
+				undefined,
+				undefined,
+				56
+			);
+		},
+		2,
+		'victoryText'
+	);
+}
+
+var updateTimer: Timer;
+var renderTimer: Timer = new Timer(frameInterval, 9999999, render);
 function gameUpdate(): void {
 	updateCoinSpawn();
 
 	updateCoins(getCoins());
 	updateBodies(getBodies());
-
-	render();
 }
 var coinTimer = 0;
 function updateCoinSpawn(): void {

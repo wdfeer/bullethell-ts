@@ -19,17 +19,20 @@ class drawable {
 }
 
 var drawables: drawable[] = [];
+function getDrawablesOfType<Type extends drawable>(c: {
+	new (arg1: any, arg2: any, arg3: any): Type;
+}): Type[] {
+	return drawables.filter((x) => x instanceof c) as Type[];
+}
 function getCircles(): stationaryCircle[] {
-	return drawables.filter(
-		(x) => x instanceof stationaryCircle
-	) as stationaryCircle[];
+	return getDrawablesOfType(stationaryCircle);
 }
 function getBodies(): body[] {
-	return drawables.filter((x) => x instanceof body) as body[];
+	return getDrawablesOfType(body);
 }
 function getPlayer(): player {
-	return drawables.filter((x) => x instanceof player)[0] as player;
+	return getDrawablesOfType(player)[0];
 }
 function getCoins(): coin[] {
-	return drawables.filter((x) => x instanceof coin) as coin[];
+	return getDrawablesOfType(coin);
 }

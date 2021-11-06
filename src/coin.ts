@@ -19,7 +19,13 @@ class coin extends stationaryCircle {
 		});
 		new drawable(
 			(ctx) => {
-				drawCenteredText(ctx, String(getPlayer().score), undefined, alpha);
+				drawCenteredText(
+					ctx,
+					String(getPlayer().score),
+					undefined,
+					undefined,
+					alpha
+				);
 			},
 			undefined,
 			'score'
