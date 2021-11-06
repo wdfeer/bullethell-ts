@@ -29,6 +29,6 @@ function playSound(src: string, volume: number = 1) {
 }
 
 window.onkeydown = (event: KeyboardEvent) => {
-	onKeyPress(event.key);
+	onKeyPress(event.code);
 };
 canv.addEventListener('click', (event) => onClick(event));

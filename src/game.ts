@@ -11,6 +11,7 @@ function randomPoint(): Vector2 {
 var currentBoss: boss;
 let bossTimer: SecTimer;
 function restart(): void {
+	paused = false;
 	if (bossTimer) bossTimer.end();
 	if (victoryTimer) victoryTimer.end();
 	if (updateTimer) updateTimer.end();
@@ -38,9 +39,6 @@ restart();
 function initiateVictory(counter: number) {
 	victoryTimer = new SecTimer(counter, (count) => {
 		if (count == 1) victory(getPlayer().score);
-		getDrawablesOfType(bullet).forEach((b) => {
-			b.fadeTimer.end();
-		});
 	});
 }
 var victoryTimer: Timer;
@@ -73,6 +71,35 @@ function victory(score: number) {
 	);
 }
 
+var paused: boolean = false;
+function pause() {
+	if (paused) {
+		updateTimer = new Timer(frameInterval, 9999999, gameUpdate);
+		getDrawableWithId('pauseShade')?.delete();
+		getDrawableWithId('pauseText')?.delete();
+	} else {
+		updateTimer.end();
+		new drawable(
+			(ctx) => {
+				ctx.globalAlpha = 0.5;
+				ctx.fillStyle = 'white';
+				ctx.fillRect(0, 0, canv.width, canv.height);
+			},
+			1,
+			'pauseShade'
+		);
+		new drawable(
+			(ctx) => {
+				drawCenteredText(ctx, 'Paused');
+			},
+			1,
+			'pauseText'
+		);
+	}
+
+	paused = !paused;
+}
+
 var updateTimer: Timer;
 var renderTimer: Timer = new Timer(frameInterval, 9999999, render);
 function gameUpdate(): void {
@@ -103,8 +130,9 @@ function updateBodies(bodies: body[]): void {
 	});
 }
 
-function onKeyPress(key: string) {
-	if (key == 'r') restart();
+function onKeyPress(keyCode: string) {
+	if (keyCode == 'KeyR') restart();
+	else if (keyCode == 'Space') pause();
 }
 function onClick(event: MouseEvent): void {
 	getPlayer().velocity = CursorPos(event)

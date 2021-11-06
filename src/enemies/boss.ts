@@ -1,7 +1,7 @@
 abstract class boss extends enemy {
 	baseRadius: number;
 	baseTimeLeft: number;
-	timer: Timer;
+	timeLeft: number;
 	preTick(timeLeft: number) {
 		this.radius =
 			this.baseRadius * 0.35 +
@@ -10,7 +10,6 @@ abstract class boss extends enemy {
 	abstract onTimeout(): void;
 	delete() {
 		super.delete();
-		this.timer.end();
 	}
 	speed = 2 * sizeMult();
 	get attackCooldown(): number {
@@ -37,13 +36,15 @@ abstract class boss extends enemy {
 	constructor(center: Vector2, radius: number, timeLeft: number) {
 		super(center, radius);
 		this.baseTimeLeft = timeLeft;
+		this.timeLeft = timeLeft;
 		this.baseRadius = radius;
-		this.timer = new Timer(frameInterval, this.baseTimeLeft, (counter) => {
-			this.preTick(counter);
-			if (counter == 1) {
-				this.onTimeout();
-				this.delete();
-			}
-		});
+	}
+	update() {
+		this.preTick(this.timeLeft);
+		if (this.timeLeft == 1) {
+			this.onTimeout();
+			this.delete();
+		}
+		super.update();
 	}
 }

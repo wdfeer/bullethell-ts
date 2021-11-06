@@ -69,12 +69,6 @@ class boss1 extends boss {
 					b.alpha
 				);
 			};
-			b.preUpdate = (timeLeft) => {
-				if (timeLeft <= 60) {
-					b.alpha = timeLeft / 60;
-					b.onPlayerHit = () => {};
-				}
-			};
 			b.onTimeout = () => {
 				b.delete();
 			};
