@@ -41,6 +41,7 @@ abstract class boss extends enemy {
 	}
 	update() {
 		this.preTick(this.timeLeft);
+		this.timeLeft--;
 		if (this.timeLeft == 1) {
 			this.onTimeout();
 			this.delete();

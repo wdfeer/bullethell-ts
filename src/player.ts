@@ -8,14 +8,15 @@ class player extends body {
 	score: number = 0;
 	scoreAlpha: number = 1;
 	scoreFadeTimer: Timer | null = null;
+	godmode: boolean = false;
 	static readonly maxhp: number = 100;
 	private _hp: number = player.maxhp;
-
 	public get hp(): number {
 		return this._hp;
 	}
 	public set hp(value: number) {
 		if (value < this.hp) playSound('./sounds/hit.mp3');
+		if (this.godmode) return;
 		if (value <= 0) {
 			restart();
 			this._hp = 0;
