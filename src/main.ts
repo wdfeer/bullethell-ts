@@ -19,6 +19,7 @@ window.onresize = () => {
 	});
 	canv.width = window.innerWidth;
 	canv.height = window.innerHeight;
+	sizeMult = (canv.width + canv.height) / 2600;
 };
 
 const audio = document.querySelector('audio')!;

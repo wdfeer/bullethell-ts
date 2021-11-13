@@ -5,7 +5,7 @@ class coin extends stationaryCircle {
 	};
 	zIndex = -2;
 	static get radius() {
-		return 22 * sizeMult();
+		return 22 * sizeMult;
 	}
 	onPlayerCollide: () => void = () => {
 		getPlayer().onCoinCollect();

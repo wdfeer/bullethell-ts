@@ -1,9 +1,7 @@
 const fps = 60;
 const frameInterval = 1000 / fps;
 
-function sizeMult() {
-	return (canv.width + canv.height) / 2600;
-}
+var sizeMult = (canv.width + canv.height) / 2600;
 function randomPoint(): Vector2 {
 	return new Vector2(Math.random() * canv.width, Math.random() * canv.height);
 }
@@ -18,7 +16,7 @@ function restart(): void {
 	updateTimer = new Timer(frameInterval, 9999999, gameUpdate);
 	drawables = [];
 	if (currentBoss) currentBoss.delete();
-	new player(new Vector2(canv.width / 2, canv.height / 2), 8.5 * sizeMult());
+	new player(new Vector2(canv.width / 2, canv.height / 2), 8.5 * sizeMult);
 	bossTimer = new SecTimer(9, (count, timer) => {
 		if (count == 1) {
 			if (getPlayer().score > 0) {
@@ -55,12 +53,12 @@ function victory(score: number) {
 	);
 	new drawable(
 		(ctx) => {
-			drawCenteredText(ctx, `Victory!`, new Vector2(0, -120 * sizeMult()));
+			drawCenteredText(ctx, `Victory!`, new Vector2(0, -120 * sizeMult));
 			drawCenteredText(ctx, `Score: ${score}`);
 			drawCenteredText(
 				ctx,
 				`Press R to restart`,
-				new Vector2(0, 120 * sizeMult()),
+				new Vector2(0, 120 * sizeMult),
 				undefined,
 				undefined,
 				56

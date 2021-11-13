@@ -27,7 +27,7 @@ class player extends body {
 		this.alpha = this.hp / player.maxhp;
 	}
 	get speed() {
-		return (8 - 5 * Math.pow(0.9, this.score)) * sizeMult();
+		return (8 - 5 * Math.pow(0.9, this.score)) * sizeMult;
 	}
 	onCoinCollect() {
 		this.score++;

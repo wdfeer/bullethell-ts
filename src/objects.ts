@@ -9,10 +9,10 @@ class stationaryCircle extends drawable {
 	}
 	protected _radius: number = 0;
 	public get radius() {
-		return this._radius * sizeMult();
+		return this._radius * sizeMult;
 	}
 	public set radius(value: number) {
-		this._radius = value / sizeMult();
+		this._radius = value / sizeMult;
 	}
 	get collider() {
 		return new CircleCollider(this.center, this.radius);
