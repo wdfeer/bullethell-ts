@@ -37,10 +37,10 @@ var stationaryCircle = /** @class */ (function (_super) {
     });
     Object.defineProperty(stationaryCircle.prototype, "radius", {
         get: function () {
-            return this._radius * sizeMult();
+            return this._radius * sizeMult;
         },
         set: function (value) {
-            this._radius = value / sizeMult();
+            this._radius = value / sizeMult;
         },
         enumerable: false,
         configurable: true

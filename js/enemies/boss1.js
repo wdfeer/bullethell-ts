@@ -17,7 +17,7 @@ var __extends = (this && this.__extends) || (function () {
 var boss1 = /** @class */ (function (_super) {
     __extends(boss1, _super);
     function boss1(center) {
-        var _this = _super.call(this, center, 55 * sizeMult(), 30 * fps) || this;
+        var _this = _super.call(this, center, 55 * sizeMult, 30 * fps) || this;
         _this.fillColor = { r: 0, g: 0, b: 0 };
         _this.attacks = [
             function () {
@@ -33,7 +33,7 @@ var boss1 = /** @class */ (function (_super) {
         _this.ai = function () {
             var diff = getPlayer().center.Sub(_this.center);
             var dist = diff.length;
-            if (dist > _this.radius * 4 + _this.radius * 20 * sizeMult() * Math.random())
+            if (dist > _this.radius * 4 + _this.radius * 20 * sizeMult * Math.random())
                 _this.velocity = getPlayer()
                     .center.Sub(_this.center)
                     .normalized.Mult(_this.speed);
@@ -68,10 +68,10 @@ var boss1 = /** @class */ (function (_super) {
         if (counts === void 0) { counts = [6, 12]; }
         if (homing === void 0) { homing = false; }
         if (fillColor === void 0) { fillColor = '#ef4099'; }
-        var bullets = shootEvenlyInACircle(Math.random() < 0.5 ? counts[0] : counts[1], sizeMult(), this.center, 1, this.radius);
+        var bullets = shootEvenlyInACircle(Math.random() < 0.5 ? counts[0] : counts[1], sizeMult, this.center, 1, this.radius);
         bullets.forEach(function (b) {
             b.radius *= Math.random() < 0.5 ? sizes[0] : sizes[1];
-            b.velocity.mult(Math.random() < 0.5 ? speeds[0] : speeds[1] * sizeMult());
+            b.velocity.mult(Math.random() < 0.5 ? speeds[0] : speeds[1] * sizeMult);
             b.velocity.add(_this.velocity);
             b.draw = function (ctx) {
                 drawCircle(ctx, b.radius, b.center, 'black', b.alpha);
@@ -85,7 +85,9 @@ var boss1 = /** @class */ (function (_super) {
                     var diff = getPlayer().center.Sub(b.center);
                     var direction = diff.normalized;
                     var dist = diff.length;
-                    b.velocity.add(direction.Div(dist > 20 ? dist * dist : 20).Mult(480 * sizeMult()));
+                    b.velocity.add(direction
+                        .Div(dist > 20 ? dist * dist : 20)
+                        .Mult(400 * (sizeMult < 1 ? sizeMult * sizeMult : sizeMult)));
                 };
             }
         });

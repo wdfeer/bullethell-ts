@@ -18,7 +18,7 @@ var boss = /** @class */ (function (_super) {
     __extends(boss, _super);
     function boss(center, radius, timeLeft) {
         var _this = _super.call(this, center, radius) || this;
-        _this.speed = 2 * sizeMult();
+        _this.speed = 2 * sizeMult;
         _this.attackTimer = 0;
         _this.attacks = [];
         _this._currentAttack = 0;

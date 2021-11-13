@@ -31,7 +31,7 @@ var coin = /** @class */ (function (_super) {
     }
     Object.defineProperty(coin, "radius", {
         get: function () {
-            return 22 * sizeMult();
+            return 22 * sizeMult;
         },
         enumerable: false,
         configurable: true

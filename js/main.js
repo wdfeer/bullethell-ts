@@ -19,6 +19,7 @@ window.onresize = function () {
     });
     canv.width = window.innerWidth;
     canv.height = window.innerHeight;
+    sizeMult = (canv.width + canv.height) / 2600;
 };
 var audio = document.querySelector('audio');
 function playSound(src, volume) {
