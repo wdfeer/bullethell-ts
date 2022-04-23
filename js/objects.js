@@ -18,6 +18,7 @@ var stationaryCircle = /** @class */ (function (_super) {
     __extends(stationaryCircle, _super);
     function stationaryCircle(center, radius) {
         var _this = _super.call(this) || this;
+        /** from 0 (transparent) to 1 (opaque) */
         _this.alpha = 1;
         _this._center = Vector2.Zero;
         _this._radius = 0;
@@ -37,10 +38,10 @@ var stationaryCircle = /** @class */ (function (_super) {
     });
     Object.defineProperty(stationaryCircle.prototype, "radius", {
         get: function () {
-            return this._radius * sizeMult;
+            return this._radius * distScale;
         },
         set: function (value) {
-            this._radius = value / sizeMult;
+            this._radius = value / distScale;
         },
         enumerable: false,
         configurable: true
@@ -57,7 +58,7 @@ var stationaryCircle = /** @class */ (function (_super) {
 var body = /** @class */ (function (_super) {
     __extends(body, _super);
     function body(center, radius) {
-        var _this = _super.call(this, center, radius) || this;
+        var _this = _super.call(this, center.clone(), radius) || this;
         _this.velocity = Vector2.Zero;
         return _this;
     }
@@ -65,10 +66,10 @@ var body = /** @class */ (function (_super) {
         this.center.add(this.velocity);
         if ((this.center.x + this.radius > canv.width && this.velocity.x > 0) ||
             (this.center.x - this.radius < 0 && this.velocity.x < 0))
-            this.velocity.x = -this.velocity.x * 0.5;
+            this.velocity.x = -this.velocity.x * 0.9;
         if ((this.center.y + this.radius > canv.height && this.velocity.y > 0) ||
             (this.center.y - this.radius < 0 && this.velocity.y < 0))
-            this.velocity.y = -this.velocity.y * 0.5;
+            this.velocity.y = -this.velocity.y * 0.9;
     };
     return body;
 }(stationaryCircle));

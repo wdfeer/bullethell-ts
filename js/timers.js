@@ -15,16 +15,19 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var Timer = /** @class */ (function () {
-    function Timer(tickInterval, counter, preTick) {
+    function Timer(tickInterval, counter, preTick, timeOut) {
         var _this = this;
         this.tickInterval = tickInterval;
         this.counter = counter;
+        this.timeOut = function () { };
         this.intervalId = setInterval(function () {
             preTick(_this.counter, _this);
             _this.counter = _this.counter - 1;
             if (_this.counter <= 0)
                 _this.end();
         }, tickInterval);
+        if (timeOut)
+            this.timeOut = timeOut;
     }
     Object.defineProperty(Timer.prototype, "hasEnded", {
         get: function () {
@@ -35,6 +38,7 @@ var Timer = /** @class */ (function () {
     });
     Timer.prototype.end = function () {
         clearInterval(this.intervalId);
+        this.timeOut();
     };
     return Timer;
 }());

@@ -54,7 +54,7 @@ var player = /** @class */ (function (_super) {
     });
     Object.defineProperty(player.prototype, "speed", {
         get: function () {
-            return (8 - 5 * Math.pow(0.9, this.score)) * sizeMult;
+            return (8 - 5 * Math.pow(0.9, this.score)) * distScale;
         },
         enumerable: false,
         configurable: true
@@ -77,6 +77,37 @@ var player = /** @class */ (function (_super) {
             new drawable(function (ctx) {
                 drawCenteredText(ctx, String(getPlayer().score), undefined, undefined, _this.scoreAlpha);
             }, undefined, 'score');
+    };
+    player.prototype.shoot = function (normalVelocity) {
+        var bull = new body(this.center, this.radius * 0.6);
+        var velocity = normalVelocity.Mult(distScale * (6 + this.score / 6));
+        bull.velocity = velocity.Add(this.velocity);
+        this.velocity.sub(velocity.Mult(0.1));
+        bull.draw = function (ctx) {
+            drawCircle(ctx, bull.radius, bull.center, 'lime');
+            fillCircle(ctx, bull.radius, bull.center, 'green', bull.alpha);
+        };
+        var bullUpdateTimer = new Timer(1, 120, function (count) {
+            if (paused) {
+                count++;
+                return;
+            }
+            if (count <= 60)
+                bull.alpha = count / 60;
+            {
+                var allEnemyBullets = getDrawablesOfType(bullet);
+                var collidingWith = allEnemyBullets.filter(function (enemyBullet) { return bull.collider.colliding(enemyBullet.collider); });
+                if (collidingWith.length != 0) {
+                    var enemyBullet = collidingWith[0];
+                    enemyBullet.alphaMod /= 2;
+                    enemyBullet.damage /= 2;
+                    bull.delete();
+                    bullUpdateTimer.end();
+                }
+            }
+        }, function () {
+            bull.delete();
+        });
     };
     Object.defineProperty(player.prototype, "coinSpawnCooldown", {
         get: function () {

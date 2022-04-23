@@ -19,7 +19,7 @@ window.onresize = function () {
     });
     canv.width = window.innerWidth;
     canv.height = window.innerHeight;
-    sizeMult = (canv.width + canv.height) / 2600;
+    distScale = (canv.width + canv.height) / 2600;
 };
 var audio = document.querySelector('audio');
 function playSound(src, volume) {
@@ -28,7 +28,11 @@ function playSound(src, volume) {
     audio.volume = volume;
     audio.play();
 }
+var cursorPos = new Vector2(0, 0);
+document.onmousemove = function (event) {
+    cursorPos = getCursorPos(event);
+};
 window.onkeydown = function (event) {
-    onKeyPress(event.code);
+    onKeyDown(event.code);
 };
 canv.addEventListener('click', function (event) { return onClick(event); });

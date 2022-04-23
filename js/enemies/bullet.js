@@ -25,9 +25,10 @@ var bullet = /** @class */ (function (_super) {
             _super.prototype.onPlayerHit.call(_this);
             _this.delete();
         };
+        _this.alphaMod = 1;
         _this.preUpdate = function (timeLeft) {
             if (timeLeft <= 60) {
-                _this.alpha = timeLeft / 60;
+                _this.alpha = _this.alphaMod * timeLeft / 60;
                 _this.onPlayerHit = function () { };
             }
         };

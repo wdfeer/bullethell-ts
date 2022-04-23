@@ -1,7 +1,7 @@
 "use strict";
 var fps = 60;
 var frameInterval = 1000 / fps;
-var sizeMult = (canv.width + canv.height) / 2600;
+var distScale = (canv.width + canv.height) / 2600;
 function randomPoint() {
     return new Vector2(Math.random() * canv.width, Math.random() * canv.height);
 }
@@ -19,7 +19,7 @@ function restart() {
     drawables = [];
     if (currentBoss)
         currentBoss.delete();
-    new player(new Vector2(canv.width / 2, canv.height / 2), 8.5 * sizeMult);
+    new player(new Vector2(canv.width / 2, canv.height / 2), 8.5 * distScale);
     bossTimer = new SecTimer(9, function (count, timer) {
         if (count == 1) {
             if (getPlayer().score > 0) {
@@ -51,9 +51,9 @@ function victory(score) {
         ctx.fillRect(0, 0, canv.width, canv.height);
     }, 1, 'victoryShade');
     new drawable(function (ctx) {
-        drawCenteredText(ctx, "Victory!", new Vector2(0, -120 * sizeMult));
-        drawCenteredText(ctx, "Score: " + score);
-        drawCenteredText(ctx, "Press R to restart", new Vector2(0, 120 * sizeMult), undefined, undefined, 56);
+        drawCenteredText(ctx, "Victory!", new Vector2(0, -120 * distScale));
+        drawCenteredText(ctx, "Score: ".concat(score));
+        drawCenteredText(ctx, "Press R to restart", new Vector2(0, 120 * distScale), undefined, undefined, 56);
     }, 2, 'victoryText');
 }
 var paused = false;
@@ -105,17 +105,30 @@ function updateBodies(bodies) {
         b.update();
     });
 }
-function onKeyPress(keyCode) {
-    if (keyCode == 'KeyR')
-        restart();
-    else if (keyCode == 'Space')
-        pause();
+function onKeyDown(keyCode) {
+    switch (keyCode) {
+        case 'KeyR':
+            restart();
+            break;
+        case 'Space':
+            pause();
+            break;
+        case 'KeyS':
+            if (paused)
+                break;
+            var player_1 = getPlayer();
+            var vel = cursorPos.Sub(player_1.center).normalized;
+            player_1.shoot(vel);
+            break;
+        default:
+            break;
+    }
 }
 function onClick(event) {
-    getPlayer().velocity = CursorPos(event)
+    getPlayer().velocity = getCursorPos(event)
         .Sub(getPlayer().center)
         .normalized.Mult(getPlayer().speed);
 }
-function CursorPos(event) {
+function getCursorPos(event) {
     return new Vector2(event.clientX, event.clientY);
 }
