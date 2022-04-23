@@ -31,7 +31,7 @@ class boss1 extends boss {
 		let diff: Vector2 = getPlayer().center.Sub(this.center);
 		let dist: number = diff.length;
 
-		if (dist > this.radius * 4 + this.radius * 20 * sizeMult * Math.random())
+		if (dist > this.radius * 4 + this.radius * 20 * distScale * Math.random())
 			this.velocity = getPlayer()
 				.center.Sub(this.center)
 				.normalized.Mult(this.speed);
@@ -49,14 +49,14 @@ class boss1 extends boss {
 	): bullet[] {
 		let bullets = shootEvenlyInACircle(
 			Math.random() < 0.5 ? counts[0] : counts[1],
-			sizeMult,
+			distScale,
 			this.center,
 			1,
 			this.radius
 		);
 		bullets.forEach((b) => {
 			b.radius *= Math.random() < 0.5 ? sizes[0] : sizes[1];
-			b.velocity.mult(Math.random() < 0.5 ? speeds[0] : speeds[1] * sizeMult);
+			b.velocity.mult(Math.random() < 0.5 ? speeds[0] : speeds[1] * distScale);
 
 			b.velocity.add(this.velocity);
 			b.draw = (ctx) => {
@@ -80,7 +80,7 @@ class boss1 extends boss {
 					b.velocity.add(
 						direction
 							.Div(dist > 20 ? dist * dist : 20)
-							.Mult(400 * (sizeMult < 1 ? sizeMult * sizeMult : sizeMult))
+							.Mult(400 * (distScale < 1 ? distScale * distScale : distScale))
 					);
 				};
 			}
@@ -88,7 +88,7 @@ class boss1 extends boss {
 		return bullets;
 	}
 	constructor(center: Vector2) {
-		super(center, 55 * sizeMult, 30 * fps);
+		super(center, 55 * distScale, 30 * fps);
 		this.draw = (ctx) => {
 			fillCircle(ctx, this.radius, this.center, '#ff10a0');
 			fillCircle(

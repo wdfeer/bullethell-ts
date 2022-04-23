@@ -5,17 +5,22 @@ class Timer {
 	}
 	end() {
 		clearInterval(this.intervalId);
+		this.timeOut();
 	}
+	public timeOut: () => void = () => { };
 	constructor(
 		public tickInterval: number,
 		public counter: number,
-		preTick: (counter: number, timer: Timer) => void
+		preTick: (counter: number, timer: Timer) => void,
+		timeOut?: () => void
 	) {
 		this.intervalId = setInterval(() => {
 			preTick(this.counter, this);
 			this.counter = this.counter - 1;
 			if (this.counter <= 0) this.end();
 		}, tickInterval);
+		if (timeOut)
+			this.timeOut = timeOut;
 	}
 }
 class SecTimer extends Timer {

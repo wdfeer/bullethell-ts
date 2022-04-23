@@ -5,10 +5,11 @@ class bullet extends enemy {
 		super.onPlayerHit();
 		this.delete();
 	};
+	public alphaMod = 1;
 	preUpdate = (timeLeft: number) => {
 		if (timeLeft <= 60) {
-			this.alpha = timeLeft / 60;
-			this.onPlayerHit = () => {};
+			this.alpha = this.alphaMod * timeLeft / 60;
+			this.onPlayerHit = () => { };
 		}
 	};
 	onTimeout = () => {

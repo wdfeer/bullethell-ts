@@ -11,7 +11,7 @@ abstract class boss extends enemy {
 	delete() {
 		super.delete();
 	}
-	speed = 2 * sizeMult;
+	speed = 2 * distScale;
 	get attackCooldown(): number {
 		return (
 			40 + 80 / (getPlayer().score > 9 ? Math.sqrt(getPlayer().score - 8) : 1)

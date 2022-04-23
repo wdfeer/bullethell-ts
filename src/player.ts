@@ -27,7 +27,7 @@ class player extends body {
 		this.alpha = this.hp / player.maxhp;
 	}
 	get speed() {
-		return (8 - 5 * Math.pow(0.9, this.score)) * sizeMult;
+		return (8 - 5 * Math.pow(0.9, this.score)) * distScale;
 	}
 	onCoinCollect() {
 		this.score++;
@@ -57,6 +57,37 @@ class player extends body {
 				undefined,
 				'score'
 			);
+	}
+	public shoot(normalVelocity: Vector2) {
+		let bull = new body(this.center, this.radius * 0.6);
+		let velocity = normalVelocity.Mult(distScale * (6 + this.score / 6));
+		bull.velocity = velocity.Add(this.velocity);
+		this.velocity.sub(velocity.Mult(0.1));
+		bull.draw = (ctx) => {
+			drawCircle(ctx, bull.radius, bull.center, 'lime');
+			fillCircle(ctx, bull.radius, bull.center, 'green', bull.alpha);
+		}
+		let bullUpdateTimer: Timer = new Timer(1, 120, (count) => {
+			if (paused) {
+				count++;
+				return;
+			}
+			if (count <= 60)
+				bull.alpha = count / 60;
+			{
+				let allEnemyBullets = getDrawablesOfType(bullet);
+				let collidingWith = allEnemyBullets.filter((enemyBullet) => bull.collider.colliding(enemyBullet.collider));
+				if (collidingWith.length != 0) {
+					let enemyBullet = collidingWith[0];
+					enemyBullet.alphaMod /= 2;
+					enemyBullet.damage /= 2;
+					bull.delete();
+					bullUpdateTimer.end();
+				}
+			}
+		}, () => {
+			bull.delete();
+		});
 	}
 	get coinSpawnCooldown() {
 		return (fps * 3) / Math.sqrt(1 + this.score / 3);

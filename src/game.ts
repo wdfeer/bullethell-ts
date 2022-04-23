@@ -1,7 +1,7 @@
 const fps = 60;
 const frameInterval = 1000 / fps;
 
-var sizeMult = (canv.width + canv.height) / 2600;
+var distScale = (canv.width + canv.height) / 2600;
 function randomPoint(): Vector2 {
 	return new Vector2(Math.random() * canv.width, Math.random() * canv.height);
 }
@@ -16,7 +16,7 @@ function restart(): void {
 	updateTimer = new Timer(frameInterval, 9999999, gameUpdate);
 	drawables = [];
 	if (currentBoss) currentBoss.delete();
-	new player(new Vector2(canv.width / 2, canv.height / 2), 8.5 * sizeMult);
+	new player(new Vector2(canv.width / 2, canv.height / 2), 8.5 * distScale);
 	bossTimer = new SecTimer(9, (count, timer) => {
 		if (count == 1) {
 			if (getPlayer().score > 0) {
@@ -53,12 +53,12 @@ function victory(score: number) {
 	);
 	new drawable(
 		(ctx) => {
-			drawCenteredText(ctx, `Victory!`, new Vector2(0, -120 * sizeMult));
+			drawCenteredText(ctx, `Victory!`, new Vector2(0, -120 * distScale));
 			drawCenteredText(ctx, `Score: ${score}`);
 			drawCenteredText(
 				ctx,
 				`Press R to restart`,
-				new Vector2(0, 120 * sizeMult),
+				new Vector2(0, 120 * distScale),
 				undefined,
 				undefined,
 				56
@@ -102,7 +102,6 @@ var updateTimer: Timer;
 var renderTimer: Timer = new Timer(frameInterval, 9999999, render);
 function gameUpdate(): void {
 	updateCoinSpawn();
-
 	updateCoins(getCoins());
 	updateBodies(getBodies());
 }
@@ -128,7 +127,7 @@ function updateBodies(bodies: body[]): void {
 	});
 }
 
-function onKeyPress(keyCode: string): void {
+function onKeyDown(keyCode: string): void {
 	switch (keyCode) {
 		case 'KeyR':
 			restart();
@@ -136,16 +135,23 @@ function onKeyPress(keyCode: string): void {
 		case 'Space':
 			pause();
 			break;
+		case 'KeyS':
+			if (paused)
+				break;
+			let player = getPlayer();
+			let vel = cursorPos.Sub(player.center).normalized;
+			player.shoot(vel);
+			break;
 		default:
 			break;
 	}
 }
 function onClick(event: MouseEvent): void {
-	getPlayer().velocity = CursorPos(event)
+	getPlayer().velocity = getCursorPos(event)
 		.Sub(getPlayer().center)
 		.normalized.Mult(getPlayer().speed);
 }
 
-function CursorPos(event: MouseEvent): Vector2 {
+function getCursorPos(event: MouseEvent): Vector2 {
 	return new Vector2(event.clientX, event.clientY);
 }

@@ -19,7 +19,7 @@ window.onresize = () => {
 	});
 	canv.width = window.innerWidth;
 	canv.height = window.innerHeight;
-	sizeMult = (canv.width + canv.height) / 2600;
+	distScale = (canv.width + canv.height) / 2600;
 };
 
 const audio = document.querySelector('audio')!;
@@ -29,7 +29,11 @@ function playSound(src: string, volume: number = 1) {
 	audio.play();
 }
 
+var cursorPos = new Vector2(0, 0);
+document.onmousemove = (event: MouseEvent) => {
+	cursorPos = getCursorPos(event);
+}
 window.onkeydown = (event: KeyboardEvent) => {
-	onKeyPress(event.code);
+	onKeyDown(event.code);
 };
 canv.addEventListener('click', (event) => onClick(event));

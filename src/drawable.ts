@@ -11,7 +11,7 @@ class drawable {
 	delete() {
 		delete drawables[drawables.indexOf(this)];
 	}
-	constructor(draw: draw = () => {}, zIndex: number = 0, id: string = '') {
+	constructor(draw: draw = () => { }, zIndex: number = 0, id: string = '') {
 		this.draw = draw;
 		this.zIndex = zIndex;
 		this.id = id;
@@ -27,7 +27,7 @@ function getDrawableWithId(id: string): drawable | null {
 	return null;
 }
 function getDrawablesOfType<Type extends drawable>(c: {
-	new (arg1: any, arg2: any, arg3: any): Type;
+	new(arg1: any, arg2: any, arg3: any): Type;
 }): Type[] {
 	return drawables.filter((x) => x instanceof c) as Type[];
 }
