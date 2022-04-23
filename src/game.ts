@@ -128,9 +128,17 @@ function updateBodies(bodies: body[]): void {
 	});
 }
 
-function onKeyPress(keyCode: string) {
-	if (keyCode == 'KeyR') restart();
-	else if (keyCode == 'Space') pause();
+function onKeyPress(keyCode: string): void {
+	switch (keyCode) {
+		case 'KeyR':
+			restart();
+			break;
+		case 'Space':
+			pause();
+			break;
+		default:
+			break;
+	}
 }
 function onClick(event: MouseEvent): void {
 	getPlayer().velocity = CursorPos(event)
