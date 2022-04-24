@@ -59,13 +59,10 @@ class player extends body {
 			);
 	}
 	public shoot(normalVelocity: Vector2) {
-		let bull = new body(this.center, this.radius * 0.6);
-		let velocity = normalVelocity.Mult(distScale * (8 + this.score / 4));
-		bull.velocity = velocity.Add(this.velocity);
-		this.velocity.sub(velocity.Mult(0.1));
+		let bull = new body(this.center, this.radius * 20);
 		bull.draw = (ctx) => {
 			drawCircle(ctx, bull.radius, bull.center, 'lime');
-			fillCircle(ctx, bull.radius, bull.center, 'green', bull.alpha);
+			fillCircle(ctx, bull.radius, bull.center, 'green', bull.alpha / 3);
 		}
 		let bullUpdateTimer: Timer = new Timer(1, 120, (count) => {
 			if (paused) {
@@ -75,20 +72,11 @@ class player extends body {
 			if (count <= 60)
 				bull.alpha = count / 60;
 			{
-				let allEnemies: enemy[] = getDrawablesOfType(bullet);
-				allEnemies.push(currentBoss);
-				let collidingWith = allEnemies.filter((enemyBullet) => bull.collider.colliding(enemyBullet.collider));
+				let bullets: bullet[] = getDrawablesOfType(bullet);
+				let collidingWith = bullets.filter((enemyBullet) => bull.collider.colliding(enemyBullet.collider));
 				if (collidingWith.length != 0) {
 					let foe = collidingWith[0];
-					if (foe instanceof bullet) {
-						foe.alphaMod /= 2;
-						foe.damage /= 2;
-					}
-					else if (foe instanceof boss) {
-						foe.timeLeft -= 5;
-					}
-					bull.delete();
-					bullUpdateTimer.end();
+					foe.delete();
 				}
 			}
 		}, () => {

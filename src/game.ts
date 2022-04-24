@@ -135,7 +135,7 @@ function onKeyDown(keyCode: string): void {
 		case 'Space':
 			pause();
 			break;
-		case 'KeyS':
+		case 'KeyB':
 			if (paused)
 				break;
 			let player = getPlayer();
