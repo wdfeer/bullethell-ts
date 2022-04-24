@@ -18,13 +18,13 @@ class boss1 extends boss {
 	}
 	attacks = [
 		() => {
-			this.rangedAttack([6, 12], [3, 3], [12, 12], false);
+			this.rangedAttack([6, 12], [0.8, 0.8], [12, 12], false, undefined, 1200);
 		},
 		() => {
 			this.rangedAttack([8, 16], [1.5, 2.5], [11, 12], false);
 		},
 		() => {
-			this.rangedAttack([5, 7], [3, 4], [8, 10], true);
+			this.rangedAttack([5, 7], [3, 4], [8, 10], true, '#9940ef');
 		},
 	];
 	ai = () => {
@@ -45,16 +45,18 @@ class boss1 extends boss {
 		speeds: [number, number],
 		sizes: [number, number],
 		homing: boolean = false,
-		fillColor: string = '#ef4099'
+		fillColor: string = '#ef4099',
+		timeLeft: number = 600
 	): bullet[] {
 		let bullets = shootEvenlyInACircle(
 			Math.random() < 0.5 ? counts[0] : counts[1],
 			distScale,
 			this.center,
 			1,
-			this.radius
+			this.radius,
 		);
 		bullets.forEach((b) => {
+			b.timeLeft = timeLeft;
 			b.radius *= Math.random() < 0.5 ? sizes[0] : sizes[1];
 			b.velocity.mult(Math.random() < 0.5 ? speeds[0] : speeds[1] * distScale);
 
@@ -65,7 +67,7 @@ class boss1 extends boss {
 					ctx,
 					b.radius,
 					b.center,
-					homing && fillColor == '#ef4099' ? '#9940ef' : fillColor,
+					fillColor,
 					b.alpha
 				);
 			};

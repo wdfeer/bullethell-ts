@@ -3,7 +3,7 @@ abstract class enemy extends body {
 	constructor(center: Vector2, radius: number) {
 		super(center, radius);
 	}
-	ai = () => {};
+	ai = () => { };
 	onPlayerHit() {
 		getPlayer().hp -= this.damage;
 	}
