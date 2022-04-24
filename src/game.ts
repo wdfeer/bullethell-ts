@@ -147,9 +147,10 @@ function onKeyDown(keyCode: string): void {
 	}
 }
 function onClick(event: MouseEvent): void {
-	getPlayer().velocity = getCursorPos(event)
-		.Sub(getPlayer().center)
-		.normalized.Mult(getPlayer().speed);
+	let player = getPlayer();
+	player.velocity = getCursorPos(event)
+		.Sub(player.center)
+		.normalized.Mult(player.speed * 0.8).Add(player.velocity.Mult(0.2));
 }
 
 function getCursorPos(event: MouseEvent): Vector2 {

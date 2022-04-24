@@ -60,7 +60,7 @@ class player extends body {
 	}
 	public shoot(normalVelocity: Vector2) {
 		let bull = new body(this.center, this.radius * 0.6);
-		let velocity = normalVelocity.Mult(distScale * (6 + this.score / 6));
+		let velocity = normalVelocity.Mult(distScale * (8 + this.score / 4));
 		bull.velocity = velocity.Add(this.velocity);
 		this.velocity.sub(velocity.Mult(0.1));
 		bull.draw = (ctx) => {
@@ -75,12 +75,18 @@ class player extends body {
 			if (count <= 60)
 				bull.alpha = count / 60;
 			{
-				let allEnemyBullets = getDrawablesOfType(bullet);
-				let collidingWith = allEnemyBullets.filter((enemyBullet) => bull.collider.colliding(enemyBullet.collider));
+				let allEnemies: enemy[] = getDrawablesOfType(bullet);
+				allEnemies.push(currentBoss);
+				let collidingWith = allEnemies.filter((enemyBullet) => bull.collider.colliding(enemyBullet.collider));
 				if (collidingWith.length != 0) {
-					let enemyBullet = collidingWith[0];
-					enemyBullet.alphaMod /= 2;
-					enemyBullet.damage /= 2;
+					let foe = collidingWith[0];
+					if (foe instanceof bullet) {
+						foe.alphaMod /= 2;
+						foe.damage /= 2;
+					}
+					else if (foe instanceof boss) {
+						foe.timeLeft -= 5;
+					}
 					bull.delete();
 					bullUpdateTimer.end();
 				}
