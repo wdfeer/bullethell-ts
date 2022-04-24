@@ -113,7 +113,7 @@ function onKeyDown(keyCode) {
         case 'Space':
             pause();
             break;
-        case 'KeyS':
+        case 'KeyB':
             if (paused)
                 break;
             var player_1 = getPlayer();
