@@ -59,7 +59,8 @@ function shootEvenlyInACircle(count, bulletRadius, pos, velocity, spawnRadius) {
         var Vy = Math.sin(angle) * velocity;
         var Vx = Math.cos(angle) * velocity;
         var V = new Vector2(Vx, Vy);
-        bullets.push(new bullet(pos.Add(V.normalized.Mult(spawnRadius)), V, bulletRadius));
+        var b = new bullet(pos.Add(V.normalized.Mult(spawnRadius)), V, bulletRadius);
+        bullets.push(b);
         angle += (Math.PI * 2) / count;
     }
     return bullets;

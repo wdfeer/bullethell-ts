@@ -80,7 +80,7 @@ var player = /** @class */ (function (_super) {
     };
     player.prototype.shoot = function (normalVelocity) {
         var bull = new body(this.center, this.radius * 0.6);
-        var velocity = normalVelocity.Mult(distScale * (6 + this.score / 6));
+        var velocity = normalVelocity.Mult(distScale * (8 + this.score / 4));
         bull.velocity = velocity.Add(this.velocity);
         this.velocity.sub(velocity.Mult(0.1));
         bull.draw = function (ctx) {
@@ -95,12 +95,18 @@ var player = /** @class */ (function (_super) {
             if (count <= 60)
                 bull.alpha = count / 60;
             {
-                var allEnemyBullets = getDrawablesOfType(bullet);
-                var collidingWith = allEnemyBullets.filter(function (enemyBullet) { return bull.collider.colliding(enemyBullet.collider); });
+                var allEnemies = getDrawablesOfType(bullet);
+                allEnemies.push(currentBoss);
+                var collidingWith = allEnemies.filter(function (enemyBullet) { return bull.collider.colliding(enemyBullet.collider); });
                 if (collidingWith.length != 0) {
-                    var enemyBullet = collidingWith[0];
-                    enemyBullet.alphaMod /= 2;
-                    enemyBullet.damage /= 2;
+                    var foe = collidingWith[0];
+                    if (foe instanceof bullet) {
+                        foe.alphaMod /= 2;
+                        foe.damage /= 2;
+                    }
+                    else if (foe instanceof boss) {
+                        foe.timeLeft -= 5;
+                    }
                     bull.delete();
                     bullUpdateTimer.end();
                 }

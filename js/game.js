@@ -125,9 +125,10 @@ function onKeyDown(keyCode) {
     }
 }
 function onClick(event) {
-    getPlayer().velocity = getCursorPos(event)
-        .Sub(getPlayer().center)
-        .normalized.Mult(getPlayer().speed);
+    var player = getPlayer();
+    player.velocity = getCursorPos(event)
+        .Sub(player.center)
+        .normalized.Mult(player.speed * 0.8).Add(player.velocity.Mult(0.2));
 }
 function getCursorPos(event) {
     return new Vector2(event.clientX, event.clientY);

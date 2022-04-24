@@ -21,13 +21,13 @@ var boss1 = /** @class */ (function (_super) {
         _this.fillColor = { r: 0, g: 0, b: 0 };
         _this.attacks = [
             function () {
-                _this.rangedAttack([6, 12], [3, 3], [12, 12], false);
+                _this.rangedAttack([6, 12], [0.8, 0.8], [12, 12], false, undefined, 1200);
             },
             function () {
                 _this.rangedAttack([8, 16], [1.5, 2.5], [11, 12], false);
             },
             function () {
-                _this.rangedAttack([5, 7], [3, 4], [8, 10], true);
+                _this.rangedAttack([5, 7], [3, 4], [8, 10], true, '#9940ef');
             },
         ];
         _this.ai = function () {
@@ -63,19 +63,21 @@ var boss1 = /** @class */ (function (_super) {
         this.rangedAttack([8, 9], [3, 5], [24, 24], false, 'rgb(36,36,36)');
         initiateVictory(8);
     };
-    boss1.prototype.rangedAttack = function (counts, speeds, sizes, homing, fillColor) {
+    boss1.prototype.rangedAttack = function (counts, speeds, sizes, homing, fillColor, timeLeft) {
         var _this = this;
         if (counts === void 0) { counts = [6, 12]; }
         if (homing === void 0) { homing = false; }
         if (fillColor === void 0) { fillColor = '#ef4099'; }
+        if (timeLeft === void 0) { timeLeft = 600; }
         var bullets = shootEvenlyInACircle(Math.random() < 0.5 ? counts[0] : counts[1], distScale, this.center, 1, this.radius);
         bullets.forEach(function (b) {
+            b.timeLeft = timeLeft;
             b.radius *= Math.random() < 0.5 ? sizes[0] : sizes[1];
             b.velocity.mult(Math.random() < 0.5 ? speeds[0] : speeds[1] * distScale);
             b.velocity.add(_this.velocity);
             b.draw = function (ctx) {
                 drawCircle(ctx, b.radius, b.center, 'black', b.alpha);
-                fillCircle(ctx, b.radius, b.center, homing && fillColor == '#ef4099' ? '#9940ef' : fillColor, b.alpha);
+                fillCircle(ctx, b.radius, b.center, fillColor, b.alpha);
             };
             b.onTimeout = function () {
                 b.delete();
