@@ -31,6 +31,7 @@ function restart(): void {
 			} else timer.counter += 4;
 		}
 	});
+	spawnCoin();
 }
 restart();
 
@@ -108,12 +109,14 @@ function gameUpdate(): void {
 var coinTimer = 0;
 function updateCoinSpawn(): void {
 	coinTimer += 1;
-	if (coinTimer >= getPlayer().coinSpawnCooldown && getCoins().length < 3) {
-		let coinPos = randomPoint();
-		new coin(coinPos);
-
+	if (coinTimer >= getPlayer().coinSpawnCooldown && getCoins().length < 4) {
+		spawnCoin()
 		coinTimer = 0;
 	}
+}
+function spawnCoin() {
+	let coinPos = randomPoint();
+	new coin(coinPos);
 }
 function updateCoins(coins: coin[]): void {
 	coins.forEach((c) => {
