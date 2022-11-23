@@ -59,11 +59,16 @@ var body = /** @class */ (function (_super) {
     __extends(body, _super);
     function body(center, radius) {
         var _this = _super.call(this, center.clone(), radius) || this;
+        _this.deflect = true;
         _this.velocity = Vector2.Zero;
         return _this;
     }
     body.prototype.update = function () {
         this.center.add(this.velocity);
+        if (this.deflect)
+            this.updateDeflect();
+    };
+    body.prototype.updateDeflect = function () {
         if ((this.center.x + this.radius > canv.width && this.velocity.x > 0) ||
             (this.center.x - this.radius < 0 && this.velocity.x < 0))
             this.velocity.x = -this.velocity.x * 0.9;

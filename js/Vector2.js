@@ -4,6 +4,12 @@ var Vector2 = /** @class */ (function () {
         this.x = x;
         this.y = y;
     }
+    Vector2.rotate = function (v2, degrees) {
+        var newV2 = v2.clone();
+        newV2.x = Math.cos(degrees) * v2.x - Math.sin(degrees) * v2.y;
+        newV2.y = Math.sin(degrees) * v2.x + Math.cos(degrees) * v2.y;
+        return newV2;
+    };
     Vector2.prototype.clone = function () {
         return new Vector2(this.x, this.y);
     };

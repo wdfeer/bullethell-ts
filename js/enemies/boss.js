@@ -37,7 +37,7 @@ var boss = /** @class */ (function (_super) {
     };
     Object.defineProperty(boss.prototype, "attackCooldown", {
         get: function () {
-            return (40 + 80 / (getPlayer().score > 9 ? Math.sqrt(getPlayer().score - 8) : 1));
+            return (35 + 55 / (getPlayer().score > 9 ? Math.sqrt(getPlayer().score - 8) : 1));
         },
         enumerable: false,
         configurable: true
@@ -64,7 +64,7 @@ var boss = /** @class */ (function (_super) {
     boss.prototype.update = function () {
         this.preTick(this.timeLeft);
         this.timeLeft--;
-        if (this.timeLeft == 1) {
+        if (this.timeLeft <= 1) {
             this.onTimeout();
             this.delete();
         }

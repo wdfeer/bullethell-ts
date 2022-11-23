@@ -17,20 +17,51 @@ var __extends = (this && this.__extends) || (function () {
 var boss1 = /** @class */ (function (_super) {
     __extends(boss1, _super);
     function boss1(center) {
-        var _this = _super.call(this, center, 55 * distScale, 30 * fps) || this;
+        var _this = _super.call(this, center, 55 * distScale, 60 * fps) || this;
         _this.fillColor = { r: 0, g: 0, b: 0 };
+        _this.attackTimers = [];
         _this.attacks = [
             function () {
-                _this.rangedAttack([6, 12], [0.8, 0.8], [12, 12], false, undefined, 1200);
+                var diff = getPlayer().center.Sub(_this.center);
+                var angle = Math.atan2(diff.y, diff.x);
+                _this.rangedAttack([1, 1], [16, 16], [15, 15], undefined, 180, angle);
+                var _loop_1 = function (i) {
+                    _this.newAttackTimer(4 * i, function () {
+                        _this.rangedAttack([2, 2], [16 - i, 16 - i], [15 - i, 15 - i], undefined, 180, angle);
+                    });
+                };
+                for (var i = 1; i <= 7; i++) {
+                    _loop_1(i);
+                }
             },
             function () {
-                _this.rangedAttack([8, 16], [1.5, 2.5], [11, 12], false);
+                var rotation = (Math.random() < 0.5 ? 1 : -1) * 0.008;
+                var coolAttack = function (rotation, angle) {
+                    _this.rangedAttack([4, 4], [3.2, 3.2], [11, 11], undefined, 480, angle, function (b) {
+                        b.velocity = Vector2.rotate(b.velocity, rotation);
+                    }, false);
+                };
+                coolAttack(rotation, 0);
+                var _loop_2 = function (i) {
+                    _this.newAttackTimer((i + 1) * 2, function () { return coolAttack(rotation, (i + 1) * 10); });
+                };
+                for (var i = 0; i < 9; i++) {
+                    _loop_2(i);
+                }
             },
             function () {
-                _this.rangedAttack([5, 7], [3, 4], [8, 10], true, '#9940ef');
+                _this.rangedAttack([12, 14], [1.5, 2.5], [13, 13], '#9940ef', 300, undefined, function (b) {
+                    var diff = getPlayer().center.Sub(b.center);
+                    var direction = diff.normalized;
+                    var dist = diff.length;
+                    b.velocity.add(direction
+                        .Div(dist > 20 ? dist * dist : 20)
+                        .Mult(200 * (distScale < 1 ? distScale * distScale : distScale)));
+                });
             },
         ];
         _this.ai = function () {
+            _this.timeLeft -= getPlayer().score / 6;
             var diff = getPlayer().center.Sub(_this.center);
             var dist = diff.length;
             if (dist > _this.radius * 4 + _this.radius * 20 * distScale * Math.random())
@@ -59,21 +90,31 @@ var boss1 = /** @class */ (function (_super) {
         }
     };
     boss1.prototype.onTimeout = function () {
-        this.rangedAttack([15, 18], [4, 4], [8, 9], true);
-        this.rangedAttack([8, 9], [3, 5], [24, 24], false, 'rgb(36,36,36)');
-        initiateVictory(8);
+        this.rangedAttack([15, 18], [4, 4], [8, 9]);
+        this.rangedAttack([9, 9], [2, 3], [24, 24], 'rgb(36,36,36)');
+        initiateVictory(7);
     };
-    boss1.prototype.rangedAttack = function (counts, speeds, sizes, homing, fillColor, timeLeft) {
+    boss1.prototype.delete = function () {
+        this.attackTimers.forEach(function (t) { return t.delete(); });
+        _super.prototype.delete.call(this);
+    };
+    boss1.prototype.newAttackTimer = function (frames, onTimeout) {
+        this.attackTimers.push(new Timer(frameInterval, frames, function () { }, onTimeout));
+    };
+    boss1.prototype.rangedAttack = function (counts, speeds, sizes, fillColor, timeLeft, angle, customAi, deflect) {
         var _this = this;
         if (counts === void 0) { counts = [6, 12]; }
-        if (homing === void 0) { homing = false; }
         if (fillColor === void 0) { fillColor = '#ef4099'; }
-        if (timeLeft === void 0) { timeLeft = 600; }
-        var bullets = shootEvenlyInACircle(Math.random() < 0.5 ? counts[0] : counts[1], distScale, this.center, 1, this.radius);
+        if (timeLeft === void 0) { timeLeft = 360; }
+        if (angle === void 0) { angle = 0; }
+        if (customAi === void 0) { customAi = undefined; }
+        if (deflect === void 0) { deflect = true; }
+        var bullets = shootEvenlyInACircle(Math.random() < 0.5 ? counts[0] : counts[1], distScale, this.center, 1, this.radius, angle);
         bullets.forEach(function (b) {
             b.timeLeft = timeLeft;
             b.radius *= Math.random() < 0.5 ? sizes[0] : sizes[1];
             b.velocity.mult(Math.random() < 0.5 ? speeds[0] : speeds[1] * distScale);
+            b.deflect = deflect;
             b.velocity.add(_this.velocity);
             b.draw = function (ctx) {
                 drawCircle(ctx, b.radius, b.center, 'black', b.alpha);
@@ -82,15 +123,8 @@ var boss1 = /** @class */ (function (_super) {
             b.onTimeout = function () {
                 b.delete();
             };
-            if (homing) {
-                b.ai = function () {
-                    var diff = getPlayer().center.Sub(b.center);
-                    var direction = diff.normalized;
-                    var dist = diff.length;
-                    b.velocity.add(direction
-                        .Div(dist > 20 ? dist * dist : 20)
-                        .Mult(400 * (distScale < 1 ? distScale * distScale : distScale)));
-                };
+            if (customAi != undefined) {
+                b.ai = function () { return customAi(b); };
             }
         });
         return bullets;

@@ -27,7 +27,7 @@ var bullet = /** @class */ (function (_super) {
         };
         _this.alphaMod = 1;
         _this.preUpdate = function (timeLeft) {
-            if (timeLeft <= 60) {
+            if (timeLeft <= 30) {
                 _this.alpha = _this.alphaMod * timeLeft / 60;
                 _this.onPlayerHit = function () { };
             }
@@ -51,10 +51,11 @@ var bullet = /** @class */ (function (_super) {
     };
     return bullet;
 }(enemy));
-function shootEvenlyInACircle(count, bulletRadius, pos, velocity, spawnRadius) {
+function shootEvenlyInACircle(count, bulletRadius, pos, velocity, spawnRadius, initialAngle) {
     if (spawnRadius === void 0) { spawnRadius = 0; }
+    if (initialAngle === void 0) { initialAngle = 0; }
     var bullets = [];
-    var angle = 0;
+    var angle = initialAngle;
     for (var i = 0; i < count; i++) {
         var Vy = Math.sin(angle) * velocity;
         var Vx = Math.cos(angle) * velocity;

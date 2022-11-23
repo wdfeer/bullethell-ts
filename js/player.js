@@ -54,16 +54,19 @@ var player = /** @class */ (function (_super) {
     });
     Object.defineProperty(player.prototype, "speed", {
         get: function () {
-            return (8 - 5 * Math.pow(0.9, this.score)) * distScale;
+            return 4.5 * distScale;
         },
         enumerable: false,
         configurable: true
     });
     player.prototype.onCoinCollect = function () {
-        var _this = this;
         this.score++;
         this.hp += 5;
         playSound('./sounds/score.mp3', 0.25);
+        this.showScore();
+    };
+    player.prototype.showScore = function () {
+        var _this = this;
         this.scoreAlpha = 1;
         var timeLeft = fps * (1 + 2 * Math.pow(0.9, this.score));
         if (this.scoreFadeTimer)

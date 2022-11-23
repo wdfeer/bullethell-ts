@@ -40,6 +40,9 @@ var Timer = /** @class */ (function () {
         clearInterval(this.intervalId);
         this.timeOut();
     };
+    Timer.prototype.delete = function () {
+        clearInterval(this.intervalId);
+    };
     return Timer;
 }());
 var SecTimer = /** @class */ (function (_super) {

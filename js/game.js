@@ -34,6 +34,7 @@ function restart() {
                 timer.counter += 4;
         }
     });
+    spawnCoin();
 }
 restart();
 function initiateVictory(counter) {
@@ -87,11 +88,14 @@ function gameUpdate() {
 var coinTimer = 0;
 function updateCoinSpawn() {
     coinTimer += 1;
-    if (coinTimer >= getPlayer().coinSpawnCooldown && getCoins().length < 3) {
-        var coinPos = randomPoint();
-        new coin(coinPos);
+    if (coinTimer >= getPlayer().coinSpawnCooldown && getCoins().length < 4) {
+        spawnCoin();
         coinTimer = 0;
     }
+}
+function spawnCoin() {
+    var coinPos = randomPoint();
+    new coin(coinPos);
 }
 function updateCoins(coins) {
     coins.forEach(function (c) {
@@ -117,8 +121,13 @@ function onKeyDown(keyCode) {
             if (paused)
                 break;
             var player_1 = getPlayer();
+            if (player_1.score <= 0)
+                break;
             var vel = cursorPos.Sub(player_1.center).normalized;
             player_1.shoot(vel);
+            player_1.score--;
+            player_1.showScore();
+            player_1.hp += 15;
             break;
         default:
             break;
@@ -128,7 +137,7 @@ function onClick(event) {
     var player = getPlayer();
     player.velocity = getCursorPos(event)
         .Sub(player.center)
-        .normalized.Mult(player.speed * 0.8).Add(player.velocity.Mult(0.2));
+        .normalized.Mult(player.speed * 0.8);
 }
 function getCursorPos(event) {
     return new Vector2(event.clientX, event.clientY);
