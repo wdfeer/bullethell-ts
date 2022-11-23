@@ -150,7 +150,7 @@ function onClick(event: MouseEvent): void {
 	let player = getPlayer();
 	player.velocity = getCursorPos(event)
 		.Sub(player.center)
-		.normalized.Mult(player.speed * 0.8).Add(player.velocity.Mult(0.2));
+		.normalized.Mult(player.speed * 0.8);
 }
 
 function getCursorPos(event: MouseEvent): Vector2 {
