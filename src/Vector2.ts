@@ -1,4 +1,10 @@
 class Vector2 {
+	static rotate(v2: Vector2, degrees: number): Vector2 {
+		let newV2 = v2.clone();
+		newV2.x = Math.cos(degrees) * v2.x - Math.sin(degrees) * v2.y;
+		newV2.y = Math.sin(degrees) * v2.x + Math.cos(degrees) * v2.y;
+		return newV2;
+	}
 	clone(): Vector2 {
 		return new Vector2(this.x, this.y);
 	}

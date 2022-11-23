@@ -11,23 +11,60 @@ class boss1 extends boss {
 		}
 	}
 	onTimeout() {
-		this.rangedAttack([15, 18], [4, 4], [8, 9], true);
-		this.rangedAttack([8, 9], [3, 5], [24, 24], false, 'rgb(36,36,36)');
 
-		initiateVictory(8);
+		this.rangedAttack([15, 18], [4, 4], [8, 9]);
+		this.rangedAttack([9, 9], [2, 3], [24, 24], 'rgb(36,36,36)');
+
+		initiateVictory(7);
+	}
+	delete() {
+		this.attackTimers.forEach((t) => t.delete());
+		super.delete();
+	}
+	attackTimers: Timer[] = [];
+	private newAttackTimer(frames: number, onTimeout: () => void) {
+		this.attackTimers.push(new Timer(frameInterval, frames, () => { }, onTimeout));
 	}
 	attacks = [
 		() => {
-			this.rangedAttack([6, 12], [0.8, 0.8], [12, 12], false, undefined, 1200);
+			let diff: Vector2 = getPlayer().center.Sub(this.center);
+			let angle = Math.atan2(diff.y, diff.x);
+			this.rangedAttack([1, 1], [16, 16], [15, 15], undefined, 180, angle);
+			for (let i = 1; i <= 7; i++) {
+				this.newAttackTimer(4 * i, () => {
+					this.rangedAttack([2, 2], [16 - i, 16 - i], [15 - i, 15 - i], undefined, 180, angle);
+				});
+			}
 		},
 		() => {
-			this.rangedAttack([8, 16], [1.5, 2.5], [11, 12], false);
+			let rotation = (Math.random() < 0.5 ? 1 : -1) * 0.008;
+			let coolAttack = (rotation: number, angle: number) => {
+				this.rangedAttack([4, 4], [3.2, 3.2], [11, 11], undefined, 480, angle, (b) => {
+					b.velocity = Vector2.rotate(b.velocity, rotation);
+				}, false);
+			}
+			coolAttack(rotation, 0);
+			for (let i = 0; i < 9; i++) {
+				this.newAttackTimer((i + 1) * 2, () => coolAttack(rotation, (i + 1) * 10));
+			}
 		},
 		() => {
-			this.rangedAttack([5, 7], [3, 4], [8, 10], true, '#9940ef');
+			this.rangedAttack([12, 14], [1.5, 2.5], [13, 13], '#9940ef', 300, undefined,
+				(b: bullet) => {
+					let diff = getPlayer().center.Sub(b.center);
+					let direction = diff.normalized;
+					let dist = diff.length;
+					b.velocity.add(
+						direction
+							.Div(dist > 20 ? dist * dist : 20)
+							.Mult(200 * (distScale < 1 ? distScale * distScale : distScale)));
+				}
+			);
 		},
 	];
 	ai = () => {
+		this.timeLeft -= getPlayer().score / 6;
+
 		let diff: Vector2 = getPlayer().center.Sub(this.center);
 		let dist: number = diff.length;
 
@@ -44,9 +81,11 @@ class boss1 extends boss {
 		counts: [number, number] = [6, 12],
 		speeds: [number, number],
 		sizes: [number, number],
-		homing: boolean = false,
 		fillColor: string = '#ef4099',
-		timeLeft: number = 600
+		timeLeft: number = 360,
+		angle: number = 0,
+		customAi: ((b: bullet) => void) | undefined = undefined,
+		deflect: boolean = true
 	): bullet[] {
 		let bullets = shootEvenlyInACircle(
 			Math.random() < 0.5 ? counts[0] : counts[1],
@@ -54,11 +93,13 @@ class boss1 extends boss {
 			this.center,
 			1,
 			this.radius,
+			angle
 		);
 		bullets.forEach((b) => {
 			b.timeLeft = timeLeft;
 			b.radius *= Math.random() < 0.5 ? sizes[0] : sizes[1];
 			b.velocity.mult(Math.random() < 0.5 ? speeds[0] : speeds[1] * distScale);
+			b.deflect = deflect;
 
 			b.velocity.add(this.velocity);
 			b.draw = (ctx) => {
@@ -74,23 +115,14 @@ class boss1 extends boss {
 			b.onTimeout = () => {
 				b.delete();
 			};
-			if (homing) {
-				b.ai = () => {
-					let diff = getPlayer().center.Sub(b.center);
-					let direction = diff.normalized;
-					let dist = diff.length;
-					b.velocity.add(
-						direction
-							.Div(dist > 20 ? dist * dist : 20)
-							.Mult(400 * (distScale < 1 ? distScale * distScale : distScale))
-					);
-				};
+			if (customAi != undefined) {
+				b.ai = () => customAi(b);
 			}
 		});
 		return bullets;
 	}
 	constructor(center: Vector2) {
-		super(center, 55 * distScale, 30 * fps);
+		super(center, 55 * distScale, 60 * fps);
 		this.draw = (ctx) => {
 			fillCircle(ctx, this.radius, this.center, '#ff10a0');
 			fillCircle(

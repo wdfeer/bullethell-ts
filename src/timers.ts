@@ -7,6 +7,9 @@ class Timer {
 		clearInterval(this.intervalId);
 		this.timeOut();
 	}
+	delete() {
+		clearInterval(this.intervalId);
+	}
 	public timeOut: () => void = () => { };
 	constructor(
 		public tickInterval: number,

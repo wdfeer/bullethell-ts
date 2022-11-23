@@ -25,12 +25,17 @@ class stationaryCircle extends drawable {
 	}
 }
 class body extends stationaryCircle {
+	deflect: boolean = true;
 	velocity: Vector2 = Vector2.Zero;
 	constructor(center: Vector2, radius: number) {
 		super(center.clone(), radius);
 	}
 	update() {
 		this.center.add(this.velocity);
+		if (this.deflect)
+			this.updateDeflect();
+	}
+	private updateDeflect() {
 		if (
 			(this.center.x + this.radius > canv.width && this.velocity.x > 0) ||
 			(this.center.x - this.radius < 0 && this.velocity.x < 0)

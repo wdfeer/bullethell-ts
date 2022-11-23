@@ -14,7 +14,7 @@ abstract class boss extends enemy {
 	speed = 2 * distScale;
 	get attackCooldown(): number {
 		return (
-			40 + 80 / (getPlayer().score > 9 ? Math.sqrt(getPlayer().score - 8) : 1)
+			35 + 55 / (getPlayer().score > 9 ? Math.sqrt(getPlayer().score - 8) : 1)
 		);
 	}
 	attackTimer = 0;
@@ -42,7 +42,7 @@ abstract class boss extends enemy {
 	update() {
 		this.preTick(this.timeLeft);
 		this.timeLeft--;
-		if (this.timeLeft == 1) {
+		if (this.timeLeft <= 1) {
 			this.onTimeout();
 			this.delete();
 		}

@@ -7,7 +7,7 @@ class bullet extends enemy {
 	};
 	public alphaMod = 1;
 	preUpdate = (timeLeft: number) => {
-		if (timeLeft <= 60) {
+		if (timeLeft <= 30) {
 			this.alpha = this.alphaMod * timeLeft / 60;
 			this.onPlayerHit = () => { };
 		}
@@ -41,9 +41,10 @@ function shootEvenlyInACircle(
 	pos: Vector2,
 	velocity: number,
 	spawnRadius: number = 0,
+	initialAngle: number = 0
 ): bullet[] {
 	let bullets: bullet[] = [];
-	let angle = 0;
+	let angle = initialAngle;
 	for (let i = 0; i < count; i++) {
 		let Vy = Math.sin(angle) * velocity;
 		let Vx = Math.cos(angle) * velocity;
