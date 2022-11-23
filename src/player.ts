@@ -27,14 +27,16 @@ class player extends body {
 		this.alpha = this.hp / player.maxhp;
 	}
 	get speed() {
-		return (8 - 5 * Math.pow(0.9, this.score)) * distScale;
+		return 4.5 * distScale;
 	}
 	onCoinCollect() {
 		this.score++;
 		this.hp += 5;
 
 		playSound('./sounds/score.mp3', 0.25);
-
+		this.showScore();
+	}
+	showScore() {
 		this.scoreAlpha = 1;
 		let timeLeft = fps * (1 + 2 * Math.pow(0.9, this.score));
 		if (this.scoreFadeTimer) this.scoreFadeTimer.end();
