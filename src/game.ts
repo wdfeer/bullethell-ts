@@ -17,18 +17,16 @@ function restart(): void {
 	drawables = [];
 	if (currentBoss) currentBoss.delete();
 	new player(new Vector2(canv.width / 2, canv.height / 2), 8.5 * distScale);
-	bossTimer = new SecTimer(9, (count, timer) => {
+	bossTimer = new SecTimer(6, (count) => {
 		if (count == 1) {
-			if (getPlayer().score > 0) {
-				let pos = randomPoint();
-				while (
-					pos.Sub(getPlayer().center).length <
-					(canv.width + canv.height) / 3
-				) {
-					pos = randomPoint();
-				}
-				currentBoss = new boss1(pos);
-			} else timer.counter += 4;
+			let pos = randomPoint();
+			while (
+				pos.Sub(getPlayer().center).length <
+				(canv.width + canv.height) / 3
+			) {
+				pos = randomPoint();
+			}
+			currentBoss = new boss1(pos);
 		}
 	});
 	spawnCoin();
@@ -131,6 +129,7 @@ function updateBodies(bodies: body[]): void {
 }
 
 function onKeyDown(keyCode: string): void {
+	let player = getPlayer();
 	switch (keyCode) {
 		case 'KeyR':
 			restart();
@@ -141,7 +140,6 @@ function onKeyDown(keyCode: string): void {
 		case 'KeyB':
 			if (paused)
 				break;
-			let player = getPlayer();
 			if (player.score <= 0)
 				break;
 			let vel = cursorPos.Sub(player.center).normalized;

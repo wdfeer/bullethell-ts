@@ -12,8 +12,8 @@ class boss1 extends boss {
 	}
 	onTimeout() {
 
-		this.rangedAttack([15, 18], [4, 4], [8, 9]);
-		this.rangedAttack([9, 9], [2, 3], [24, 24], 'rgb(36,36,36)');
+		this.rangedAttack(16, 4, 9);
+		this.rangedAttack(9, 2, 24, 'rgb(36,36,36)');
 
 		initiateVictory(7);
 	}
@@ -29,17 +29,17 @@ class boss1 extends boss {
 		() => {
 			let diff: Vector2 = getPlayer().center.Sub(this.center);
 			let angle = Math.atan2(diff.y, diff.x);
-			this.rangedAttack([1, 1], [16, 16], [15, 15], undefined, 180, angle);
+			this.rangedAttack(1, 16, 15, undefined, 180, angle);
 			for (let i = 1; i <= 7; i++) {
 				this.newAttackTimer(4 * i, () => {
-					this.rangedAttack([2, 2], [16 - i, 16 - i], [15 - i, 15 - i], undefined, 180, angle);
+					this.rangedAttack(2, 16 - i, 15 - i, undefined, 180, angle);
 				});
 			}
 		},
 		() => {
 			let rotation = (Math.random() < 0.5 ? 1 : -1) * 0.008;
 			let coolAttack = (rotation: number, angle: number) => {
-				this.rangedAttack([4, 4], [3.2, 3.2], [11, 11], undefined, 480, angle, (b) => {
+				this.rangedAttack(4, 3.2, 11, undefined, 480, angle, (b) => {
 					b.velocity = Vector2.rotate(b.velocity, rotation);
 				}, false);
 			}
@@ -49,7 +49,7 @@ class boss1 extends boss {
 			}
 		},
 		() => {
-			this.rangedAttack([12, 14], [1.5, 2.5], [13, 13], '#9940ef', 300, undefined,
+			this.rangedAttack(12, 2, 13, '#9940ef', 300, undefined,
 				(b: bullet) => {
 					let diff = getPlayer().center.Sub(b.center);
 					let direction = diff.normalized;
@@ -78,9 +78,9 @@ class boss1 extends boss {
 		}
 	};
 	rangedAttack(
-		counts: [number, number] = [6, 12],
-		speeds: [number, number],
-		sizes: [number, number],
+		count: number,
+		speed: number,
+		size: number,
 		fillColor: string = '#ef4099',
 		timeLeft: number = 360,
 		angle: number = 0,
@@ -88,7 +88,7 @@ class boss1 extends boss {
 		deflect: boolean = true
 	): bullet[] {
 		let bullets = shootEvenlyInACircle(
-			Math.random() < 0.5 ? counts[0] : counts[1],
+			count,
 			distScale,
 			this.center,
 			1,
@@ -97,8 +97,8 @@ class boss1 extends boss {
 		);
 		bullets.forEach((b) => {
 			b.timeLeft = timeLeft;
-			b.radius *= Math.random() < 0.5 ? sizes[0] : sizes[1];
-			b.velocity.mult(Math.random() < 0.5 ? speeds[0] : speeds[1] * distScale);
+			b.radius *= size;
+			b.velocity.mult(speed * distScale);
 			b.deflect = deflect;
 
 			b.velocity.add(this.velocity);
