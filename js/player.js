@@ -21,12 +21,16 @@ var player = /** @class */ (function (_super) {
         _this.draw = function (ctx) {
             drawCircle(ctx, _this.radius, _this.center);
             fillCircle(ctx, _this.radius, _this.center, 'crimson', _this.alpha);
+            if (_this.iFrames > 0) {
+                var radius = _this.radius + _this.iFrames;
+                drawCircle(ctx, radius, _this.center, 'black');
+            }
         };
         _this.id = 'player';
         _this.score = 0;
         _this.scoreAlpha = 1;
         _this.scoreFadeTimer = null;
-        _this.godmode = false;
+        _this.iFrames = 0;
         _this._hp = player.maxhp;
         return _this;
     }
@@ -35,14 +39,16 @@ var player = /** @class */ (function (_super) {
             return this._hp;
         },
         set: function (value) {
-            if (value < this.hp)
-                playSound('./sounds/hit.mp3');
-            if (this.godmode)
-                return;
             if (value <= 0) {
                 restart();
                 this._hp = 0;
                 return;
+            }
+            if (value < this.hp) {
+                if (this.iFrames > 0)
+                    return;
+                playSound('./sounds/hit.mp3');
+                this.iFrames = player.immunityOnHit;
             }
             if (value >= player.maxhp)
                 value = player.maxhp;
@@ -54,7 +60,7 @@ var player = /** @class */ (function (_super) {
     });
     Object.defineProperty(player.prototype, "speed", {
         get: function () {
-            return 4.5 * distScale;
+            return 2.25 * distScale;
         },
         enumerable: false,
         configurable: true
@@ -81,19 +87,20 @@ var player = /** @class */ (function (_super) {
                 drawCenteredText(ctx, String(getPlayer().score), undefined, undefined, _this.scoreAlpha);
             }, undefined, 'score');
     };
-    player.prototype.shoot = function (normalVelocity) {
+    player.prototype.shoot = function () {
         var bull = new body(this.center, this.radius * 20);
         bull.draw = function (ctx) {
             drawCircle(ctx, bull.radius, bull.center, 'lime');
             fillCircle(ctx, bull.radius, bull.center, 'green', bull.alpha / 3);
         };
-        var bullUpdateTimer = new Timer(1, 120, function (count) {
+        this.iFrames = 60;
+        new Timer(frameInterval, 60, function (count) {
             if (paused) {
                 count++;
                 return;
             }
-            if (count <= 60)
-                bull.alpha = count / 60;
+            if (count <= 30)
+                bull.alpha = count / 30;
             {
                 var bullets = getDrawablesOfType(bullet);
                 var collidingWith = bullets.filter(function (enemyBullet) { return bull.collider.colliding(enemyBullet.collider); });
@@ -113,6 +120,13 @@ var player = /** @class */ (function (_super) {
         enumerable: false,
         configurable: true
     });
+    player.prototype.update = function () {
+        _super.prototype.update.call(this);
+        if (this.iFrames > 0) {
+            this.iFrames--;
+        }
+    };
+    player.immunityOnHit = 45;
     player.maxhp = 100;
     return player;
 }(body));

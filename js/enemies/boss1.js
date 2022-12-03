@@ -24,10 +24,10 @@ var boss1 = /** @class */ (function (_super) {
             function () {
                 var diff = getPlayer().center.Sub(_this.center);
                 var angle = Math.atan2(diff.y, diff.x);
-                _this.rangedAttack([1, 1], [16, 16], [15, 15], undefined, 180, angle);
+                _this.rangedAttack(1, 12, 15, '#ef6f0f', 240, angle);
                 var _loop_1 = function (i) {
                     _this.newAttackTimer(4 * i, function () {
-                        _this.rangedAttack([2, 2], [16 - i, 16 - i], [15 - i, 15 - i], undefined, 180, angle);
+                        _this.rangedAttack(2, 12 - i, 15 - i, '#ef6f0f', 360, angle);
                     });
                 };
                 for (var i = 1; i <= 7; i++) {
@@ -35,33 +35,29 @@ var boss1 = /** @class */ (function (_super) {
                 }
             },
             function () {
-                var rotation = (Math.random() < 0.5 ? 1 : -1) * 0.008;
+                var rotation = (Math.random() < 0.5 ? 1 : -1) * 0.004;
                 var coolAttack = function (rotation, angle) {
-                    _this.rangedAttack([4, 4], [3.2, 3.2], [11, 11], undefined, 480, angle, function (b) {
+                    _this.rangedAttack(3, 1.5, 10, undefined, 800, angle, function (b) {
                         b.velocity = Vector2.rotate(b.velocity, rotation);
                     }, false);
                 };
                 coolAttack(rotation, 0);
                 var _loop_2 = function (i) {
-                    _this.newAttackTimer((i + 1) * 2, function () { return coolAttack(rotation, (i + 1) * 10); });
+                    _this.newAttackTimer((i + 1) * 3, function () { return coolAttack(rotation, 360 / 12 * (i + 1)); });
                 };
-                for (var i = 0; i < 9; i++) {
+                for (var i = 0; i < 12; i++) {
                     _loop_2(i);
                 }
             },
             function () {
-                _this.rangedAttack([12, 14], [1.5, 2.5], [13, 13], '#9940ef', 300, undefined, function (b) {
-                    var diff = getPlayer().center.Sub(b.center);
-                    var direction = diff.normalized;
-                    var dist = diff.length;
-                    b.velocity.add(direction
-                        .Div(dist > 20 ? dist * dist : 20)
-                        .Mult(200 * (distScale < 1 ? distScale * distScale : distScale)));
-                });
+                var playerPos = getPlayer().center;
+                _this.rangedAttack(12, 0.7, 12, '#ef10ef', 240, undefined, function (b) {
+                    b.velocity.add(b.velocity.normalized.Div(12));
+                }, false);
             },
         ];
         _this.ai = function () {
-            _this.timeLeft -= getPlayer().score / 6;
+            _this.timeLeft -= getPlayer().score / 5;
             var diff = getPlayer().center.Sub(_this.center);
             var dist = diff.length;
             if (dist > _this.radius * 4 + _this.radius * 20 * distScale * Math.random())
@@ -90,8 +86,8 @@ var boss1 = /** @class */ (function (_super) {
         }
     };
     boss1.prototype.onTimeout = function () {
-        this.rangedAttack([15, 18], [4, 4], [8, 9]);
-        this.rangedAttack([9, 9], [2, 3], [24, 24], 'rgb(36,36,36)');
+        this.rangedAttack(16, 2, 9);
+        this.rangedAttack(9, 1, 24, 'rgb(36,36,36)');
         initiateVictory(7);
     };
     boss1.prototype.delete = function () {
@@ -99,21 +95,24 @@ var boss1 = /** @class */ (function (_super) {
         _super.prototype.delete.call(this);
     };
     boss1.prototype.newAttackTimer = function (frames, onTimeout) {
-        this.attackTimers.push(new Timer(frameInterval, frames, function () { }, onTimeout));
+        this.attackTimers.push(new Timer(frameInterval, frames, function (c, timer) {
+            if (paused) {
+                timer.counter++;
+            }
+        }, onTimeout));
     };
-    boss1.prototype.rangedAttack = function (counts, speeds, sizes, fillColor, timeLeft, angle, customAi, deflect) {
+    boss1.prototype.rangedAttack = function (count, speed, size, fillColor, timeLeft, angle, customAi, deflect) {
         var _this = this;
-        if (counts === void 0) { counts = [6, 12]; }
         if (fillColor === void 0) { fillColor = '#ef4099'; }
-        if (timeLeft === void 0) { timeLeft = 360; }
+        if (timeLeft === void 0) { timeLeft = 720; }
         if (angle === void 0) { angle = 0; }
         if (customAi === void 0) { customAi = undefined; }
         if (deflect === void 0) { deflect = true; }
-        var bullets = shootEvenlyInACircle(Math.random() < 0.5 ? counts[0] : counts[1], distScale, this.center, 1, this.radius, angle);
+        var bullets = shootEvenlyInACircle(count, distScale, this.center, 1, this.radius, angle);
         bullets.forEach(function (b) {
             b.timeLeft = timeLeft;
-            b.radius *= Math.random() < 0.5 ? sizes[0] : sizes[1];
-            b.velocity.mult(Math.random() < 0.5 ? speeds[0] : speeds[1] * distScale);
+            b.radius *= size;
+            b.velocity.mult(speed * distScale);
             b.deflect = deflect;
             b.velocity.add(_this.velocity);
             b.draw = function (ctx) {

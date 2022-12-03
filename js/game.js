@@ -20,18 +20,14 @@ function restart() {
     if (currentBoss)
         currentBoss.delete();
     new player(new Vector2(canv.width / 2, canv.height / 2), 8.5 * distScale);
-    bossTimer = new SecTimer(9, function (count, timer) {
+    bossTimer = new SecTimer(6, function (count) {
         if (count == 1) {
-            if (getPlayer().score > 0) {
-                var pos = randomPoint();
-                while (pos.Sub(getPlayer().center).length <
-                    (canv.width + canv.height) / 3) {
-                    pos = randomPoint();
-                }
-                currentBoss = new boss1(pos);
+            var pos = randomPoint();
+            while (pos.Sub(getPlayer().center).length <
+                (canv.width + canv.height) / 3) {
+                pos = randomPoint();
             }
-            else
-                timer.counter += 4;
+            currentBoss = new boss1(pos);
         }
     });
     spawnCoin();
@@ -110,6 +106,7 @@ function updateBodies(bodies) {
     });
 }
 function onKeyDown(keyCode) {
+    var player = getPlayer();
     switch (keyCode) {
         case 'KeyR':
             restart();
@@ -120,14 +117,12 @@ function onKeyDown(keyCode) {
         case 'KeyB':
             if (paused)
                 break;
-            var player_1 = getPlayer();
-            if (player_1.score <= 0)
+            if (player.score <= 0)
                 break;
-            var vel = cursorPos.Sub(player_1.center).normalized;
-            player_1.shoot(vel);
-            player_1.score--;
-            player_1.showScore();
-            player_1.hp += 15;
+            player.shoot();
+            player.score--;
+            player.showScore();
+            player.hp += 20;
             break;
         default:
             break;
