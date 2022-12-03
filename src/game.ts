@@ -142,11 +142,10 @@ function onKeyDown(keyCode: string): void {
 				break;
 			if (player.score <= 0)
 				break;
-			let vel = cursorPos.Sub(player.center).normalized;
-			player.shoot(vel);
+			player.shoot();
 			player.score--;
 			player.showScore();
-			player.hp += 15;
+			player.hp += 20;
 			break;
 		default:
 			break;

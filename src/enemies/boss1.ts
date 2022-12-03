@@ -12,8 +12,8 @@ class boss1 extends boss {
 	}
 	onTimeout() {
 
-		this.rangedAttack(16, 4, 9);
-		this.rangedAttack(9, 2, 24, 'rgb(36,36,36)');
+		this.rangedAttack(16, 2, 9);
+		this.rangedAttack(9, 1, 24, 'rgb(36,36,36)');
 
 		initiateVictory(7);
 	}
@@ -23,47 +23,46 @@ class boss1 extends boss {
 	}
 	attackTimers: Timer[] = [];
 	private newAttackTimer(frames: number, onTimeout: () => void) {
-		this.attackTimers.push(new Timer(frameInterval, frames, () => { }, onTimeout));
+		this.attackTimers.push(new Timer(frameInterval, frames, (c, timer) => {
+			if (paused) {
+				timer.counter++;
+			}
+		}, onTimeout));
 	}
 	attacks = [
-		() => {
+		() => { // Aimed attack
 			let diff: Vector2 = getPlayer().center.Sub(this.center);
 			let angle = Math.atan2(diff.y, diff.x);
-			this.rangedAttack(1, 16, 15, undefined, 180, angle);
+			this.rangedAttack(1, 12, 15, '#ef6f0f', 240, angle);
 			for (let i = 1; i <= 7; i++) {
 				this.newAttackTimer(4 * i, () => {
-					this.rangedAttack(2, 16 - i, 15 - i, undefined, 180, angle);
+					this.rangedAttack(2, 12 - i, 15 - i, '#ef6f0f', 360, angle);
 				});
 			}
 		},
-		() => {
-			let rotation = (Math.random() < 0.5 ? 1 : -1) * 0.008;
+		() => { // Rotating attack
+			let rotation = (Math.random() < 0.5 ? 1 : -1) * 0.004;
 			let coolAttack = (rotation: number, angle: number) => {
-				this.rangedAttack(4, 3.2, 11, undefined, 480, angle, (b) => {
+				this.rangedAttack(3, 1.5, 10, undefined, 800, angle, (b) => {
 					b.velocity = Vector2.rotate(b.velocity, rotation);
 				}, false);
 			}
 			coolAttack(rotation, 0);
-			for (let i = 0; i < 9; i++) {
-				this.newAttackTimer((i + 1) * 2, () => coolAttack(rotation, (i + 1) * 10));
+			for (let i = 0; i < 12; i++) {
+				this.newAttackTimer((i + 1) * 3, () => coolAttack(rotation, 360 / 12 * (i + 1)));
 			}
 		},
-		() => {
-			this.rangedAttack(12, 2, 13, '#9940ef', 300, undefined,
+		() => { // Accelerating attack
+			let playerPos = getPlayer().center;
+			this.rangedAttack(12, 0.7, 12, '#ef10ef', 240, undefined,
 				(b: bullet) => {
-					let diff = getPlayer().center.Sub(b.center);
-					let direction = diff.normalized;
-					let dist = diff.length;
-					b.velocity.add(
-						direction
-							.Div(dist > 20 ? dist * dist : 20)
-							.Mult(200 * (distScale < 1 ? distScale * distScale : distScale)));
+					b.velocity.add(b.velocity.normalized.Div(12));
 				}
-			);
+				, false);
 		},
 	];
 	ai = () => {
-		this.timeLeft -= getPlayer().score / 6;
+		this.timeLeft -= getPlayer().score / 5;
 
 		let diff: Vector2 = getPlayer().center.Sub(this.center);
 		let dist: number = diff.length;
@@ -82,7 +81,7 @@ class boss1 extends boss {
 		speed: number,
 		size: number,
 		fillColor: string = '#ef4099',
-		timeLeft: number = 360,
+		timeLeft: number = 720,
 		angle: number = 0,
 		customAi: ((b: bullet) => void) | undefined = undefined,
 		deflect: boolean = true

@@ -20,22 +20,22 @@ class player extends body {
 		return this._hp;
 	}
 	public set hp(value: number) {
-		if (this.iFrames > 0) return;
-		if (value < this.hp) {
-			playSound('./sounds/hit.mp3');
-			this.iFrames = player.immunityOnHit;
-		}
 		if (value <= 0) {
 			restart();
 			this._hp = 0;
 			return;
+		}
+		if (value < this.hp) {
+			if (this.iFrames > 0) return;
+			playSound('./sounds/hit.mp3');
+			this.iFrames = player.immunityOnHit;
 		}
 		if (value >= player.maxhp) value = player.maxhp;
 		this._hp = value;
 		this.alpha = this.hp / player.maxhp;
 	}
 	get speed() {
-		return 4.5 * distScale;
+		return 2.25 * distScale;
 	}
 	onCoinCollect() {
 		this.score++;
