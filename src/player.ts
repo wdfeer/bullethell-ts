@@ -2,21 +2,29 @@ class player extends body {
 	draw = (ctx: CanvasRenderingContext2D) => {
 		drawCircle(ctx, this.radius, this.center);
 		fillCircle(ctx, this.radius, this.center, 'crimson', this.alpha);
+		if (this.iFrames > 0) {
+			let radius = this.radius + this.iFrames;
+			drawCircle(ctx, radius, this.center, 'black');
+		}
 	};
 	id = 'player';
 
 	score: number = 0;
 	scoreAlpha: number = 1;
 	scoreFadeTimer: Timer | null = null;
-	godmode: boolean = false;
+	iFrames: number = 0;
+	static readonly immunityOnHit = 45;
 	static readonly maxhp: number = 100;
 	private _hp: number = player.maxhp;
 	public get hp(): number {
 		return this._hp;
 	}
 	public set hp(value: number) {
-		if (value < this.hp) playSound('./sounds/hit.mp3');
-		if (this.godmode) return;
+		if (this.iFrames > 0) return;
+		if (value < this.hp) {
+			playSound('./sounds/hit.mp3');
+			this.iFrames = player.immunityOnHit;
+		}
 		if (value <= 0) {
 			restart();
 			this._hp = 0;
@@ -60,19 +68,20 @@ class player extends body {
 				'score'
 			);
 	}
-	public shoot(normalVelocity: Vector2) {
+	public shoot() {
 		let bull = new body(this.center, this.radius * 20);
 		bull.draw = (ctx) => {
 			drawCircle(ctx, bull.radius, bull.center, 'lime');
 			fillCircle(ctx, bull.radius, bull.center, 'green', bull.alpha / 3);
 		}
-		let bullUpdateTimer: Timer = new Timer(1, 120, (count) => {
+		this.iFrames = 60;
+		new Timer(frameInterval, 60, (count) => {
 			if (paused) {
 				count++;
 				return;
 			}
-			if (count <= 60)
-				bull.alpha = count / 60;
+			if (count <= 30)
+				bull.alpha = count / 30;
 			{
 				let bullets: bullet[] = getDrawablesOfType(bullet);
 				let collidingWith = bullets.filter((enemyBullet) => bull.collider.colliding(enemyBullet.collider));
@@ -90,5 +99,11 @@ class player extends body {
 	}
 	constructor(center: Vector2, radius: number) {
 		super(center, radius);
+	}
+	update() {
+		super.update()
+		if (this.iFrames > 0) {
+			this.iFrames--;
+		}
 	}
 }
