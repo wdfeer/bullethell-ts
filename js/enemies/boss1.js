@@ -26,11 +26,11 @@ var boss1 = /** @class */ (function (_super) {
                 var angle = Math.atan2(diff.y, diff.x);
                 _this.rangedAttack(1, 12, 15, '#ef4f2f', 240, angle);
                 var _loop_1 = function (i) {
-                    _this.newAttackTimer(4 * i, function () {
-                        _this.rangedAttack(2, 12 - i, 15 - i, '#ef4f2f', 360, angle);
+                    _this.newAttackTimer(2 * i, function () {
+                        _this.rangedAttack(1, 12 - i / 2, 15 - i / 2, '#ef4f2f', 240, angle);
                     });
                 };
-                for (var i = 1; i <= 7; i++) {
+                for (var i = 1; i <= 14; i++) {
                     _loop_1(i);
                 }
             },
