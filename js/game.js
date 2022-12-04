@@ -8,6 +8,7 @@ function randomPoint() {
 var currentBoss;
 var bossTimer;
 function restart() {
+    gameFrames = 0;
     paused = false;
     if (bossTimer)
         bossTimer.end();
@@ -36,11 +37,11 @@ restart();
 function initiateVictory(counter) {
     victoryTimer = new SecTimer(counter, function (count) {
         if (count == 1)
-            victory(getPlayer().score);
+            victory(getPlayer().score, (gameFrames / fps).toFixed(2));
     });
 }
 var victoryTimer;
-function victory(score) {
+function victory(score, time) {
     updateTimer.end();
     new drawable(function (ctx) {
         ctx.globalAlpha = 0.5;
@@ -48,9 +49,10 @@ function victory(score) {
         ctx.fillRect(0, 0, canv.width, canv.height);
     }, 1, 'victoryShade');
     new drawable(function (ctx) {
-        drawCenteredText(ctx, "Victory!", new Vector2(0, -120 * distScale));
-        drawCenteredText(ctx, "Score: ".concat(score));
-        drawCenteredText(ctx, "Press R to restart", new Vector2(0, 120 * distScale), undefined, undefined, 56);
+        drawCenteredText(ctx, "Victory!", new Vector2(0, -180 * distScale));
+        drawCenteredText(ctx, "Score: ".concat(score), new Vector2(0, -60 * distScale));
+        drawCenteredText(ctx, "Time: ".concat(time, " s"), new Vector2(0, 60 * distScale));
+        drawCenteredText(ctx, "Press R to restart", new Vector2(0, 180 * distScale), undefined, undefined, 56);
     }, 2, 'victoryText');
 }
 var paused = false;
@@ -74,9 +76,11 @@ function pause() {
     }
     paused = !paused;
 }
+var gameFrames;
 var updateTimer;
 var renderTimer = new Timer(frameInterval, 9999999, render);
 function gameUpdate() {
+    gameFrames++;
     updateCoinSpawn();
     updateCoins(getCoins());
     updateBodies(getBodies());
