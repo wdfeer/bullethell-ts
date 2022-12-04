@@ -34,10 +34,10 @@ function restart() {
     spawnCoin();
 }
 restart();
-function initiateVictory(counter) {
-    victoryTimer = new SecTimer(counter, function (count) {
-        if (count == 1)
-            victory(getPlayer().score, (gameFrames / fps).toFixed(2));
+function initiateVictory(seconds) {
+    console.log("Victory initiated for ".concat(seconds, " seconds"));
+    victoryTimer = new Timer(1, seconds * 1000, undefined, function () {
+        victory(getPlayer().score, (gameFrames / fps).toFixed(2));
     });
 }
 var victoryTimer;

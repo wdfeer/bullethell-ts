@@ -20,12 +20,21 @@ var Timer = /** @class */ (function () {
         this.tickInterval = tickInterval;
         this.counter = counter;
         this.timeOut = function () { };
-        this.intervalId = setInterval(function () {
-            preTick(_this.counter, _this);
-            _this.counter = _this.counter - 1;
-            if (_this.counter <= 0)
-                _this.end();
-        }, tickInterval);
+        if (preTick) {
+            this.intervalId = setInterval(function () {
+                preTick(_this.counter, _this);
+                _this.counter = _this.counter - 1;
+                if (_this.counter <= 0)
+                    _this.end();
+            }, tickInterval);
+        }
+        else {
+            this.intervalId = setInterval(function () {
+                _this.counter = _this.counter - 1;
+                if (_this.counter <= 0)
+                    _this.end();
+            }, tickInterval);
+        }
         if (timeOut)
             this.timeOut = timeOut;
     }
