@@ -35,9 +35,9 @@ class boss1 extends boss {
 			let diff: Vector2 = getPlayer().center.Sub(this.center);
 			let angle = Math.atan2(diff.y, diff.x);
 			this.rangedAttack(1, 12, 15, '#ef4f2f', 240, angle);
-			for (let i = 1; i <= 7; i++) {
-				this.newAttackTimer(4 * i, () => {
-					this.rangedAttack(2, 12 - i, 15 - i, '#ef4f2f', 360, angle);
+			for (let i = 1; i <= 14; i++) {
+				this.newAttackTimer(2 * i, () => {
+					this.rangedAttack(1, 12 - i / 2, 15 - i / 2, '#ef4f2f', 240, angle);
 				});
 			}
 		},
