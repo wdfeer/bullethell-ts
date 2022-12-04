@@ -9,6 +9,7 @@ function randomPoint(): Vector2 {
 var currentBoss: boss;
 let bossTimer: SecTimer;
 function restart(): void {
+	gameFrames = 0;
 	paused = false;
 	if (bossTimer) bossTimer.end();
 	if (victoryTimer) victoryTimer.end();
@@ -35,11 +36,11 @@ restart();
 
 function initiateVictory(counter: number) {
 	victoryTimer = new SecTimer(counter, (count) => {
-		if (count == 1) victory(getPlayer().score);
+		if (count == 1) victory(getPlayer().score, (gameFrames / fps).toFixed(2));
 	});
 }
 var victoryTimer: Timer;
-function victory(score: number) {
+function victory(score: number, time: string) {
 	updateTimer.end();
 	new drawable(
 		(ctx) => {
@@ -52,12 +53,13 @@ function victory(score: number) {
 	);
 	new drawable(
 		(ctx) => {
-			drawCenteredText(ctx, `Victory!`, new Vector2(0, -120 * distScale));
-			drawCenteredText(ctx, `Score: ${score}`);
+			drawCenteredText(ctx, `Victory!`, new Vector2(0, -180 * distScale));
+			drawCenteredText(ctx, `Score: ${score}`, new Vector2(0, -60 * distScale));
+			drawCenteredText(ctx, `Time: ${time} s`, new Vector2(0, 60 * distScale));
 			drawCenteredText(
 				ctx,
 				`Press R to restart`,
-				new Vector2(0, 120 * distScale),
+				new Vector2(0, 180 * distScale),
 				undefined,
 				undefined,
 				56
@@ -97,9 +99,11 @@ function pause() {
 	paused = !paused;
 }
 
+var gameFrames: number;
 var updateTimer: Timer;
 var renderTimer: Timer = new Timer(frameInterval, 9999999, render);
 function gameUpdate(): void {
+	gameFrames++;
 	updateCoinSpawn();
 	updateCoins(getCoins());
 	updateBodies(getBodies());
