@@ -14,14 +14,22 @@ class Timer {
 	constructor(
 		public tickInterval: number,
 		public counter: number,
-		preTick: (counter: number, timer: Timer) => void,
+		preTick?: (counter: number, timer: Timer) => void,
 		timeOut?: () => void
 	) {
-		this.intervalId = setInterval(() => {
-			preTick(this.counter, this);
-			this.counter = this.counter - 1;
-			if (this.counter <= 0) this.end();
-		}, tickInterval);
+		if (preTick) {
+			this.intervalId = setInterval(() => {
+				preTick(this.counter, this);
+				this.counter = this.counter - 1;
+				if (this.counter <= 0) this.end();
+			}, tickInterval);
+		} else {
+			this.intervalId = setInterval(() => {
+				this.counter = this.counter - 1;
+				if (this.counter <= 0) this.end();
+			}, tickInterval);
+		}
+
 		if (timeOut)
 			this.timeOut = timeOut;
 	}

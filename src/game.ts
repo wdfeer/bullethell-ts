@@ -34,9 +34,11 @@ function restart(): void {
 }
 restart();
 
-function initiateVictory(counter: number) {
-	victoryTimer = new SecTimer(counter, (count) => {
-		if (count == 1) victory(getPlayer().score, (gameFrames / fps).toFixed(2));
+function initiateVictory(seconds: number) {
+	console.log(`Victory initiated for ${seconds} seconds`);
+
+	victoryTimer = new Timer(1, seconds * 1000, undefined, () => {
+		victory(getPlayer().score, (gameFrames / fps).toFixed(2));
 	});
 }
 var victoryTimer: Timer;
