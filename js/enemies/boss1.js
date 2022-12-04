@@ -24,10 +24,10 @@ var boss1 = /** @class */ (function (_super) {
             function () {
                 var diff = getPlayer().center.Sub(_this.center);
                 var angle = Math.atan2(diff.y, diff.x);
-                _this.rangedAttack(1, 12, 15, '#ef6f0f', 240, angle);
+                _this.rangedAttack(1, 12, 15, '#ef4f2f', 240, angle);
                 var _loop_1 = function (i) {
                     _this.newAttackTimer(4 * i, function () {
-                        _this.rangedAttack(2, 12 - i, 15 - i, '#ef6f0f', 360, angle);
+                        _this.rangedAttack(2, 12 - i, 15 - i, '#ef4f2f', 360, angle);
                     });
                 };
                 for (var i = 1; i <= 7; i++) {
@@ -88,7 +88,8 @@ var boss1 = /** @class */ (function (_super) {
     boss1.prototype.onTimeout = function () {
         this.rangedAttack(16, 2, 9);
         this.rangedAttack(9, 1, 24, 'rgb(36,36,36)');
-        initiateVictory(7);
+        var score = getPlayer().score;
+        initiateVictory(10 / (score > 0 ? Math.sqrt(score) : 1));
     };
     boss1.prototype.delete = function () {
         this.attackTimers.forEach(function (t) { return t.delete(); });
