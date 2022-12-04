@@ -15,7 +15,8 @@ class boss1 extends boss {
 		this.rangedAttack(16, 2, 9);
 		this.rangedAttack(9, 1, 24, 'rgb(36,36,36)');
 
-		initiateVictory(7);
+		let score = getPlayer().score;
+		initiateVictory(10 / (score > 0 ? Math.sqrt(score) : 1));
 	}
 	delete() {
 		this.attackTimers.forEach((t) => t.delete());
@@ -33,10 +34,10 @@ class boss1 extends boss {
 		() => { // Aimed attack
 			let diff: Vector2 = getPlayer().center.Sub(this.center);
 			let angle = Math.atan2(diff.y, diff.x);
-			this.rangedAttack(1, 12, 15, '#ef6f0f', 240, angle);
+			this.rangedAttack(1, 12, 15, '#ef4f2f', 240, angle);
 			for (let i = 1; i <= 7; i++) {
 				this.newAttackTimer(4 * i, () => {
-					this.rangedAttack(2, 12 - i, 15 - i, '#ef6f0f', 360, angle);
+					this.rangedAttack(2, 12 - i, 15 - i, '#ef4f2f', 360, angle);
 				});
 			}
 		},
