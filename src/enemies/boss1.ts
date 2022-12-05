@@ -61,6 +61,11 @@ class boss1 extends boss {
 				}
 				, false);
 		},
+		() => { // Lazer appearing attack
+			for (let i = 0; i < 100; i++) {
+				bullet.appearingBullet(randomPoint(), 15, 60, 180);
+			}
+		}
 	];
 	ai = () => {
 		this.timeLeft -= getPlayer().score / 5;
@@ -87,7 +92,7 @@ class boss1 extends boss {
 		customAi: ((b: bullet) => void) | undefined = undefined,
 		deflect: boolean = true
 	): bullet[] {
-		let bullets = shootEvenlyInACircle(
+		let bullets = bullet.shootEvenlyInACircle(
 			count,
 			distScale,
 			this.center,
@@ -102,16 +107,7 @@ class boss1 extends boss {
 			b.deflect = deflect;
 
 			b.velocity.add(this.velocity);
-			b.draw = (ctx) => {
-				drawCircle(ctx, b.radius, b.center, 'black', b.alpha);
-				fillCircle(
-					ctx,
-					b.radius,
-					b.center,
-					fillColor,
-					b.alpha
-				);
-			};
+			b.fillColor = fillColor;
 			b.onTimeout = () => {
 				b.delete();
 			};
