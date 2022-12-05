@@ -16,20 +16,14 @@ var __extends = (this && this.__extends) || (function () {
 })();
 var bullet = /** @class */ (function (_super) {
     __extends(bullet, _super);
-    function bullet(center, velocity, radius, lifetime) {
-        if (lifetime === void 0) { lifetime = 9; }
+    function bullet(center, velocity, radius) {
         var _this = _super.call(this, center, radius) || this;
         _this.zIndex = -1;
-        _this.damage = 35;
-        _this.onPlayerHit = function () {
-            _super.prototype.onPlayerHit.call(_this);
-            _this.delete();
-        };
-        _this.alphaMod = 1;
+        _this.damage = bullet.baseDamage;
+        _this.fillColor = 'black';
         _this.preUpdate = function (timeLeft) {
-            if (timeLeft <= 30) {
-                _this.alpha = _this.alphaMod * timeLeft / 60;
-                _this.onPlayerHit = function () { };
+            if (timeLeft <= 15) {
+                _this.alpha = timeLeft / 30;
             }
         };
         _this.onTimeout = function () {
@@ -37,6 +31,10 @@ var bullet = /** @class */ (function (_super) {
         };
         _this.timeLeft = 600;
         _this.velocity = velocity;
+        _this.draw = function (ctx) {
+            drawCircle(ctx, _this.radius, _this.center, 'black', _this.alpha);
+            fillCircle(ctx, _this.radius, _this.center, _this.fillColor, _this.alpha);
+        };
         return _this;
     }
     bullet.prototype.delete = function () {
@@ -49,20 +47,40 @@ var bullet = /** @class */ (function (_super) {
             this.delete();
         _super.prototype.update.call(this);
     };
+    bullet.shootEvenlyInACircle = function (count, bulletRadius, pos, velocity, spawnRadius, initialAngle) {
+        if (spawnRadius === void 0) { spawnRadius = 0; }
+        if (initialAngle === void 0) { initialAngle = 0; }
+        var bullets = [];
+        var angle = initialAngle;
+        for (var i = 0; i < count; i++) {
+            var Vy = Math.sin(angle) * velocity;
+            var Vx = Math.cos(angle) * velocity;
+            var V = new Vector2(Vx, Vy);
+            var b = new bullet(pos.Add(V.normalized.Mult(spawnRadius)), V, bulletRadius);
+            bullets.push(b);
+            angle += (Math.PI * 2) / count;
+        }
+        return bullets;
+    };
+    bullet.appearingBullet = function (center, radius, appearanceTime, lifetime) {
+        if (lifetime === void 0) { lifetime = 300; }
+        var b = new bullet(center, Vector2.Zero, radius);
+        b.timeLeft = lifetime;
+        b.fillColor = '#0f0f0f';
+        b.damage = 0;
+        b.alpha = 0;
+        b.ai = function () {
+            var timeLived = lifetime - b.timeLeft;
+            if (timeLived == appearanceTime) {
+                b.alpha = 0.8;
+                b.damage = bullet.baseDamage;
+            }
+            else if (timeLived < appearanceTime) {
+                b.alpha = Math.sqrt(timeLived / appearanceTime) * 0.8;
+            }
+        };
+        return b;
+    };
+    bullet.baseDamage = 35;
     return bullet;
 }(enemy));
-function shootEvenlyInACircle(count, bulletRadius, pos, velocity, spawnRadius, initialAngle) {
-    if (spawnRadius === void 0) { spawnRadius = 0; }
-    if (initialAngle === void 0) { initialAngle = 0; }
-    var bullets = [];
-    var angle = initialAngle;
-    for (var i = 0; i < count; i++) {
-        var Vy = Math.sin(angle) * velocity;
-        var Vx = Math.cos(angle) * velocity;
-        var V = new Vector2(Vx, Vy);
-        var b = new bullet(pos.Add(V.normalized.Mult(spawnRadius)), V, bulletRadius);
-        bullets.push(b);
-        angle += (Math.PI * 2) / count;
-    }
-    return bullets;
-}

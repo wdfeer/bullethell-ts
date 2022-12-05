@@ -36,7 +36,7 @@ function restart() {
 restart();
 function initiateVictory(seconds) {
     console.log("Victory initiated for ".concat(seconds, " seconds"));
-    victoryTimer = new Timer(1, seconds * 1000, undefined, function () {
+    victoryTimer = new Timer(frameInterval, seconds * fps, undefined, function () {
         victory(getPlayer().score, (gameFrames / fps).toFixed(2));
     });
 }

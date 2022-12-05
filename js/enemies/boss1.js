@@ -55,6 +55,11 @@ var boss1 = /** @class */ (function (_super) {
                     b.velocity.add(b.velocity.normalized.Div(12));
                 }, false);
             },
+            function () {
+                for (var i = 0; i < 100; i++) {
+                    bullet.appearingBullet(randomPoint(), 15, 60, 180);
+                }
+            }
         ];
         _this.ai = function () {
             _this.timeLeft -= getPlayer().score / 5;
@@ -109,17 +114,14 @@ var boss1 = /** @class */ (function (_super) {
         if (angle === void 0) { angle = 0; }
         if (customAi === void 0) { customAi = undefined; }
         if (deflect === void 0) { deflect = true; }
-        var bullets = shootEvenlyInACircle(count, distScale, this.center, 1, this.radius, angle);
+        var bullets = bullet.shootEvenlyInACircle(count, distScale, this.center, 1, this.radius, angle);
         bullets.forEach(function (b) {
             b.timeLeft = timeLeft;
             b.radius *= size;
             b.velocity.mult(speed * distScale);
             b.deflect = deflect;
             b.velocity.add(_this.velocity);
-            b.draw = function (ctx) {
-                drawCircle(ctx, b.radius, b.center, 'black', b.alpha);
-                fillCircle(ctx, b.radius, b.center, fillColor, b.alpha);
-            };
+            b.fillColor = fillColor;
             b.onTimeout = function () {
                 b.delete();
             };

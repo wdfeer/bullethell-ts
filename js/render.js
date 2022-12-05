@@ -43,7 +43,7 @@ function drawCenteredText(ctx, text, offset, color, alpha, fontSize) {
     if (fontSize === void 0) { fontSize = 80; }
     ctx.globalAlpha = alpha;
     ctx.fillStyle = color;
-    ctx.font = "".concat(Math.floor(80 * distScale), "px Bahnschrift");
+    ctx.font = "".concat(Math.floor(fontSize * distScale), "px Bahnschrift");
     ctx.textAlign = 'center';
     var pos = new Vector2(ctx.canvas.width / 2, ctx.canvas.height / 2);
     pos.add(offset);
