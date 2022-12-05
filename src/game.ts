@@ -18,7 +18,7 @@ function restart(): void {
 	drawables = [];
 	if (currentBoss) currentBoss.delete();
 	new player(new Vector2(canv.width / 2, canv.height / 2), 8.5 * distScale);
-	bossTimer = new SecTimer(6, (count) => {
+	bossTimer = new SecTimer(3, (count) => {
 		if (count == 1) {
 			let pos = randomPoint();
 			while (
