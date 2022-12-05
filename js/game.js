@@ -21,7 +21,7 @@ function restart() {
     if (currentBoss)
         currentBoss.delete();
     new player(new Vector2(canv.width / 2, canv.height / 2), 8.5 * distScale);
-    bossTimer = new SecTimer(6, function (count) {
+    bossTimer = new SecTimer(3, function (count) {
         if (count == 1) {
             var pos = randomPoint();
             while (pos.Sub(getPlayer().center).length <
