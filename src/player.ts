@@ -85,10 +85,9 @@ class player extends body {
 			{
 				let bullets: bullet[] = getDrawablesOfType(bullet);
 				let collidingWith = bullets.filter((enemyBullet) => bull.collider.colliding(enemyBullet.collider));
-				if (collidingWith.length != 0) {
-					let foe = collidingWith[0];
-					foe.delete();
-				}
+				collidingWith.forEach(b => {
+					b.delete();
+				})
 			}
 		}, () => {
 			bull.delete();
