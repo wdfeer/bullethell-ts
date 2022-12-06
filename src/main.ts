@@ -1,25 +1,25 @@
-const canv = document.querySelector('canvas')!;
-canv.width = window.innerWidth;
-canv.height = window.innerHeight;
+const canvas = document.querySelector('canvas')!;
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
 function isOffscreenX(x: number) {
-	return x > window.innerWidth;
+	return x > window.innerWidth || x < 0;
 }
 function isOffscreenY(y: number) {
-	return y > window.innerHeight;
+	return y > window.innerHeight || y < 0;
 }
 window.onresize = () => {
 	getCircles().forEach((renderObject) => {
 		if (isOffscreenX(renderObject.center.x))
 			renderObject.center.x =
-				(window.innerWidth * renderObject.center.x) / canv.width;
+				(window.innerWidth * renderObject.center.x) / canvas.width;
 		if (isOffscreenY(renderObject.center.y))
 			renderObject.center.y =
-				(window.innerHeight * renderObject.center.y) / canv.height;
+				(window.innerHeight * renderObject.center.y) / canvas.height;
 	});
-	canv.width = window.innerWidth;
-	canv.height = window.innerHeight;
-	distScale = (canv.width + canv.height) / 2600;
+	canvas.width = window.innerWidth;
+	canvas.height = window.innerHeight;
+	distScale = (canvas.width + canvas.height) / 2600;
 };
 
 const audio = document.querySelector('audio')!;
@@ -36,4 +36,4 @@ document.onmousemove = (event: MouseEvent) => {
 window.onkeydown = (event: KeyboardEvent) => {
 	onKeyDown(event.code);
 };
-canv.addEventListener('click', (event) => onClick(event));
+canvas.addEventListener('click', (event) => onClick(event));

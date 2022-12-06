@@ -11,9 +11,16 @@ class boss1 extends boss {
 		}
 	}
 	onTimeout() {
-
-		this.rangedAttack(16, 2, 9);
-		this.rangedAttack(9, 1, 24, 'rgb(36,36,36)');
+		function columnOfBullets(startingX: number, velocityMultiplier: number, offsetY: boolean) {
+			for (let i = 0; i <= 16; i++) {
+				let point = new Vector2(startingX, canvas.height / 16 * i + (offsetY ? canvas.height / 32 : 0));
+				let b = new bullet(point, new Vector2(3.5 * distScale * velocityMultiplier, 0), canvas.height / 64);
+				b.fillColor = '#2f2f2f';
+				b.bounce = false;
+			}
+		}
+		columnOfBullets(0, 1, true);
+		columnOfBullets(canvas.width, -1, false);
 
 		let score = getPlayer().score;
 		initiateVictory(10 / (score > 0 ? Math.sqrt(score) : 1));
@@ -61,7 +68,7 @@ class boss1 extends boss {
 				}
 				, false);
 		},
-		() => { // Lazer appearing attack
+		() => { // Appearing attack
 			for (let i = 0; i < 100; i++) {
 				bullet.appearingBullet(randomPoint(), 15, 60, 180);
 			}
@@ -104,7 +111,7 @@ class boss1 extends boss {
 			b.timeLeft = timeLeft;
 			b.radius *= size;
 			b.velocity.mult(speed * distScale);
-			b.deflect = deflect;
+			b.bounce = deflect;
 
 			b.velocity.add(this.velocity);
 			b.fillColor = fillColor;

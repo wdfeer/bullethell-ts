@@ -60,7 +60,7 @@ class bullet extends enemy {
 		}
 		return bullets;
 	}
-	public static appearingBullet(center: Vector2, radius: number, appearanceTime: number, lifetime: number = 300): bullet {
+	public static appearingBullet(center: Vector2, radius: number, appearanceTime: number = 60, lifetime: number = 180): bullet {
 		let b = new bullet(center, Vector2.Zero, radius);
 		b.timeLeft = lifetime;
 		b.fillColor = '#0f0f0f'

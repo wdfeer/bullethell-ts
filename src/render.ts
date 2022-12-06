@@ -1,6 +1,6 @@
 function render(): void {
-	let context = canv.getContext('2d')!;
-	context.clearRect(0, 0, canv.width, canv.height);
+	let context = canvas.getContext('2d')!;
+	context.clearRect(0, 0, canvas.width, canvas.height);
 
 	let getZ = (d?: drawable) => {
 		if (d) return d.zIndex;

@@ -1,9 +1,9 @@
 const fps = 60;
 const frameInterval = 1000 / fps;
 
-var distScale = (canv.width + canv.height) / 2600;
+var distScale = (canvas.width + canvas.height) / 2600;
 function randomPoint(): Vector2 {
-	return new Vector2(Math.random() * canv.width, Math.random() * canv.height);
+	return new Vector2(Math.random() * canvas.width, Math.random() * canvas.height);
 }
 
 var currentBoss: boss;
@@ -17,13 +17,13 @@ function restart(): void {
 	updateTimer = new Timer(frameInterval, 9999999, gameUpdate);
 	drawables = [];
 	if (currentBoss) currentBoss.delete();
-	new player(new Vector2(canv.width / 2, canv.height / 2), 8.5 * distScale);
+	new player(new Vector2(canvas.width / 2, canvas.height / 2), 8.5 * distScale);
 	bossTimer = new SecTimer(3, (count) => {
 		if (count == 1) {
 			let pos = randomPoint();
 			while (
 				pos.Sub(getPlayer().center).length <
-				(canv.width + canv.height) / 3
+				(canvas.width + canvas.height) / 3
 			) {
 				pos = randomPoint();
 			}
@@ -48,7 +48,7 @@ function victory(score: number, time: string) {
 		(ctx) => {
 			ctx.globalAlpha = 0.5;
 			ctx.fillStyle = 'white';
-			ctx.fillRect(0, 0, canv.width, canv.height);
+			ctx.fillRect(0, 0, canvas.width, canvas.height);
 		},
 		1,
 		'victoryShade'
@@ -84,7 +84,7 @@ function pause() {
 			(ctx) => {
 				ctx.globalAlpha = 0.5;
 				ctx.fillStyle = 'white';
-				ctx.fillRect(0, 0, canv.width, canv.height);
+				ctx.fillRect(0, 0, canvas.width, canvas.height);
 			},
 			1,
 			'pauseShade'
