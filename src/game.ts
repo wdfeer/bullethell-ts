@@ -30,7 +30,7 @@ function restart(): void {
 			currentBoss = new boss1(pos);
 		}
 	});
-	spawnCoin();
+	new coin(getPlayer().center.Add(Vector2.rotate(new Vector2(150, 0), Math.random() * 360)));
 }
 restart();
 
