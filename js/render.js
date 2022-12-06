@@ -1,7 +1,7 @@
 "use strict";
 function render() {
-    var context = canv.getContext('2d');
-    context.clearRect(0, 0, canv.width, canv.height);
+    var context = canvas.getContext('2d');
+    context.clearRect(0, 0, canvas.width, canvas.height);
     var getZ = function (d) {
         if (d)
             return d.zIndex;

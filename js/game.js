@@ -1,9 +1,9 @@
 "use strict";
 var fps = 60;
 var frameInterval = 1000 / fps;
-var distScale = (canv.width + canv.height) / 2600;
+var distScale = (canvas.width + canvas.height) / 2600;
 function randomPoint() {
-    return new Vector2(Math.random() * canv.width, Math.random() * canv.height);
+    return new Vector2(Math.random() * canvas.width, Math.random() * canvas.height);
 }
 var currentBoss;
 var bossTimer;
@@ -20,12 +20,12 @@ function restart() {
     drawables = [];
     if (currentBoss)
         currentBoss.delete();
-    new player(new Vector2(canv.width / 2, canv.height / 2), 8.5 * distScale);
+    new player(new Vector2(canvas.width / 2, canvas.height / 2), 8.5 * distScale);
     bossTimer = new SecTimer(3, function (count) {
         if (count == 1) {
             var pos = randomPoint();
             while (pos.Sub(getPlayer().center).length <
-                (canv.width + canv.height) / 3) {
+                (canvas.width + canvas.height) / 3) {
                 pos = randomPoint();
             }
             currentBoss = new boss1(pos);
@@ -46,7 +46,7 @@ function victory(score, time) {
     new drawable(function (ctx) {
         ctx.globalAlpha = 0.5;
         ctx.fillStyle = 'white';
-        ctx.fillRect(0, 0, canv.width, canv.height);
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
     }, 1, 'victoryShade');
     new drawable(function (ctx) {
         drawCenteredText(ctx, "Victory!", new Vector2(0, -180 * distScale));
@@ -68,7 +68,7 @@ function pause() {
         new drawable(function (ctx) {
             ctx.globalAlpha = 0.5;
             ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, canv.width, canv.height);
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
         }, 1, 'pauseShade');
         new drawable(function (ctx) {
             drawCenteredText(ctx, 'Paused');

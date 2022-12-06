@@ -63,7 +63,8 @@ var bullet = /** @class */ (function (_super) {
         return bullets;
     };
     bullet.appearingBullet = function (center, radius, appearanceTime, lifetime) {
-        if (lifetime === void 0) { lifetime = 300; }
+        if (appearanceTime === void 0) { appearanceTime = 60; }
+        if (lifetime === void 0) { lifetime = 180; }
         var b = new bullet(center, Vector2.Zero, radius);
         b.timeLeft = lifetime;
         b.fillColor = '#0f0f0f';

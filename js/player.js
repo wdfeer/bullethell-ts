@@ -104,10 +104,9 @@ var player = /** @class */ (function (_super) {
             {
                 var bullets = getDrawablesOfType(bullet);
                 var collidingWith = bullets.filter(function (enemyBullet) { return bull.collider.colliding(enemyBullet.collider); });
-                if (collidingWith.length != 0) {
-                    var foe = collidingWith[0];
-                    foe.delete();
-                }
+                collidingWith.forEach(function (b) {
+                    b.delete();
+                });
             }
         }, function () {
             bull.delete();

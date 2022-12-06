@@ -91,8 +91,16 @@ var boss1 = /** @class */ (function (_super) {
         }
     };
     boss1.prototype.onTimeout = function () {
-        this.rangedAttack(16, 2, 9);
-        this.rangedAttack(9, 1, 24, 'rgb(36,36,36)');
+        function columnOfBullets(startingX, velocityMultiplier, offsetY) {
+            for (var i = 0; i <= 16; i++) {
+                var point = new Vector2(startingX, canvas.height / 16 * i + (offsetY ? canvas.height / 32 : 0));
+                var b = new bullet(point, new Vector2(3.5 * distScale * velocityMultiplier, 0), canvas.height / 64);
+                b.fillColor = '#2f2f2f';
+                b.bounce = false;
+            }
+        }
+        columnOfBullets(0, 1, true);
+        columnOfBullets(canvas.width, -1, false);
         var score = getPlayer().score;
         initiateVictory(10 / (score > 0 ? Math.sqrt(score) : 1));
     };
@@ -119,7 +127,7 @@ var boss1 = /** @class */ (function (_super) {
             b.timeLeft = timeLeft;
             b.radius *= size;
             b.velocity.mult(speed * distScale);
-            b.deflect = deflect;
+            b.bounce = deflect;
             b.velocity.add(_this.velocity);
             b.fillColor = fillColor;
             b.onTimeout = function () {
