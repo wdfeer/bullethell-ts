@@ -2,4 +2,4 @@
 My first html-canvas-based game. A simple Bullet Hell.
 
 # Controls
-Click to change your velocity, Space to Pause, B to delete nearby projectiles
+Click to move, Space to pause, B to delete nearby projectiles
