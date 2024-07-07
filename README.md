@@ -1,4 +1,4 @@
-# tsGame1
+# bullethell-ts
 My first html-canvas-based game. A simple Bullet Hell.
 
 # Controls
